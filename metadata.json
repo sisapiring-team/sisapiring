@@ -1,0 +1,6 @@
+{
+  "name": "SisaRasa — Penyelamat Kuliner UMKM",
+  "description": "Platform pasar kuliner surplus yang menghubungkan masyarakat dengan hidangan segar berlebih dari UMKM lokal dengan potongan harga hingga 60%.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

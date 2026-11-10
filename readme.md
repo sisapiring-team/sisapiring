@@ -22,7 +22,7 @@ Platform pasar kuliner surplus yang menghubungkan masyarakat dengan hidangan seg
    ```bash
    git clone https://github.com/sisapiring-team/sisapiring.git
    cd sisapiring
-   git checkout feature/frontend-app
+   git checkout user-frontend
    ```
 
 2. **Install dependencies**:
@@ -35,3 +35,4 @@ Platform pasar kuliner surplus yang menghubungkan masyarakat dengan hidangan seg
    npm run dev
    ```
    Aplikasi akan berjalan di `http://localhost:3000`.
+

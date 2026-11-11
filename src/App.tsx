@@ -1,3 +1,25 @@
+
+import { AppProvider, useApp } from './context/AppContext';
+import { ToastContainer } from './components/common/ToastContainer';
+import { SellerSidebar } from './components/layout/SellerSidebar';
+import { SellerHeader } from './components/layout/SellerHeader';
+import { MobileNav } from './components/layout/MobileNav';
+
+// Seller Views
+import { SellerDashboardView } from './components/dashboard/SellerDashboardView';
+import { ProductManagementView } from './components/products/ProductManagementView';
+import { OrderManagementView } from './components/orders/OrderManagementView';
+import { RescueDealsView } from './components/rescue/RescueDealsView';
+import { QRPickupVerificationView } from './components/pickup/QRPickupVerificationView';
+import { SalesAnalyticsView } from './components/analytics/SalesAnalyticsView';
+import { StoreProfileView } from './components/profile/StoreProfileView';
+import { SettingsView } from './components/settings/SettingsView';
+import { SellerRegistrationView } from './components/registration/SellerRegistrationView';
+
+import { VerificationBadgeModal } from './components/common/VerificationBadgeModal';
+import { FoodSafetyModal } from './components/products/FoodSafetyModal';
+import { ProductFormModal } from './components/products/ProductFormModal';
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -95,7 +117,8 @@ const DELIVERY_STAGES: {
   },
 ];
 
-export default function App() {
+function CustomerAndAdminPortal() {
+  const { activeTab, setActiveTab } = useApp();
   // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store')
   const [activePage, setActivePage] = useState<
     'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store'
@@ -293,6 +316,7 @@ export default function App() {
   };
 
   const openEtalasePage = () => {
+    setActiveTab('marketplace');
     setActivePage('etalase');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -374,6 +398,7 @@ export default function App() {
   };
 
   const openAdminPage = () => {
+    setActiveTab('admin');
     setActivePage('admin');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -646,6 +671,13 @@ export default function App() {
             </button>
             <button
               type="button"
+              onClick={() => setActiveTab('dashboard')}
+              className="hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              Mitra UMKM
+            </button>
+            <button
+              type="button"
               onClick={openAdminPage}
               className="hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
@@ -653,13 +685,23 @@ export default function App() {
             </button>
           </nav>
 
-          {/* Zone 3: Quick Admin Toggle + Cart Icon + Login/Register */}
+          {/* Zone 3: Quick Portal Switchers + Cart Icon + Login/Register */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setActiveTab('dashboard')}
+              title="Buka Portal Mitra UMKM"
+              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-emerald-400/30 bg-white/10 hover:bg-white/20 text-emerald-200 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <Store className="w-4 h-4 text-emerald-300 shrink-0" />
+              <span className="hidden sm:inline">Mitra UMKM</span>
+            </button>
+
             <button
               type="button"
               onClick={openAdminPage}
               title="Akses Panel Admin & Tata Kelola Platform"
-              className="h-10 px-2.5 sm:px-3 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-amber-300/30 bg-white/10 hover:bg-white/20 text-amber-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-amber-300/30 bg-white/10 hover:bg-white/20 text-amber-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4 text-amber-300 shrink-0" />
               <span className="hidden sm:inline">Panel Admin</span>
@@ -776,6 +818,18 @@ export default function App() {
                         type="button"
                         onClick={() => {
                           setIsAccountMenuOpen(false);
+                          setActiveTab('dashboard');
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                      >
+                        <Store className="w-4 h-4 text-[#16382C] shrink-0" />
+                        <span>Portal Mitra UMKM</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAccountMenuOpen(false);
                           openAdminPage();
                         }}
                         className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
@@ -852,6 +906,7 @@ export default function App() {
             onUpdateUserAccess={handleUpdateUserAccess}
             onAddUserAccount={handleAddUserAccount}
             onSwitchToPublicEtalase={openEtalasePage}
+            onSwitchToSellerPortal={() => setActiveTab('dashboard')}
             onOpenPublicStore={openStorePage}
           />
         </main>
@@ -1802,6 +1857,13 @@ export default function App() {
               </button>
               <button
                 type="button"
+                onClick={() => setActiveTab('dashboard')}
+                className="hover:text-stone-900 font-semibold text-[#16382C] transition-colors cursor-pointer"
+              >
+                Portal Mitra UMKM
+              </button>
+              <button
+                type="button"
                 onClick={openAdminPage}
                 className="hover:text-stone-900 font-semibold text-[#16382C] transition-colors cursor-pointer"
               >
@@ -2328,5 +2390,89 @@ export default function App() {
         </nav>
       )}
     </div>
+  );
+}
+
+
+const SellerPortalContent: React.FC = () => {
+  const {
+    activeTab,
+    isAddProductModalOpen,
+    setIsAddProductModalOpen,
+    isVerificationModalOpen,
+    setIsVerificationModalOpen,
+    isFoodSafetyModalOpen,
+    setIsFoodSafetyModalOpen,
+    addProduct,
+  } = useApp();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <div className="flex h-screen w-full bg-[#FAF9F6] text-[#292929] overflow-hidden">
+      {/* Desktop Sidebar (lg:flex) */}
+      <div className="hidden lg:flex shrink-0">
+        <SellerSidebar />
+      </div>
+
+      {/* Mobile Nav Drawer & Floating Bottom Bar */}
+      <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+
+      {/* Main Viewport */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Header Bar */}
+        <SellerHeader onMobileMenuToggle={() => setMobileMenuOpen(true)} />
+
+        {/* Scrollable Content View */}
+        <main className="flex-1 overflow-y-auto pb-20 lg:pb-8 focus:outline-none">
+          {activeTab === 'dashboard' && <SellerDashboardView />}
+          {activeTab === 'products' && <ProductManagementView />}
+          {activeTab === 'orders' && <OrderManagementView />}
+          {activeTab === 'rescue_deals' && <RescueDealsView />}
+          {activeTab === 'qr_pickup' && <QRPickupVerificationView />}
+          {activeTab === 'analytics' && <SalesAnalyticsView />}
+          {activeTab === 'profile' && <StoreProfileView />}
+          {activeTab === 'settings' && <SettingsView />}
+          {activeTab === 'registration' && <SellerRegistrationView />}
+        </main>
+      </div>
+
+      {/* Global Modals for Interactive Merchant Actions */}
+      <ProductFormModal
+        isOpen={isAddProductModalOpen}
+        onClose={() => setIsAddProductModalOpen(false)}
+        onSave={(data) => addProduct(data)}
+      />
+
+      <VerificationBadgeModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+      />
+
+      <FoodSafetyModal
+        isOpen={isFoodSafetyModalOpen}
+        onClose={() => setIsFoodSafetyModalOpen(false)}
+      />
+
+      {/* Global Toast Feedback */}
+      <ToastContainer />
+    </div>
+  );
+};
+
+function MainAppDispatcher() {
+  const { activeTab } = useApp();
+
+  if (activeTab === 'admin' || activeTab === 'marketplace') {
+    return <CustomerAndAdminPortal />;
+  }
+
+  return <SellerPortalContent />;
+}
+
+export default function App() {
+  return (
+    <AppProvider>
+      <MainAppDispatcher />
+    </AppProvider>
   );
 }

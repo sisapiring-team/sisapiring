@@ -100,6 +100,7 @@ interface AdminDashboardPageProps {
   ) => void;
   onAddUserAccount: (newUser: UserAccessRecord) => void;
   onSwitchToPublicEtalase: () => void;
+  onSwitchToSellerPortal?: () => void;
   onOpenPublicStore: (merchantName: string) => void;
 }
 
@@ -120,6 +121,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   onUpdateUserAccess,
   onAddUserAccount,
   onSwitchToPublicEtalase,
+  onSwitchToSellerPortal,
   onOpenPublicStore,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminModuleTab>('macro-impact');
@@ -435,13 +437,24 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
               Pusat Tata Kelola & Keamanan Pangan
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onSwitchToPublicEtalase}
-            className="lg:hidden px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white cursor-pointer whitespace-nowrap"
-          >
-            Lihat Etalase
-          </button>
+          <div className="flex items-center gap-1.5 lg:hidden">
+            <button
+              type="button"
+              onClick={onSwitchToPublicEtalase}
+              className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white cursor-pointer whitespace-nowrap"
+            >
+              Etalase
+            </button>
+            {onSwitchToSellerPortal && (
+              <button
+                type="button"
+                onClick={onSwitchToSellerPortal}
+                className="px-2.5 py-1.5 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-xs font-medium text-white cursor-pointer whitespace-nowrap"
+              >
+                Mitra UMKM
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Navigation Links */}
@@ -514,6 +527,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
             <span>Buka Etalase Pembeli</span>
             <ExternalLink className="w-3.5 h-3.5 text-amber-300" />
           </button>
+          {onSwitchToSellerPortal && (
+            <button
+              type="button"
+              onClick={onSwitchToSellerPortal}
+              className="w-full h-9 px-3 rounded-lg bg-emerald-900/60 hover:bg-emerald-900/90 text-emerald-200 text-xs font-medium inline-flex items-center justify-between transition-colors cursor-pointer border border-emerald-700/50"
+            >
+              <span>Buka Portal Mitra UMKM</span>
+              <Store className="w-3.5 h-3.5 text-emerald-300" />
+            </button>
+          )}
         </div>
       </aside>
 

@@ -1,6 +1,6 @@
 {
-  "name": "SisaRasa (SisaPiring) — Penyelamat Kuliner UMKM & Admin Governance",
-  "description": "Platform pasar kuliner surplus dan tata kelola terpadu yang menghubungkan masyarakat dengan hidangan segar berlebih dari UMKM lokal dengan potongan harga hingga 60%, dilengkapi dengan Admin Governance Console.",
+  "name": "SisaPiring (SisaRasa) — Ekosistem Terpadu Penyelamat Kuliner UMKM",
+  "description": "Platform pasar kuliner surplus terpadu yang mengintegrasikan Pasar Konsumen, Portal Mitra UMKM Bandung, dan Pusat Tata Kelola Admin (Governance Console) untuk pencegahan food waste dan pemberdayaan ekonomi kuliner lokal.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

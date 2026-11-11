@@ -1,58 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SisaPiring (SisaRasa — Penyelamat Kuliner UMKM)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Platform pasar kuliner sisa piring terpadu yang menghubungkan masyarakat dengan hidangan segar berlebih dari UMKM lokal dengan potongan harga hingga 60%, dilengkapi dengan Portal Mitra UMKM Kota Bandung dan Pusat Tata Kelola Admin (Platform Governance & Control Console).
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🌟 Ekosistem Platform Terpadu (Unified 3-in-1 Platform)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+SisaPiring menyatukan tiga pilar utama dalam satu platform:
+1. **Portal Konsumen (Customer Marketplace)**: Tempat warga menemukan, memesan, dan menyelamatkan hidangan berlebih dari UMKM lokal dengan potongan harga hingga 60%, kalkulator dampak lingkungan, dan pelacakan pesanan.
+2. **Portal Mitra UMKM (Seller / Merchant Portal)**: Dashboard interaktif bagi pelaku usaha kuliner di Kota Bandung untuk mengelola stok sisa piring, rekomendasi diskon pintar otomatis (50%, 70%, 90%, 100% donasi), verifikasi pengambilan via QR Code, deklarasi keamanan pangan, analitik penjualan, dan registrasi KYB.
+3. **Pusat Tata Kelola Admin (Platform Governance & Control Console)**: Pengawasan kepatuhan legalitas (NIB, KTP, Halal/PIRT), monitoring mutu produk & prep window, investigasi manipulasi diskon semu, resolusi komplain & refund escrow, serta analitik makro kota Bandung.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 Fitur Lengkap Per Modul
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 👥 1. Modul Konsumen (User Marketplace)
+- **Etalase Sisa Piring Interaktif**: Filter kategori kuliner, filter radius wilayah, jam batas konsumsi aman (*prep window*).
+- **Katalog Toko Mitra (Store Profile)**: Profil gerai, jam operasional, ulasan dan penilaian bintang.
+- **Kantong Penyelamatan (Cart) & Checkout**: Pilihan pembayaran QRIS Terintegrasi, VA/E-Wallet, atau COD Kasir.
+- **Pelacakan Pesanan Real-Time**: Status pesanan bertahap (Menunggu Konfirmasi -> Disiapkan Mitra -> Siap Ambil / Diantar -> Selesai).
+- **Sistem Rating & Ulasan Transparan**: Ulasan produk dan bintang pasca-transaksi.
+- **Pusat Komplain & Garansi Keamanan**: Form pelaporan makanan bermasalah dengan integrasi ke tim sengketa admin dan pengembalian dana escrow.
+- **Impact Calculator**: Kalkulasi otomatis penghematan emisi CO2e, sampah pangan dicegah (kg), air bersih (L), dan nominal rupiah dihemat.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🏪 2. Modul Mitra UMKM (Seller Portal Bandung)
+- **Seller Dashboard**: Ringkasan performa harian (porsi diselamatkan, pendapatan sisa piring, pesanan aktif, jam operasional toko).
+- **Manajemen Produk Sisa Piring**: Tambah hidangan sisa piring, pengaturan stok real-time, waktu batas aman konsumsi.
+- **Discount Suggestion Engine**: Rekomendasi diskon otomatis bertahap (50%, 70%, 90%, 100% donasi) berbasis sisa jam konsumsi dan volume stok.
+- **Verifikasi Pengambilan QR (QR Pickup Scanner)**: Validasi serah terima pesanan secara instan dengan verifikasi kode QR pesanan pembeli.
+- **Deklarasi Standar Higienitas & Keamanan Pangan**: Pengecekan komitmen mutu sebelum merilis hidangan sisa piring ke etalase.
+- **Analitik Penjualan & Dampak UMKM**: Visualisasi omzet sisa piring yang berhasil diselamatkan dan tren penyelamatan harian.
+- **Profil Gerai & Pengaturan Toko**: Manajemen info toko, jadwal operasional, dan pengaturan notifikasi.
+- **Registrasi Mitra Baru (KYB Onboarding)**: Formulir pengajuan izin usaha, NIB, sertifikasi halal/PIRT untuk ditinjau admin.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🛡️ 3. Modul Tata Kelola Admin (Admin Governance Console)
+- **Macro Environmental & Economic Impact Dashboard**: Analitik makro metrik dampak lingkungan makro (porsi diselamatkan, sampah pangan terhindarkan, reduksi emisi CO2e, air bersih terselamatkan), pendapatan UMKM yang dipulihkan, partisipasi per kecamatan (Coblong, Lengkong, Sukasari, dll.), dan ekspor laporan ke CSV.
+- **Verifikasi Legalitas & Higienitas UMKM (Seller Onboarding KYB)**: Validasi NIB, KTP pemilik usaha, nomor sertifikasi Halal / PIRT, foto dapur/gerai, serta penandatanganan komitmen higienitas pangan.
+- **Monitoring Produk & Kontrol Keamanan Pangan**: Pemantauan kesegaran hidangan sisa piring, kontrol prep window, dan fitur penarikan/pembekuan (*Take Down*) atas produk yang tidak aman.
+- **Investigasi Manipulasi Harga & Diskon Semu**: Sistem deteksi anomali untuk mencegah UMKM menaikkan harga normal secara fiktif sebelum menerapkan diskon penyelamatan.
+- **Penyelesaian Sengketa Pelanggan (Dispute Resolution)**: Penanganan tiket laporan pembeli dengan investigasi cepat, fasilitas eksekusi *refund* otomatis ke pembeli dari dana *escrow*, serta penjatuhan sanksi peringatan/suspensi gerai.
+- **Monitoring Transaksi & Pembayaran Escrow**: Pemantauan status gerbang pembayaran (*Escrow*, *Settled*, *Refunded*, *Dibatalkan*).
+- **Manajemen Hak Akses Pengguna (RBAC)**: Pengelolaan akun pengguna lintas peran (*Buyer*, *UMKM Partner*, *Admin Platform*) serta pemberian sanksi akun (*Aktif*, *Peringatan*, *Suspended*).
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🛠️ Tech Stack
+
+- **Framework**: React 19 + TypeScript
+- **Bundler**: Vite 8
+- **Styling**: Tailwind CSS v4
+- **Motion**: Motion (Framer Motion)
+- **Icons**: Lucide React
+- **AI Integration**: Google GenAI SDK (`@google/genai`)
+
+---
+
+## 💻 Menjalankan Secara Lokal
 
 ```bash
-composer require laravel/boost --dev
+# 1. Install dependencies
+npm install
 
-php artisan boost:install
+# 2. Jalankan server development
+npm run dev
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Aplikasi dapat diakses di:
+👉 `http://localhost:3000`
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🔄 Navigasi Antar Peran (Portal Switcher)
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Platform ini dilengkapi pengalih peran instan di bilah navigasi atas:
+- **🛍️ Konsumen**: Akses etalase sisa piring, keranjang, pesanan, dan ulasan.
+- **🏪 Mitra UMKM**: Akses dashboard penjual, kelola produk, diskon kilat, dan QR scanner.
+- **🛡️ Admin**: Akses dashboard tata kelola, verifikasi UMKM, investigasi manipulasi, dan analitik makro.

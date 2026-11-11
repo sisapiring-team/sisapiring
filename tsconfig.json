@@ -18,11 +18,24 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": [
-        "./*"
+        "./*",
+        "./src/*",
+        "./resources/js/*"
+      ],
+      "ziggy-js": [
+        "./vendor/tightenco/ziggy"
       ]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "exclude": ["dist"]
+  "include": [
+    "src/**/*",
+    "resources/js/**/*"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "vendor"
+  ]
 }

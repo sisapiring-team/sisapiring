@@ -81,9 +81,8 @@ export const ReviewsModerationTab: React.FC = () => {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-3.5 h-3.5 ${
-                      i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-neutral-200'
-                    }`}
+                    className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-neutral-200'
+                      }`}
                   />
                 ))}
               </div>
@@ -113,3 +112,4 @@ export const ReviewsModerationTab: React.FC = () => {
     </div>
   );
 };
+

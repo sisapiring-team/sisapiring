@@ -94,3 +94,4 @@ export const DisputeResolutionModal: React.FC<DisputeResolutionModalProps> = ({
     </div>
   );
 };
+

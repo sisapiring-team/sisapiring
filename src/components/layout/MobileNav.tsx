@@ -11,6 +11,7 @@ import {
   X,
   FileCheck,
   ShoppingBag as MarketplaceIcon,
+  ShieldCheck,
 } from 'lucide-react';
 import { ActiveTab, useApp } from '../../context/AppContext';
 
@@ -110,13 +111,20 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
               })}
             </nav>
 
-            <div className="p-3 border-t border-white/10">
+            <div className="p-3 border-t border-white/10 space-y-2">
               <button
                 onClick={() => handleSelect('marketplace')}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold bg-[#FAF9F6] text-[#16382C]"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold bg-[#FAF9F6] text-[#16382C] cursor-pointer"
               >
                 <MarketplaceIcon className="w-4 h-4 text-[#EE4D2D]" />
                 <span>Lihat Etalase Pembeli</span>
+              </button>
+              <button
+                onClick={() => handleSelect('admin')}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold bg-amber-400/20 text-amber-300 border border-amber-300/30 cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-300" />
+                <span>Panel Admin Platform</span>
               </button>
             </div>
           </div>

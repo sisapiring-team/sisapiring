@@ -141,13 +141,12 @@ export const OrderEscrowTab: React.FC<OrderEscrowTabProps> = ({
                   </td>
                   <td className="py-3.5 px-4">
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        trx.gatewayStatus === 'Selesai (Settled)'
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${trx.gatewayStatus === 'Selesai (Settled)'
                           ? 'bg-emerald-100 text-emerald-800'
                           : trx.gatewayStatus === 'Dana Ditahan (Escrow)'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-rose-100 text-rose-800'
-                      }`}
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-rose-100 text-rose-800'
+                        }`}
                     >
                       {trx.gatewayStatus === 'Selesai (Settled)' && (
                         <CheckCircle2 className="w-3 h-3 text-emerald-700" />
@@ -180,3 +179,4 @@ export const OrderEscrowTab: React.FC<OrderEscrowTabProps> = ({
     </div>
   );
 };
+

@@ -167,15 +167,14 @@ export const SellerGovernanceTab: React.FC<SellerGovernanceTabProps> = ({
                   </td>
                   <td className="py-3.5 px-4">
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        umkm.status === 'Verified'
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${umkm.status === 'Verified'
                           ? 'bg-emerald-100 text-emerald-800'
                           : umkm.status === 'Menunggu Verifikasi'
-                          ? 'bg-amber-100 text-amber-800'
-                          : umkm.status === 'Suspended'
-                          ? 'bg-rose-100 text-rose-800'
-                          : 'bg-neutral-100 text-neutral-700'
-                      }`}
+                            ? 'bg-amber-100 text-amber-800'
+                            : umkm.status === 'Suspended'
+                              ? 'bg-rose-100 text-rose-800'
+                              : 'bg-neutral-100 text-neutral-700'
+                        }`}
                     >
                       {umkm.status === 'Verified' && <CheckCircle2 className="w-3 h-3 text-emerald-700" />}
                       {umkm.status === 'Menunggu Verifikasi' && <Clock className="w-3 h-3 text-amber-700" />}
@@ -202,3 +201,4 @@ export const SellerGovernanceTab: React.FC<SellerGovernanceTabProps> = ({
     </div>
   );
 };
+

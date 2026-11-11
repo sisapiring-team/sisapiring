@@ -36,3 +36,4 @@ export interface AdminMacroStats {
   openDisputesCount: number;
   totalEscrowHeld: number;
 }
+

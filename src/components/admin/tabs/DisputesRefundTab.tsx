@@ -80,11 +80,10 @@ export const DisputesRefundTab: React.FC<DisputesRefundTabProps> = ({
                       #{dispute.ticketCode}
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        dispute.severity.includes('Kritis')
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${dispute.severity.includes('Kritis')
                           ? 'bg-rose-100 text-rose-800'
                           : 'bg-amber-100 text-amber-800'
-                      }`}
+                        }`}
                     >
                       {dispute.severity}
                     </span>
@@ -98,9 +97,8 @@ export const DisputesRefundTab: React.FC<DisputesRefundTabProps> = ({
                 </div>
 
                 <span
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${
-                    isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
-                  }`}
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}
                 >
                   {dispute.status}
                 </span>
@@ -157,3 +155,4 @@ export const DisputesRefundTab: React.FC<DisputesRefundTabProps> = ({
     </div>
   );
 };
+

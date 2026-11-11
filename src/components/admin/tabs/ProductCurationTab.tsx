@@ -100,9 +100,8 @@ export const ProductCurationTab: React.FC<ProductCurationTabProps> = ({
                 return (
                   <tr
                     key={item.id}
-                    className={`hover:bg-neutral-50/70 transition-colors ${
-                      isTakenDown ? 'bg-rose-50/40 opacity-80' : ''
-                    }`}
+                    className={`hover:bg-neutral-50/70 transition-colors ${isTakenDown ? 'bg-rose-50/40 opacity-80' : ''
+                      }`}
                   >
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
@@ -153,13 +152,12 @@ export const ProductCurationTab: React.FC<ProductCurationTabProps> = ({
                     </td>
                     <td className="py-3.5 px-4">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                          meta.monitoringStatus === 'Aktif & Aman'
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${meta.monitoringStatus === 'Aktif & Aman'
                             ? 'bg-emerald-100 text-emerald-800'
                             : meta.monitoringStatus === 'Dalam Tinjauan'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-rose-100 text-rose-800'
-                        }`}
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-rose-100 text-rose-800'
+                          }`}
                       >
                         {meta.monitoringStatus === 'Aktif & Aman' && (
                           <CheckCircle2 className="w-3 h-3 text-emerald-700" />
@@ -206,3 +204,4 @@ export const ProductCurationTab: React.FC<ProductCurationTabProps> = ({
     </div>
   );
 };
+

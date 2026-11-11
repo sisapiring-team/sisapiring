@@ -108,23 +108,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 key={tab.id}
                 type="button"
                 onClick={() => onTabChange(tab.id as AdminTab)}
-                className={`flex items-center gap-2 py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap transition-colors border-b-2 cursor-pointer ${
-                  isActive
+                className={`flex items-center gap-2 py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap transition-colors border-b-2 cursor-pointer ${isActive
                     ? 'border-amber-400 text-white bg-white/5 font-bold'
                     : 'border-transparent text-emerald-200/70 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <Icon
-                  className={`w-3.5 h-3.5 ${
-                    isActive ? 'text-amber-400' : 'text-emerald-300/70'
-                  }`}
+                  className={`w-3.5 h-3.5 ${isActive ? 'text-amber-400' : 'text-emerald-300/70'
+                    }`}
                 />
                 <span>{tab.label}</span>
                 {tab.badge !== undefined && tab.badge > 0 && (
                   <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold text-white ${
-                      tab.badgeColor || 'bg-amber-500'
-                    }`}
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold text-white ${tab.badgeColor || 'bg-amber-500'
+                      }`}
                   >
                     {tab.badge}
                   </span>
@@ -137,3 +134,4 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     </header>
   );
 };
+

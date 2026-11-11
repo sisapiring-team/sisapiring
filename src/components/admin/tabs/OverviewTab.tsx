@@ -260,11 +260,10 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                 </span>
               </div>
               <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                  macroStats.openDisputesCount > 0
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${macroStats.openDisputesCount > 0
                     ? 'bg-rose-100 text-rose-800 font-bold'
                     : 'bg-emerald-100 text-emerald-800'
-                }`}
+                  }`}
               >
                 {macroStats.openDisputesCount > 0 ? 'Perlu Ditindak' : 'Semua Beres'}
               </span>
@@ -343,3 +342,4 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
     </div>
   );
 };
+

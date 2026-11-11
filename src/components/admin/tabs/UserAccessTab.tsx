@@ -73,13 +73,12 @@ export const UserAccessTab: React.FC<UserAccessTabProps> = ({
                   </td>
                   <td className="py-3.5 px-4">
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        u.role === 'Admin'
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${u.role === 'Admin'
                           ? 'bg-amber-100 text-amber-800'
                           : u.role === 'UMKM'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-sky-100 text-sky-800'
-                      }`}
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-sky-100 text-sky-800'
+                        }`}
                     >
                       {u.role}
                     </span>
@@ -87,13 +86,12 @@ export const UserAccessTab: React.FC<UserAccessTabProps> = ({
                   <td className="py-3.5 px-4 font-semibold text-neutral-800">{u.district}</td>
                   <td className="py-3.5 px-4">
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        u.status === 'Aktif'
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${u.status === 'Aktif'
                           ? 'bg-emerald-100 text-emerald-800'
                           : u.status === 'Peringatan (Warning)'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-rose-100 text-rose-800'
-                      }`}
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-rose-100 text-rose-800'
+                        }`}
                     >
                       {u.status}
                     </span>
@@ -126,3 +124,4 @@ export const UserAccessTab: React.FC<UserAccessTabProps> = ({
     </div>
   );
 };
+

@@ -170,6 +170,26 @@ export interface MacroPeriodStats {
 
 export const INITIAL_UMKM_VERIFICATIONS: UmkmVerificationRecord[] = [
   {
+    id: 'umkm-ver-00',
+    storeName: 'Kala Bakehouse & Artisan Cafe',
+    ownerName: 'Kang Ridwan Sasmita',
+    email: 'ridwan@kalabakehouse.id',
+    phone: '+62 812-2345-6789',
+    category: 'Roti, Kue & Pastry',
+    district: 'Bandung Wetan (Citarum / Progo)',
+    address: 'Jl. Progo No. 14, Citarum, Bandung Wetan, Bandung',
+    submittedAt: 'Kemarin · 10.15 WIB',
+    status: 'Verified',
+    nibNumber: '02847291038',
+    ktpMasked: '327310******0019',
+    halalOrPirtNumber: 'ID32110009847120425',
+    docType: 'NIB Berusaha & Sertifikasi Higiene Sanitasi Pangan',
+    docFileName: 'NIB_02847291038_KalaBakehouse.pdf',
+    storePhotoUrl: '/src/assets/images/sisapiring_storefront_1794322286782.jpg',
+    hygieneCommitmentSigned: true,
+    adminNotes: 'Mitra resmi terverifikasi. Standar dapur higienis, fasilitas pendingin terjaga, dan komitmen anti-food waste telah disetujui kurator SisaPiring.',
+  },
+  {
     id: 'umkm-ver-01',
     storeName: 'Kue Balok & Kopi Lengkong Jaya',
     ownerName: 'Kang Asep Sunandar',

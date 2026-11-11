@@ -160,6 +160,32 @@ export const INITIAL_PRODUCTS: SurplusProduct[] = [
 
 export const INITIAL_ORDERS: Order[] = [
   {
+    id: 'SP-BDG-2026-084',
+    pickupCode: 'SP-8421',
+    customerName: 'Nabil Rachman (Warga Coblong)',
+    customerPhone: '081234567890',
+    items: [
+      {
+        productId: 'PRD-001',
+        productName: 'Artisan Butter Croissant & Pain au Chocolat (Paket 3 Pcs)',
+        category: 'Bakery & Roti',
+        pricePerItem: 32500,
+        quantity: 1,
+        image: '/src/assets/images/sisapiring_bakery_1794322284427.jpg',
+      },
+    ],
+    totalPayment: 32500,
+    orderDate: 'Hari ini · 16.40 WIB',
+    pickupDeadline: 'Hari ini, 21:00 WIB',
+    status: 'ready_for_pickup',
+    statusHistory: [
+      { status: 'waiting_confirmation', timestamp: 'Hari ini · 16.40 WIB' },
+      { status: 'confirmed', timestamp: 'Hari ini · 16.45 WIB' },
+      { status: 'ready_for_pickup', timestamp: 'Hari ini · 16.50 WIB', note: 'Pesanan telah siap diambil di gerai Kala Bakehouse Progo' },
+    ],
+    isVerifiedByQR: false,
+  },
+  {
     id: 'SP-BDG-2026-081',
     pickupCode: 'SP-7842',
     customerName: 'Dinda Maharani (Mahasiswi ITB)',

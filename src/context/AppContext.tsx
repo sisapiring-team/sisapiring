@@ -44,6 +44,7 @@ interface AppContextType {
     customerName: string,
     customerPhone: string
   ) => Order;
+  registerCustomerOrder: (order: Order) => void;
   ordersFilterStatus: 'all' | OrderStatus;
   setOrdersFilterStatus: (status: 'all' | OrderStatus) => void;
   navigateToOrdersWithFilter: (status: 'all' | OrderStatus) => void;
@@ -469,6 +470,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newOrder;
   };
 
+  const registerCustomerOrder = (newOrder: Order) => {
+    setOrders((prev) => {
+      if (prev.some((o) => o.id === newOrder.id || o.pickupCode === newOrder.pickupCode)) {
+        return prev;
+      }
+      return [newOrder, ...prev];
+    });
+    showToast(
+      'Pesanan Masuk dari Etalase!',
+      `Pesanan #${newOrder.pickupCode} (${newOrder.customerName}) siap dikonfirmasi di antrean.`,
+      'info'
+    );
+  };
+
   const resetAllDemoData = () => {
     setSellerProfile(INITIAL_SELLER_PROFILE);
     setProducts(INITIAL_PRODUCTS);
@@ -513,6 +528,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         cancelOrder,
         verifyPickupCode,
         createCustomerOrder,
+        registerCustomerOrder,
         toasts,
         showToast,
         removeToast,

@@ -118,7 +118,15 @@ const DELIVERY_STAGES: {
 ];
 
 function CustomerAndAdminPortal() {
-  const { activeTab, setActiveTab } = useApp();
+  const {
+    activeTab,
+    setActiveTab,
+    products: sellerProducts,
+    orders: sellerOrders,
+    registerCustomerOrder,
+    updateProduct,
+    setVerificationStatus,
+  } = useApp();
   // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store')
   const [activePage, setActivePage] = useState<
     'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store'
@@ -220,6 +228,62 @@ function CustomerAndAdminPortal() {
   ]);
   const [activeProductModal, setActiveProductModal] = useState<SurplusItem | null>(null);
   const [recentToast, setRecentToast] = useState<string | null>(null);
+
+  // Two-way synchronization: If Seller updates order in Seller Portal (Confirmed, Ready for Pickup, QR Verified / Completed),
+  // update the corresponding customer order in Customer Marketplace
+  React.useEffect(() => {
+    setOrders((prevCustomerOrders) =>
+      prevCustomerOrders.map((custOrder) => {
+        const matchedSellerOrder = sellerOrders.find(
+          (so) => so.pickupCode === custOrder.orderCode || so.id === custOrder.orderCode
+        );
+        if (!matchedSellerOrder) return custOrder;
+
+        let nextStage = custOrder.deliveryStage;
+        let nextStatus = custOrder.status;
+
+        if (matchedSellerOrder.status === 'confirmed') {
+          nextStage = 'diterima';
+          nextStatus = 'siap-diambil';
+        } else if (matchedSellerOrder.status === 'ready_for_pickup') {
+          nextStage = 'perjalanan';
+          nextStatus = 'siap-diambil';
+        } else if (matchedSellerOrder.status === 'completed' || matchedSellerOrder.isVerifiedByQR) {
+          nextStage = 'sampai';
+          nextStatus = 'selesai';
+        }
+
+        if (nextStage !== custOrder.deliveryStage || nextStatus !== custOrder.status) {
+          return {
+            ...custOrder,
+            deliveryStage: nextStage,
+            status: nextStatus,
+          };
+        }
+        return custOrder;
+      })
+    );
+  }, [sellerOrders]);
+
+  // Two-way synchronization: If Seller adjusts product price/discount in Seller Portal (Rescue Deals),
+  // update the product in Customer Marketplace catalog
+  React.useEffect(() => {
+    setCatalogItems((prevItems) =>
+      prevItems.map((item) => {
+        const sellerProduct = sellerProducts.find((sp) => sp.id === item.id);
+        if (sellerProduct) {
+          return {
+            ...item,
+            originalPrice: sellerProduct.originalPrice,
+            rescuePrice: sellerProduct.discountedPrice,
+            discountPercent: sellerProduct.discountPercentage,
+            remainingStock: sellerProduct.stock,
+          };
+        }
+        return item;
+      })
+    );
+  }, [sellerProducts]);
 
   // Partner Lead Capture Form State (on Landing Page)
   const [registrationRole, setRegistrationRole] = useState<'mitra' | 'warga'>('mitra');
@@ -389,6 +453,38 @@ function CustomerAndAdminPortal() {
       };
       setAdminTransactions((prev) => [newTrx, ...prev]);
     }
+
+    // Two-way synchronization: Bridge order to Seller Portal
+    registerCustomerOrder({
+      id: `SP-BDG-2026-${Math.floor(100 + Math.random() * 900)}`,
+      pickupCode: newOrder.orderCode,
+      customerName: newOrder.name,
+      customerPhone: newOrder.phone,
+      items: newOrder.items.map(({ item, quantity }) => ({
+        productId: item.id,
+        productName: item.title,
+        category: (item.category === 'Roti'
+          ? 'Bakery & Roti'
+          : item.category === 'Nasi & Lauk'
+          ? 'Katering & Nasi Kotak'
+          : 'Kue & Pastry') as any,
+        pricePerItem: item.rescuePrice,
+        quantity,
+        image: item.imageUrl,
+      })),
+      totalPayment: newOrder.totalPaid,
+      orderDate: newOrder.createdAt,
+      pickupDeadline: 'Hari ini, 21:30 WIB',
+      status: 'waiting_confirmation',
+      statusHistory: [
+        {
+          status: 'waiting_confirmation',
+          timestamp: newOrder.createdAt,
+          note: 'Pesanan masuk dari etalase pelanggan SisaPiring',
+        },
+      ],
+      isVerifiedByQR: false,
+    });
   };
 
   const openStorePage = (merchantName: string) => {
@@ -440,6 +536,16 @@ function CustomerAndAdminPortal() {
         u.id === id ? { ...u, status, adminNotes: notes } : u
       )
     );
+    if (id === 'umkm-ver-00') {
+      setVerificationStatus(
+        status === 'Verified'
+          ? 'verified'
+          : status === 'Ditolak'
+          ? 'rejected'
+          : 'pending_review',
+        notes
+      );
+    }
   };
 
   const handleAddSimulatedUmkm = (record: UmkmVerificationRecord) => {
@@ -465,6 +571,11 @@ function CustomerAndAdminPortal() {
         takedownReason: status === 'Take Down' ? reason : undefined,
       },
     }));
+    if (status === 'Take Down') {
+      updateProduct(itemId, { isActive: false });
+    } else if (status === 'Aktif & Aman') {
+      updateProduct(itemId, { isActive: true });
+    }
   };
 
   const handleCorrectProductPrice = (
@@ -487,6 +598,7 @@ function CustomerAndAdminPortal() {
         };
       })
     );
+    updateProduct(itemId, { originalPrice: correctedOriginalPrice });
     setDiscountHistory((prev) =>
       prev.map((dh) =>
         dh.id === discountEntryId

@@ -109,17 +109,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 key={item.id}
                 type="button"
                 onClick={() => onTabChange(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs transition-colors cursor-pointer text-left ${
-                  isActive
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs transition-colors cursor-pointer text-left ${isActive
                     ? 'bg-emerald-800 text-white font-bold border border-emerald-600/40 shadow-sm'
                     : 'text-emerald-100/75 hover:bg-white/5 hover:text-white'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                      isActive ? 'bg-amber-400 text-neutral-950' : 'bg-white/10 text-emerald-300'
-                    }`}
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${isActive ? 'bg-amber-400 text-neutral-950' : 'bg-white/10 text-emerald-300'
+                      }`}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
@@ -130,9 +128,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 </div>
                 {item.badge !== undefined && item.badge > 0 && (
                   <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold text-white ${
-                      item.badgeColor || 'bg-amber-500'
-                    }`}
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold text-white ${item.badgeColor || 'bg-amber-500'
+                      }`}
                   >
                     {item.badge}
                   </span>
@@ -211,11 +208,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => onTabChange(item.id)}
-                className={`w-11 h-11 xl:w-12 xl:h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer relative ${
-                  isActive
+                className={`w-11 h-11 xl:w-12 xl:h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer relative ${isActive
                     ? 'bg-amber-400 text-neutral-950 font-bold shadow-md shadow-amber-400/20 scale-105'
                     : 'text-emerald-100/70 hover:bg-white/10 hover:text-white hover:scale-105'
-                }`}
+                  }`}
                 aria-label={item.label}
               >
                 <Icon className="w-5 h-5" />
@@ -223,9 +219,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 {/* Counter Badge Dot */}
                 {item.badge !== undefined && item.badge > 0 && (
                   <span
-                    className={`absolute -top-1 -right-1 w-4 h-4 rounded-full ${
-                      item.badgeColor || 'bg-amber-500'
-                    } text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs border-2 border-[#122e24]`}
+                    className={`absolute -top-1 -right-1 w-4 h-4 rounded-full ${item.badgeColor || 'bg-amber-500'
+                      } text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs border-2 border-[#122e24]`}
                   >
                     {item.badge}
                   </span>
@@ -238,9 +233,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   <span className="font-bold text-xs text-white">{item.label}</span>
                   {item.badge !== undefined && item.badge > 0 && (
                     <span
-                      className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold text-white ${
-                        item.badgeColor || 'bg-amber-500'
-                      }`}
+                      className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold text-white ${item.badgeColor || 'bg-amber-500'
+                        }`}
                     >
                       {item.badge}
                     </span>

@@ -102,7 +102,7 @@ export const SettingsView: React.FC = () => {
         <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-4">
           <div className="flex items-center gap-2.5 pb-3 border-b border-neutral-100">
             <Sparkles className="w-5 h-5 text-[#EE4D2D]" />
-            <h3 className="text-sm font-bold text-neutral-800">Otomatisasi Surplus Rescue</h3>
+            <h3 className="text-sm font-bold text-neutral-800">Otomatisasi Sisa Piring Rescue</h3>
           </div>
 
           <div className="space-y-3 text-xs">
@@ -132,7 +132,7 @@ export const SettingsView: React.FC = () => {
               <div>
                 <p className="font-semibold text-neutral-800">Tutup Etalase Otomatis Bila Stok Habis</p>
                 <p className="text-neutral-500 text-[11px]">
-                  Ubah status toko menjadi nonaktif sementara jika seluruh stok surplus sudah habis terjual.
+                  Ubah status toko menjadi nonaktif sementara jika seluruh stok sisa piring sudah habis terjual.
                 </p>
               </div>
               <button
@@ -189,7 +189,7 @@ export const SettingsView: React.FC = () => {
       <ConfirmationModal
         isOpen={showResetModal}
         title="Reset Semua Data Demo?"
-        message="Tindakan ini akan mengembalikan seluruh produk surplus, pesanan, dan profil UMKM ke data awal bawaan sistem."
+        message="Tindakan ini akan mengembalikan seluruh produk sisa piring, pesanan, dan profil UMKM ke data awal bawaan sistem."
         confirmLabel="Reset Sekarang"
         cancelLabel="Batal"
         isDestructive={true}

@@ -11,7 +11,7 @@ import {
   CheckCircle2,
   Package,
 } from 'lucide-react';
-import { SurplusProduct } from '../../types/seller';
+import { SisaPiringProduct } from '../../types/seller';
 import { formatRupiah } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
 import { ConfirmationModal } from '../common/ConfirmationModal';
@@ -25,7 +25,7 @@ export const ProductManagementView: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<SurplusProduct | null>(null);
+  const [editingProduct, setEditingProduct] = useState<SisaPiringProduct | null>(null);
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
 
   // Filter products
@@ -57,7 +57,7 @@ export const ProductManagementView: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (p: SurplusProduct) => {
+  const handleOpenEdit = (p: SisaPiringProduct) => {
     setEditingProduct(p);
     setIsModalOpen(true);
   };
@@ -83,10 +83,10 @@ export const ProductManagementView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
-            Katalog Produk Surplus
+            Katalog Produk Sisa Piring
           </h1>
           <p className="text-xs text-neutral-500 mt-1">
-            Kelola menu surplus harian, stok tersedia, dan deklarasi keamanan pangan untuk pembeli di Bandung.
+            Kelola menu sisa piring harian, stok tersedia, dan deklarasi keamanan pangan untuk pembeli di Bandung.
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export const ProductManagementView: React.FC = () => {
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span>Tambah Produk Surplus</span>
+          <span>Tambah Produk Sisa Piring</span>
         </button>
       </div>
 
@@ -186,7 +186,7 @@ export const ProductManagementView: React.FC = () => {
           <p className="text-xs text-neutral-500 max-w-sm mx-auto">
             {searchQuery
               ? `Tidak ada produk yang cocok dengan "${searchQuery}". Coba kata kunci lain.`
-              : 'Belum ada produk surplus yang masuk dalam filter ini.'}
+              : 'Belum ada produk sisa piring yang masuk dalam filter ini.'}
           </p>
           <button
             type="button"
@@ -480,7 +480,7 @@ export const ProductManagementView: React.FC = () => {
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={!!deletingProductId}
-        title="Hapus Produk Surplus?"
+        title="Hapus Produk Sisa Piring?"
         message="Produk ini akan dihapus dari etalase SisaPiring Bandung. Pelanggan tidak akan dapat memesan produk ini lagi."
         confirmLabel="Hapus Produk"
         cancelLabel="Batal"

@@ -29,7 +29,7 @@ export const OrderManagementView: React.FC = () => {
 
   // Cancellation modal state
   const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
-  const [cancelReason, setCancelReason] = useState('Stok bahan baku surplus tidak mencukupi untuk batch pesanan');
+  const [cancelReason, setCancelReason] = useState('Stok bahan baku sisa piring tidak mencukupi untuk batch pesanan');
 
   const filteredOrders = orders.filter((o) => {
     if (statusFilter !== 'all' && o.status !== statusFilter) return false;
@@ -84,7 +84,7 @@ export const OrderManagementView: React.FC = () => {
   };
 
   const handleReadyForPickup = (orderId: string) => {
-    updateOrderStatus(orderId, 'ready_for_pickup', 'Makanan surplus telah dikemas rapi di meja pickup');
+    updateOrderStatus(orderId, 'ready_for_pickup', 'Makanan sisa piring telah dikemas rapi di meja pickup');
   };
 
   const handleOpenCancelModal = (order: Order) => {
@@ -110,7 +110,7 @@ export const OrderManagementView: React.FC = () => {
             Pesanan Masuk (Incoming Orders)
           </h1>
           <p className="text-xs text-neutral-500 mt-1">
-            Pantau pesanan penjemputan surplus food dan pastikan paket makanan siap sebelum diambil warga.
+            Pantau pesanan penjemputan sisa piring dan pastikan paket makanan siap sebelum diambil warga.
           </p>
         </div>
 
@@ -241,7 +241,7 @@ export const OrderManagementView: React.FC = () => {
                   {/* Ordered Items Preview */}
                   <div className="md:col-span-1 space-y-1">
                     <span className="text-neutral-400 uppercase font-semibold text-[10px]">
-                      Menu Surplus ({totalItemsCount} Porsi)
+                      Menu Sisa Piring ({totalItemsCount} Porsi)
                     </span>
                     <div className="space-y-1">
                       {order.items.map((item, idx) => (
@@ -462,8 +462,8 @@ export const OrderManagementView: React.FC = () => {
                 onChange={(e) => setCancelReason(e.target.value)}
                 className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl"
               >
-                <option value="Stok bahan baku surplus tidak mencukupi untuk batch pesanan">
-                  Stok bahan baku surplus tidak mencukupi untuk batch pesanan
+                <option value="Stok bahan baku sisa piring tidak mencukupi untuk batch pesanan">
+                  Stok bahan baku sisa piring tidak mencukupi untuk batch pesanan
                 </option>
                 <option value="Kondisi makanan tidak memenuhi standar uji food safety sore ini">
                   Kondisi makanan tidak memenuhi standar uji food safety sore ini

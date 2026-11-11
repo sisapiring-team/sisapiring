@@ -77,7 +77,7 @@ export const ALL_FOOD_TAGS: FoodTag[] = [
   'Favorit Warga',
 ];
 
-export interface SurplusItem {
+export interface SisaPiringItem {
   id: string;
   title: string;
   merchantName: string;
@@ -101,7 +101,7 @@ export interface SurplusItem {
   imageUrl: string;
   shortDescription: string;
   contentsList: string[];
-  surplusReason: string;
+  sisaPiringReason: string;
   dietaryNotes: string;
   storageTip: string;
   tags: FoodTag[];
@@ -122,7 +122,7 @@ export interface MerchantStory {
 export const HERO_IMAGE_PATH = '/src/assets/images/hero_umkm_bakery_1794295650050.jpg';
 export const PARTNER_PORTRAIT_PATH = '/src/assets/images/umkm_partner_portrait_1794295655906.jpg';
 
-export const SURPLUS_CATALOG: SurplusItem[] = [
+export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
   {
     id: 'PRD-001',
     title: 'Artisan Butter Croissant & Pain au Chocolat (Paket 3 Pcs)',
@@ -151,7 +151,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '2x Butter Croissant Premium Lapis Emas',
       '1x Pain au Chocolat dengan Cokelat Batang Belgia',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Batch panggang pagi berlebih dari estimasi walk-in cafe, kualitas aroma dan rasa butter tetap prima.',
     dietaryNotes: '100% Halal MUI · Mengandung butter susu sapi, gandum, dan telur',
     storageTip: 'Panaskan di oven atau airfryer selama 3 menit suhu 160°C untuk kerenyahan maksimal.',
@@ -185,7 +185,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '1x Utuh Rustic Sourdough Loaf (Berat 650 gram)',
       'Dipotong rapi 12-14 slice siap konsumsi',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Sisa pemanggangan pagi hari yang disiapkan untuk konsumsi sore/malam sebelum toko tutup.',
     dietaryNotes: 'Vegan Friendly · Fermentasi Alami · Rendah Gula',
     storageTip: 'Simpan di plastik kedap udara di suhu ruang atau bekukan irisan di freezer hingga 1 bulan.',
@@ -219,7 +219,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '1x Slice Creamy Strawberry Cheesecake',
       '2x Chocolate Pastry Cream Eclair',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Produk chiller harian wajib dihabiskan sebelum batch baru besok pagi demi menjaga kesegaran.',
     dietaryNotes: 'Halal · Wajib disimpan di chiller / kulkas',
     storageTip: 'Simpan dalam chiller 2-6°C dan konsumsi dalam kurun waktu 24 jam.',
@@ -253,7 +253,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '1x Loyang Martabak Manis Kombinasi Keju Susu & Cokelat Kacang (8 potong tebal)',
       'Olesan mentega Wijsman harum saat masih hangat',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Adonan fermentasi martabak malam ini dibuat berlebih untuk pesanan acara warga dan tidak dapat disimpan untuk keesokan hari.',
     dietaryNotes: '100% Halal · Mengandung telur, susu, keju, dan kacang',
     storageTip: 'Hangatkan di teflon tanpa minyak selama 2 menit agar pinggirannya kembali renyah.',
@@ -288,7 +288,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '2x Bungkus Kuah Kaldu Sumsum Sapi Panas terpisah',
       'Mie Kuning, Bihun, Seledri, Bawang Goreng & Sambal Rawit Merah',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Bakso digiling pagi hari tanpa bahan pengenyal buatan (boraks/pengawet) sehingga wajib habis terjual setiap malam.',
     dietaryNotes: '100% Halal · Daging Sapi Segar Tanpa Pengawet',
     storageTip: 'Didihkan kembali kuah kaldu sebelum dituang ke mangkok bakso.',
@@ -323,7 +323,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '3x Kue Lumpur Kentang Kismis lembut',
       '3x Risoles Ragout Ayam & Pastel Telur Bumbu Kari',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Kue basah tradisional dibuat tanpa bahan pengawet dan tidak dapat dijual kembali esok hari.',
     dietaryNotes: 'Halal · Mengandung susu, telur, dan kelapa segar',
     storageTip: 'Kue basah sebaiknya dikonsumsi sebelum pukul 22.00 WIB.',
@@ -358,7 +358,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '2x Cup Topping Ayam Jamur Kecap Gurih & Minyak Bawang',
       '4x Pangsit Goreng Ayam Udang & Kuah Kaldu Daun Bawang',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Mie telur dibuat setiap pagi menggunakan telur bebek dan ayam segar tanpa pewarna maupun pengawet.',
     dietaryNotes: '100% Halal · No Pork No Lard · Bebas Pengawet',
     storageTip: 'Jika belum langsung dimakan, minta varian mie mentah yang tahan 2 hari di kulkas.',
@@ -393,7 +393,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '1x Pain au Chocolat cokelat Belgia',
       '2x Cream Cheese Danish / Cinnamon Roll (sesuai ketersediaan etalase sore)',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Warung Roti Senja menerapkan standar pemanggangan harian tanpa menyimpan pastry semalaman. Seluruh kue dipanggang pukul 06.30 WIB dan wajib habis pada hari yang sama.',
     dietaryNotes: 'Halal · Mengandung gandum, telur, dan produk susu',
     storageTip: 'Hangatkan kembali di oven atau air fryer suhu 160°C selama 3 menit untuk mengembalikan tekstur renyah berlapis.',
@@ -427,7 +427,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '2x Cup Brown Sugar Boba Fresh Milk (boba dimasak sore ini)',
       '1x Cup Iced Creamy Thai Tea 16oz (es terpisah agar tidak cair)',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Boba mutiara tapioka yang sudah dimasak sore hari hanya bertahan kenyal selama 5 jam dan tidak dapat disimpan hingga besok.',
     dietaryNotes: '100% Halal · Susu Sapi Lembang Segar Pasteurisasi',
     storageTip: 'Kocok sebelum diminum; tahan hingga 24 jam di dalam kulkas.',
@@ -462,7 +462,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '2x Potong Daging Sapi Rendang bumbu rempah dimasak 6 jam',
       'Gulai Nangka Muda, Daun Singkong, dan Sambal Lado Hijau terpisah',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Dimasak pada sesi makan siang pukul 11.30 WIB. Porsi berlebih menjelang tutup warung dikemas higienis dalam wadah kraft food-grade agar tidak terbuang.',
     dietaryNotes: '100% Halal · Bebas pengawet buatan',
     storageTip: 'Dapat langsung disantap malam ini atau disimpan di kulkas tertutup hingga 24 jam (pisahkan sambal).',
@@ -497,7 +497,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '1x Mangkok Quinoa, Ubi Panggang, Jagung Manis, dan Kacang Hitam',
       '1x Botol Cold-Pressed Tropical Glow (Mangga, Nanas, Markisa 250ml)',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Sayuran hidroponik Lembang dan buah peras dingin disiapkan setiap pagi. Demi menjaga kerenyahan daun selada, stok sore dijual hemat 60%.',
     dietaryNotes: 'Halal · Rendah Kalori · Tanpa Gula Tambahan',
     storageTip: 'Simpan pada suhu dingin 4°C dan tuang saus dressing sesaat sebelum dikonsumsi.',
@@ -532,7 +532,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '2x Donat Kentang Gula Halus / Cokelat Meses',
       '2x Roti Manis Klasik (Cokelat Keju / Srikaya Pandan)',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Kelebihan kuota produksi harian dari pesanan katering pagi yang selalu dilebihkan 10% sebagai cadangan kualitas.',
     dietaryNotes: '100% Halal · Ragi Alami tanpa pelembut sintetis',
     storageTip: 'Roti sourdough tahan hingga 3 hari di suhu ruang atau 2 minggu di dalam freezer.',
@@ -567,7 +567,7 @@ export const SURPLUS_CATALOG: SurplusItem[] = [
       '3x Potong Empal Gepuk Daging Sapi & Tahu Tempe Bacem',
       '1x Kotak Sayur Tumis Harian dan Sambal Bajak',
     ],
-    surplusReason:
+    sisaPiringReason:
       'Menu prasmanan sore yang baru dimasak pukul 14.00 WIB dan dikemas rapat sebelum warung tutup pukul 20.30 WIB.',
     dietaryNotes: '100% Halal · Masakan rumahan rendah minyak',
     storageTip: 'Panaskan sebentar di kukusan atau teflon sebelum disajikan bersama keluarga.',

@@ -22,7 +22,7 @@ import {
   Store,
   Calendar,
 } from 'lucide-react';
-import { OrderStatus, SurplusProduct } from '../../types/seller';
+import { OrderStatus, SisaPiringProduct } from '../../types/seller';
 import { formatRupiah, calculateCO2Saved } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
 
@@ -124,7 +124,7 @@ export const SellerDashboardView: React.FC = () => {
             id: 'act-1',
             type: 'incoming_order',
             title: `Pesanan Baru ${waitingOrders[0].id}`,
-            desc: `${waitingOrders[0].customerName} memesan ${waitingOrders[0].items.length} menu surplus`,
+            desc: `${waitingOrders[0].customerName} memesan ${waitingOrders[0].items.length} menu sisa piring`,
             time: waitingOrders[0].orderDate,
             actionLabel: 'Konfirmasi Pesanan',
             onClick: () => navigateToOrdersWithFilter('waiting_confirmation'),
@@ -243,14 +243,14 @@ export const SellerDashboardView: React.FC = () => {
               <span>Verifikasi QR</span>
             </button>
 
-            {/* Add Surplus */}
+            {/* Add Sisa Piring */}
             <button
               type="button"
               onClick={() => setIsAddProductModalOpen(true)}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
             >
               <Plus className="w-4 h-4" />
-              <span>Tambah Surplus</span>
+              <span>Tambah Sisa Piring</span>
             </button>
           </div>
         </div>
@@ -266,7 +266,7 @@ export const SellerDashboardView: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
-          {/* Action 1: Tambah Surplus Baru */}
+          {/* Action 1: Tambah Sisa Piring Baru */}
           <button
             type="button"
             onClick={() => setIsAddProductModalOpen(true)}
@@ -276,7 +276,7 @@ export const SellerDashboardView: React.FC = () => {
               <Plus className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-bold text-xs text-neutral-900 leading-tight">Tambah Surplus</p>
+              <p className="font-bold text-xs text-neutral-900 leading-tight">Tambah Sisa Piring</p>
               <p className="text-[10px] text-neutral-500 mt-0.5">Input batch makanan baru</p>
             </div>
           </button>
@@ -455,7 +455,7 @@ export const SellerDashboardView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-[#16382C]" />
                 <h3 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                  Analisis Pendapatan Penjualan Surplus
+                  Analisis Pendapatan Penjualan Sisa Piring
                 </h3>
               </div>
               <div className="flex items-baseline gap-2 mt-1">
@@ -592,7 +592,7 @@ export const SellerDashboardView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Total Surplus Sold vs Donated */}
+              {/* Total Sisa Piring Sold vs Donated */}
               <div className="grid grid-cols-2 gap-2.5 text-xs">
                 <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
                   <span className="text-[11px] text-neutral-500 block">Produk Terjual</span>
@@ -644,7 +644,7 @@ export const SellerDashboardView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                Performa Produk Surplus
+                Performa Produk Sisa Piring
               </h3>
               <p className="text-xs text-neutral-500 mt-0.5">
                 Pantau menu terlaris, stok menipis, dan produk yang mendekati batas aman
@@ -731,7 +731,7 @@ export const SellerDashboardView: React.FC = () => {
             {performanceTab === 'low_stock' &&
               (lowStockProducts.length === 0 ? (
                 <div className="py-6 text-center text-xs text-neutral-400">
-                  Semua stok surplus saat ini dalam kondisi aman (&gt; 3 porsi).
+                  Semua stok sisa piring saat ini dalam kondisi aman (&gt; 3 porsi).
                 </div>
               ) : (
                 lowStockProducts.map((p) => (

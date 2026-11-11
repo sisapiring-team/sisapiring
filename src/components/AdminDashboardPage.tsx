@@ -25,10 +25,10 @@ import {
   Plus,
 } from 'lucide-react';
 import {
-  SurplusItem,
+  SisaPiringItem,
   ComplaintReport,
   formatRupiah,
-} from '../data/surplusCatalog';
+} from '../data/sisaPiringCatalog';
 import { OrderRecord } from './RescueModals';
 import { ResilientImage } from './ResilientImage';
 import {
@@ -55,7 +55,7 @@ export type AdminModuleTab =
   | 'access-control';
 
 interface AdminDashboardPageProps {
-  catalogItems: SurplusItem[];
+  catalogItems: SisaPiringItem[];
   productMonitoring: Record<string, ProductMonitoringMeta>;
   umkmVerifications: UmkmVerificationRecord[];
   disputes: AdminDisputeRecord[];
@@ -142,7 +142,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   // Module 2: Product Monitoring State
   const [productFilter, setProductFilter] = useState<'Semua' | ProductMonitoringStatus>('Semua');
   const [productSearch, setProductSearch] = useState('');
-  const [takedownModalItem, setTakedownModalItem] = useState<SurplusItem | null>(null);
+  const [takedownModalItem, setTakedownModalItem] = useState<SisaPiringItem | null>(null);
   const [takedownReasonInput, setTakedownReasonInput] = useState(
     'Laporan Ketidaksesuaian Standar Keamanan Pangan / Risiko Basi'
   );
@@ -1203,7 +1203,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                     Pemantauan Produk & Keamanan Pangan
                   </h1>
                   <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
-                    Awasi seluruh menu surplus yang diunggah UMKM dan nonaktifkan (Take Down) produk yang dilaporkan bermasalah atau melanggar keamanan pangan. Produk yang di-take down otomatis disembunyikan dari Etalase Pembeli.
+                    Awasi seluruh menu sisa piring yang diunggah UMKM dan nonaktifkan (Take Down) produk yang dilaporkan bermasalah atau melanggar keamanan pangan. Produk yang di-take down otomatis disembunyikan dari Etalase Pembeli.
                   </p>
                 </div>
               </div>

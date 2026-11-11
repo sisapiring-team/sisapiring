@@ -1,6 +1,6 @@
 {
   "name": "SisaPiring (SisaRasa) — Ekosistem Terpadu Penyelamat Kuliner UMKM",
-  "description": "Platform pasar kuliner surplus terpadu yang mengintegrasikan Pasar Konsumen, Portal Mitra UMKM Bandung, dan Pusat Tata Kelola Admin (Governance Console) untuk pencegahan food waste dan pemberdayaan ekonomi kuliner lokal.",
+  "description": "Platform pasar kuliner sisa piring terpadu yang mengintegrasikan Pasar Konsumen, Portal Mitra UMKM Bandung, dan Pusat Tata Kelola Admin (Governance Console) untuk pencegahan food waste dan pemberdayaan ekonomi kuliner lokal.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

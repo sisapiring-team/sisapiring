@@ -47,16 +47,16 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import {
-  SURPLUS_CATALOG,
+  SISA_PIRING_CATALOG,
   MERCHANT_STORIES,
   HERO_IMAGE_PATH,
   PARTNER_PORTRAIT_PATH,
   INITIAL_STORE_REVIEWS,
-  SurplusItem,
+  SisaPiringItem,
   StoreReview,
   ComplaintReport,
   formatRupiah,
-} from './data/surplusCatalog';
+} from './data/sisaPiringCatalog';
 import {
   INITIAL_UMKM_VERIFICATIONS,
   INITIAL_PRODUCT_MONITORING,
@@ -135,7 +135,7 @@ function CustomerAndAdminPortal() {
     'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store'
   >('etalase');
   const [selectedStoreName, setSelectedStoreName] = useState<string>(
-    SURPLUS_CATALOG[0].merchantName
+    SISA_PIRING_CATALOG[0].merchantName
   );
   const [storeReviews, setStoreReviews] = useState<StoreReview[]>(
     INITIAL_STORE_REVIEWS
@@ -163,7 +163,7 @@ function CustomerAndAdminPortal() {
   const [editPhoneText, setEditPhoneText] = useState<string>('');
 
   // Dynamic Catalog State & Admin Governance States
-  const [catalogItems, setCatalogItems] = useState<SurplusItem[]>(SURPLUS_CATALOG);
+  const [catalogItems, setCatalogItems] = useState<SisaPiringItem[]>(SISA_PIRING_CATALOG);
   const [productMonitoring, setProductMonitoring] = useState<
     Record<string, ProductMonitoringMeta>
   >(INITIAL_PRODUCT_MONITORING);
@@ -185,7 +185,7 @@ function CustomerAndAdminPortal() {
 
   // Interactive Cart & Modal States
   const [cart, setCart] = useState<CartEntry[]>([
-    { item: SURPLUS_CATALOG[0], quantity: 1 },
+    { item: SISA_PIRING_CATALOG[0], quantity: 1 },
   ]);
   const [orders, setOrders] = useState<OrderRecord[]>([
     {
@@ -194,11 +194,11 @@ function CustomerAndAdminPortal() {
       name: 'Nabil Rachman',
       phone: '081234567890',
       payment: 'qris',
-      totalPaid: SURPLUS_CATALOG[0].rescuePrice,
-      totalSaved: SURPLUS_CATALOG[0].originalPrice - SURPLUS_CATALOG[0].rescuePrice,
+      totalPaid: SISA_PIRING_CATALOG[0].rescuePrice,
+      totalSaved: SISA_PIRING_CATALOG[0].originalPrice - SISA_PIRING_CATALOG[0].rescuePrice,
       status: 'siap-diambil',
       deliveryStage: 'perjalanan',
-      items: [{ item: SURPLUS_CATALOG[0], quantity: 1 }],
+      items: [{ item: SISA_PIRING_CATALOG[0], quantity: 1 }],
     },
     {
       orderCode: 'SP-7109',
@@ -206,12 +206,12 @@ function CustomerAndAdminPortal() {
       name: 'Nabil Rachman',
       phone: '081234567890',
       payment: 'qris',
-      totalPaid: SURPLUS_CATALOG[2].rescuePrice,
-      totalSaved: SURPLUS_CATALOG[2].originalPrice - SURPLUS_CATALOG[2].rescuePrice,
+      totalPaid: SISA_PIRING_CATALOG[2].rescuePrice,
+      totalSaved: SISA_PIRING_CATALOG[2].originalPrice - SISA_PIRING_CATALOG[2].rescuePrice,
       status: 'selesai',
       deliveryStage: 'sampai',
       userRating: 5,
-      items: [{ item: SURPLUS_CATALOG[2], quantity: 1 }],
+      items: [{ item: SISA_PIRING_CATALOG[2], quantity: 1 }],
     },
     {
       orderCode: 'SP-6542',
@@ -219,14 +219,14 @@ function CustomerAndAdminPortal() {
       name: 'Nabil Rachman',
       phone: '081234567890',
       payment: 'cod',
-      totalPaid: SURPLUS_CATALOG[1].rescuePrice * 2,
-      totalSaved: (SURPLUS_CATALOG[1].originalPrice - SURPLUS_CATALOG[1].rescuePrice) * 2,
+      totalPaid: SISA_PIRING_CATALOG[1].rescuePrice * 2,
+      totalSaved: (SISA_PIRING_CATALOG[1].originalPrice - SISA_PIRING_CATALOG[1].rescuePrice) * 2,
       status: 'selesai',
       deliveryStage: 'sampai',
-      items: [{ item: SURPLUS_CATALOG[1], quantity: 2 }],
+      items: [{ item: SISA_PIRING_CATALOG[1], quantity: 2 }],
     },
   ]);
-  const [activeProductModal, setActiveProductModal] = useState<SurplusItem | null>(null);
+  const [activeProductModal, setActiveProductModal] = useState<SisaPiringItem | null>(null);
   const [recentToast, setRecentToast] = useState<string | null>(null);
 
   // Two-way synchronization: If Seller updates order in Seller Portal (Confirmed, Ready for Pickup, QR Verified / Completed),
@@ -300,7 +300,7 @@ function CustomerAndAdminPortal() {
     [cart]
   );
 
-  const handleAddToCart = (item: SurplusItem, qty: number = 1) => {
+  const handleAddToCart = (item: SisaPiringItem, qty: number = 1) => {
     setCart((prev) => {
       const existingIndex = prev.findIndex((e) => e.item.id === item.id);
       if (existingIndex > -1) {
@@ -1872,7 +1872,7 @@ function CustomerAndAdminPortal() {
                               className="block text-xs font-medium text-stone-700 mb-1"
                             >
                               {registrationRole === 'mitra'
-                                ? 'Estimasi Surplus Harian'
+                                ? 'Estimasi Sisa Piring Harian'
                                 : 'Preferensi Hidangan'}
                             </label>
                             <select

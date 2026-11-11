@@ -13,12 +13,12 @@ import {
   Store,
   Star,
 } from 'lucide-react';
-import { SurplusItem, formatRupiah } from '../data/surplusCatalog';
+import { SisaPiringItem, formatRupiah } from '../data/sisaPiringCatalog';
 import { ResilientImage } from './ResilientImage';
 import { UserAccount } from './AuthPage';
 
 export interface CartEntry {
-  item: SurplusItem;
+  item: SisaPiringItem;
   quantity: number;
 }
 
@@ -38,9 +38,9 @@ export interface OrderRecord {
 }
 
 interface ProductDetailModalProps {
-  item: SurplusItem | null;
+  item: SisaPiringItem | null;
   onClose: () => void;
-  onAddToCart: (item: SurplusItem, qty: number) => void;
+  onAddToCart: (item: SisaPiringItem, qty: number) => void;
   onOpenStore?: (merchantName: string) => void;
 }
 
@@ -195,7 +195,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     Mengapa Hidangan Ini Dijual Hemat?
                   </h3>
                   <p className="text-xs text-stone-600 leading-relaxed">
-                    {item.surplusReason}
+                    {item.sisaPiringReason}
                   </p>
                 </div>
 
@@ -490,7 +490,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                 Kantong penyelamatan Anda masih kosong
               </h2>
               <p className="text-xs sm:text-sm text-stone-500 max-w-xs mx-auto leading-relaxed">
-                Pilih paket surplus dari toko roti, warung makan, atau kafe UMKM Bandung untuk ditebus dengan harga hemat sore ini.
+                Pilih paket sisa piring dari toko roti, warung makan, atau kafe UMKM Bandung untuk ditebus dengan harga hemat sore ini.
               </p>
             </div>
             <button

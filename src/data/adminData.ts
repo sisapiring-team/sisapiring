@@ -1,4 +1,4 @@
-import { ComplaintReport } from './surplusCatalog';
+import { ComplaintReport } from './sisaPiringCatalog';
 
 export type UmkmVerificationStatus =
   | 'Menunggu Verifikasi'

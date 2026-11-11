@@ -37,7 +37,7 @@ export const FoodSafetyModal: React.FC<FoodSafetyModalProps> = ({ isOpen, onClos
   const declarationRules = [
     {
       title: 'Kelayakan Pangan Konsumsi',
-      desc: 'Makanan surplus wajib berasal dari batch segar hari yang sama atau belum melewati batas konsumsi organoleptik yang ditetapkan.',
+      desc: 'Makanan sisa piring wajib berasal dari batch segar hari yang sama atau belum melewati batas konsumsi organoleptik yang ditetapkan.',
     },
     {
       title: 'Sanitasi & Pengendalian Suhu',
@@ -78,7 +78,7 @@ export const FoodSafetyModal: React.FC<FoodSafetyModalProps> = ({ isOpen, onClos
               Deklarasi & Protokol Keamanan Pangan (Food Safety)
             </h3>
             <p className="text-xs text-neutral-500">
-              Standar komitmen jaminan mutu makanan surplus Kota Bandung
+              Standar komitmen jaminan mutu makanan sisa piring Kota Bandung
             </p>
           </div>
         </div>

@@ -14,22 +14,22 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import {
-  SurplusItem,
+  SisaPiringItem,
   FoodCategory,
   FoodTag,
   ALL_FOOD_TAGS,
   CULINARY_CATEGORIES,
   formatRupiah,
-} from '../data/surplusCatalog';
+} from '../data/sisaPiringCatalog';
 import { ResilientImage } from './ResilientImage';
 import { CartEntry } from './RescueModals';
 
 interface MarketplaceDisplayPageProps {
-  items: SurplusItem[];
+  items: SisaPiringItem[];
   cart: CartEntry[];
-  onAddToCart: (item: SurplusItem, qty?: number) => void;
+  onAddToCart: (item: SisaPiringItem, qty?: number) => void;
   onUpdateCartQty: (id: string, delta: number) => void;
-  onOpenDetail: (item: SurplusItem) => void;
+  onOpenDetail: (item: SisaPiringItem) => void;
   onOpenCart: () => void;
 }
 
@@ -194,7 +194,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
         address: string;
         pickupWindow: string;
         rating: number;
-        items: SurplusItem[];
+        items: SisaPiringItem[];
       }
     > = {};
 

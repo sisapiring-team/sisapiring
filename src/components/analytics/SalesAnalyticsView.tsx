@@ -56,7 +56,7 @@ export const SalesAnalyticsView: React.FC = () => {
             Statistik Penjualan & Dampak Pangan
           </h1>
           <p className="text-xs text-neutral-500 mt-1">
-            Transparansi omzet surplus dan kontribusi nyata UMKM terhadap pengurangan limbah makanan di Kota Bandung.
+            Transparansi omzet sisa piring dan kontribusi nyata UMKM terhadap pengurangan limbah makanan di Kota Bandung.
           </p>
         </div>
 
@@ -158,7 +158,7 @@ export const SalesAnalyticsView: React.FC = () => {
       <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-[#16382C]">Tren Penjualan Surplus Mingguan</h3>
+            <h3 className="text-sm font-bold text-[#16382C]">Tren Penjualan Sisa Piring Mingguan</h3>
             <p className="text-xs text-neutral-500">
               Puncak transaksi penjemputan warga biasanya terjadi pada akhir pekan (Jumat–Minggu)
             </p>
@@ -200,7 +200,7 @@ export const SalesAnalyticsView: React.FC = () => {
           <div>
             <h3 className="text-sm font-bold text-[#16382C]">Produk Paling Banyak Terselamatkan</h3>
             <p className="text-xs text-neutral-500">
-              Peringkat menu surplus yang paling diminati oleh warga Kota Bandung
+              Peringkat menu sisa piring yang paling diminati oleh warga Kota Bandung
             </p>
           </div>
         </div>

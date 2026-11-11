@@ -12,14 +12,14 @@ import {
   Calendar,
   AlertTriangle,
 } from 'lucide-react';
-import { ProductCategory, StorageInstruction, SurplusProduct } from '../../types/seller';
+import { ProductCategory, StorageInstruction, SisaPiringProduct } from '../../types/seller';
 import { calculateRecommendedDiscount } from '../../utils/discountEngine';
 import { formatRupiah } from '../../utils/formatters';
 import { FoodSafetyDeclaration } from './FoodSafetyDeclaration';
 
 interface ProductFormModalProps {
   isOpen: boolean;
-  initialProduct?: SurplusProduct | null;
+  initialProduct?: SisaPiringProduct | null;
   onClose: () => void;
   onSave: (productData: any) => void;
 }
@@ -60,7 +60,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   );
   const [description, setDescription] = useState(
     initialProduct?.description ||
-      'Produk surplus segar produksi hari ini. Disiapkan dalam kemasan higienis tertutup rapi.'
+      'Produk sisa piring segar produksi hari ini. Disiapkan dalam kemasan higienis tertutup rapi.'
   );
   const [isActive, setIsActive] = useState(initialProduct?.isActive ?? true);
 
@@ -93,7 +93,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     e.preventDefault();
 
     if (!name.trim()) {
-      setNameError('Nama produk surplus wajib diisi');
+      setNameError('Nama produk sisa piring wajib diisi');
       return;
     }
 
@@ -143,7 +143,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 Food Rescue UMKM
               </span>
               <h3 className="text-base font-bold text-[#16382C]">
-                {isEditing ? 'Perbarui Produk Surplus' : 'Tambah Surplus Makanan Baru'}
+                {isEditing ? 'Perbarui Produk Sisa Piring' : 'Tambah Sisa Piring Baru'}
               </h3>
             </div>
             <p className="text-xs text-neutral-500 mt-0.5">
@@ -208,7 +208,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    Nama Menu Surplus <span className="text-red-500">*</span>
+                    Nama Menu Sisa Piring <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -293,7 +293,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                   2
                 </span>
                 <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                  Harga & Alokasi Stok Surplus
+                  Harga & Alokasi Stok Sisa Piring
                 </h4>
               </div>
 
@@ -342,7 +342,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
                   <div>
                     <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                      Stok Surplus (Porsi) <span className="text-red-500">*</span>
+                      Stok Sisa Piring (Porsi) <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -527,11 +527,11 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                   </div>
 
                   <h5 className="font-bold text-xs text-neutral-900 line-clamp-1">
-                    {name || 'Nama Produk Surplus'}
+                    {name || 'Nama Produk Sisa Piring'}
                   </h5>
 
                   <p className="text-[11px] text-neutral-500 line-clamp-2 leading-relaxed">
-                    {description || 'Deskripsi makanan surplus...'}
+                    {description || 'Deskripsi makanan sisa piring...'}
                   </p>
 
                   <div className="pt-1.5 flex items-baseline gap-2">
@@ -577,7 +577,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             form="product-form"
             className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
           >
-            <span>{isEditing ? 'Simpan Perubahan' : 'Terbitkan Produk Surplus'}</span>
+            <span>{isEditing ? 'Simpan Perubahan' : 'Terbitkan Produk Sisa Piring'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

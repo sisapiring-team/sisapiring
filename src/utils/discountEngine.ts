@@ -51,7 +51,7 @@ export function calculateRecommendedDiscount(
     if (stockCount >= 10) {
       return {
         recommendedDiscount: 70,
-        reason: `Stok surplus cukup besar (${stockCount} porsi). Diskon 70% OFF akan menaikkan eksposur produk di etalase pembeli Bandung.`,
+        reason: `Stok sisa piring cukup besar (${stockCount} porsi). Diskon 70% OFF akan menaikkan eksposur produk di etalase pembeli Bandung.`,
         hoursRemaining,
         urgencyLevel: 'medium',
       };

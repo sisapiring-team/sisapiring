@@ -58,7 +58,7 @@ export interface FoodSafetyChecklist {
   isAccurateInformation: boolean; // Informasi bahan baku & alergen jujur dan akurat
 }
 
-export interface SurplusProduct {
+export interface SisaPiringProduct {
   id: string;
   name: string;
   category: ProductCategory;

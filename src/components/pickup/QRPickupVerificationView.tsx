@@ -80,7 +80,7 @@ export const QRPickupVerificationView: React.FC = () => {
           Verifikasi Penjemputan Pesanan (QR & PIN)
         </h1>
         <p className="text-xs text-neutral-500 mt-1">
-          Validasi tiket penjemputan pembeli sebelum menyerahkan paket surplus food. Mencegah pengambilan ganda atau kode kedaluwarsa.
+          Validasi tiket penjemputan pembeli sebelum menyerahkan paket sisa piring. Mencegah pengambilan ganda atau kode kedaluwarsa.
         </p>
       </div>
 

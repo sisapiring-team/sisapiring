@@ -20,8 +20,8 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
   const pendingOrders = orders.filter((o) => o.status === 'waiting_confirmation');
 
   const tabTitles: Record<ActiveTab, { title: string; subtitle: string }> = {
-    dashboard: { title: 'Dashboard Ikhtisar', subtitle: 'Pantau performa surplus food rescue harian' },
-    products: { title: 'Manajemen Produk Surplus', subtitle: 'Kelola etalase makanan, stok, dan keamanan pangan' },
+    dashboard: { title: 'Dashboard Ikhtisar', subtitle: 'Pantau performa sisa piring rescue harian' },
+    products: { title: 'Manajemen Produk Sisa Piring', subtitle: 'Kelola etalase makanan, stok, dan keamanan pangan' },
     orders: { title: 'Pesanan Masuk', subtitle: 'Konfirmasi dan kelola jadwal penjemputan pembeli' },
     rescue_deals: { title: 'Rescue Deals & Diskon Pintar', subtitle: 'Rekomendasi diskon otomatis berbasis waktu kedaluwarsa' },
     qr_pickup: { title: 'Verifikasi Pengambilan QR', subtitle: 'Scan QR atau verifikasi kode 6-digit pelanggan' },
@@ -29,7 +29,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
     profile: { title: 'Profil Usaha UMKM', subtitle: 'Kelola identitas, alamat Bandung, dan jam operasional' },
     settings: { title: 'Pengaturan Toko', subtitle: 'Atur preferensi sistem, notifikasi, dan otomatisasi' },
     registration: { title: 'Registrasi & Verifikasi UMKM', subtitle: 'Alur pendaftaran mitra resmi SisaPiring Kota Bandung' },
-    marketplace: { title: 'Etalase Pasar SisaPiring', subtitle: 'Mode pelanggan: uji coba belanja surplus food' },
+    marketplace: { title: 'Etalase Pasar SisaPiring', subtitle: 'Mode pelanggan: uji coba belanja sisa piring' },
     admin: { title: 'Pusat Tata Kelola Admin', subtitle: 'Governance, verifikasi legalitas, dan analitik makro' },
   };
 

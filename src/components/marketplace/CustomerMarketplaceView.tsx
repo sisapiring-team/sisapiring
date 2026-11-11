@@ -14,7 +14,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { BANDUNG_DISTRICTS } from '../../data/bandungDistricts';
-import { BandungDistrict, SurplusProduct } from '../../types/seller';
+import { BandungDistrict, SisaPiringProduct } from '../../types/seller';
 import { formatRupiah } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
 
@@ -46,10 +46,10 @@ export const CustomerMarketplaceView: React.FC = () => {
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
 
-  const addToCart = (p: SurplusProduct) => {
+  const addToCart = (p: SisaPiringProduct) => {
     const current = cart[p.id] || 0;
     if (current >= p.stock) {
-      showToast('Stok Maksimal', `Stok surplus ${p.name} hanya tersisa ${p.stock} porsi.`, 'warning');
+      showToast('Stok Maksimal', `Stok sisa piring ${p.name} hanya tersisa ${p.stock} porsi.`, 'warning');
       return;
     }
     setCart({ ...cart, [p.id]: current + 1 });
@@ -156,7 +156,7 @@ export const CustomerMarketplaceView: React.FC = () => {
           <div className="relative z-10 max-w-xl space-y-3">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FFD230] bg-white/10 px-3 py-1 rounded-full">
               <Sparkles className="w-3.5 h-3.5" />
-              Surplus Food Rescue — Hemat Hingga 90% & Donasi 100%
+              Sisa Piring Food Rescue — Hemat Hingga 90% & Donasi 100%
             </span>
             <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight leading-tight">
               Selamatkan Makanan Lezat Bandung Dari Berakhir Sia-sia.
@@ -207,7 +207,7 @@ export const CustomerMarketplaceView: React.FC = () => {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-bold text-[#16382C]">
-              Menu Surplus Tersedia Hari Ini ({filteredProducts.length} Pilihan)
+              Menu Sisa Piring Tersedia Hari Ini ({filteredProducts.length} Pilihan)
             </h2>
             <span className="text-xs text-neutral-500">
               Lokasi: Mitra {sellerProfile.businessName} (Kec. {sellerProfile.district})
@@ -216,7 +216,7 @@ export const CustomerMarketplaceView: React.FC = () => {
 
           {filteredProducts.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-neutral-200 shadow-xs">
-              <p className="text-sm font-semibold text-neutral-700">Belum ada makanan surplus pada kategori ini</p>
+              <p className="text-sm font-semibold text-neutral-700">Belum ada makanan sisa piring pada kategori ini</p>
               <p className="text-xs text-neutral-500 mt-1">Coba pilih kategori lain atau ubah kata kunci pencarian.</p>
             </div>
           ) : (
@@ -333,7 +333,7 @@ export const CustomerMarketplaceView: React.FC = () => {
 
                 {cartCount === 0 ? (
                   <div className="py-8 text-center text-xs text-neutral-500">
-                    Keranjang masih kosong. Pilih menu surplus terlebih dahulu!
+                    Keranjang masih kosong. Pilih menu sisa piring terlebih dahulu!
                   </div>
                 ) : (
                   <>

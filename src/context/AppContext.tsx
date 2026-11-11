@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { INITIAL_ORDERS, INITIAL_PRODUCTS, INITIAL_SELLER_PROFILE } from '../data/initialData';
-import { Order, OrderStatus, SellerProfile, SurplusProduct, VerificationStatus } from '../types/seller';
+import { Order, OrderStatus, SellerProfile, SisaPiringProduct, VerificationStatus } from '../types/seller';
 
 export type ActiveTab =
   | 'dashboard'
@@ -28,9 +28,9 @@ interface AppContextType {
   sellerProfile: SellerProfile;
   updateSellerProfile: (updates: Partial<SellerProfile>) => void;
   setVerificationStatus: (status: VerificationStatus, notes?: string) => void;
-  products: SurplusProduct[];
-  addProduct: (productData: Omit<SurplusProduct, 'id' | 'createdAt' | 'portionsRescuedCount'>) => SurplusProduct;
-  updateProduct: (id: string, updates: Partial<SurplusProduct>) => void;
+  products: SisaPiringProduct[];
+  addProduct: (productData: Omit<SisaPiringProduct, 'id' | 'createdAt' | 'portionsRescuedCount'>) => SisaPiringProduct;
+  updateProduct: (id: string, updates: Partial<SisaPiringProduct>) => void;
   deleteProduct: (id: string) => void;
   toggleProductStatus: (id: string) => void;
   updateStock: (id: string, delta: number) => void;
@@ -85,7 +85,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   // Initialize products
-  const [products, setProducts] = useState<SurplusProduct[]>(() => {
+  const [products, setProducts] = useState<SisaPiringProduct[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
       return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
@@ -160,9 +160,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addProduct = (
-    productData: Omit<SurplusProduct, 'id' | 'createdAt' | 'portionsRescuedCount'>
-  ): SurplusProduct => {
-    const newProduct: SurplusProduct = {
+    productData: Omit<SisaPiringProduct, 'id' | 'createdAt' | 'portionsRescuedCount'>
+  ): SisaPiringProduct => {
+    const newProduct: SisaPiringProduct = {
       ...productData,
       id: `PRD-${Date.now().toString().slice(-4)}`,
       createdAt: new Date().toISOString(),
@@ -170,14 +170,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setProducts((prev) => [newProduct, ...prev]);
     showToast(
-      'Produk Surplus Berhasil Diterbitkan',
+      'Produk Sisa Piring Berhasil Diterbitkan',
       `"${newProduct.name}" kini tayang di etalase SisaPiring Bandung.`,
       'success'
     );
     return newProduct;
   };
 
-  const updateProduct = (id: string, updates: Partial<SurplusProduct>) => {
+  const updateProduct = (id: string, updates: Partial<SisaPiringProduct>) => {
     setProducts((prev) =>
       prev.map((p) => {
         if (p.id === id) {
@@ -193,7 +193,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return p;
       })
     );
-    showToast('Produk Diperbarui', 'Perubahan produk surplus berhasil disimpan.', 'success');
+    showToast('Produk Diperbarui', 'Perubahan produk sisa piring berhasil disimpan.', 'success');
   };
 
   const deleteProduct = (id: string) => {

@@ -1,4 +1,4 @@
-import { Order, SellerProfile, SurplusProduct } from '../types/seller';
+import { Order, SellerProfile, SisaPiringProduct } from '../types/seller';
 
 export const INITIAL_SELLER_PROFILE: SellerProfile = {
   id: 'UMKM-BDG-042',
@@ -20,7 +20,7 @@ export const INITIAL_SELLER_PROFILE: SellerProfile = {
   isOpenToday: true,
 };
 
-export const INITIAL_PRODUCTS: SurplusProduct[] = [
+export const INITIAL_PRODUCTS: SisaPiringProduct[] = [
   {
     id: 'PRD-001',
     name: 'Artisan Butter Croissant & Pain au Chocolat (Paket 3 Pcs)',
@@ -104,7 +104,7 @@ export const INITIAL_PRODUCTS: SurplusProduct[] = [
   },
   {
     id: 'PRD-004',
-    name: 'Nasi Kuning Parahyangan & Ayam Bakar Madu (Surplus Event)',
+    name: 'Nasi Kuning Parahyangan & Ayam Bakar Madu (Sisa Piring Event)',
     category: 'Katering & Nasi Kotak',
     image: '/src/assets/images/sisapiring_nasi_kotak_1794322285485.jpg',
     originalPrice: 45000,
@@ -125,7 +125,7 @@ export const INITIAL_PRODUCTS: SurplusProduct[] = [
       isNoAbnormalOdor: true,
       isAccurateInformation: true,
     },
-    description: 'Surplus nasi kotak prasmanan tertutup rapat dari sesi siang. Masih hangat dalam thermal warmer box, lengkap dengan sambal dan lalap segar.',
+    description: 'Sisa piring nasi kotak prasmanan tertutup rapat dari sesi siang. Masih hangat dalam thermal warmer box, lengkap dengan sambal dan lalap segar.',
     portionsRescuedCount: 89,
     createdAt: '2026-11-10T12:30:00Z',
   },
@@ -239,7 +239,7 @@ export const INITIAL_ORDERS: Order[] = [
     statusHistory: [
       { status: 'waiting_confirmation', timestamp: '10 Nov 2026, 15:40 WIB' },
       { status: 'confirmed', timestamp: '10 Nov 2026, 15:45 WIB', note: 'Ketersediaan dikonfirmasi staf dapur' },
-      { status: 'ready_for_pickup', timestamp: '10 Nov 2026, 16:00 WIB', note: 'Paket surplus telah dikemas rapi' },
+      { status: 'ready_for_pickup', timestamp: '10 Nov 2026, 16:00 WIB', note: 'Paket sisa piring telah dikemas rapi' },
     ],
     isVerifiedByQR: false,
   },

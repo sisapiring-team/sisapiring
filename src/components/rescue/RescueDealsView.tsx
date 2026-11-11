@@ -45,7 +45,7 @@ export const RescueDealsView: React.FC = () => {
     } else {
       showToast(
         'Sudah Optimal',
-        'Seluruh produk surplus Anda sudah menggunakan diskon optimal yang direkomendasikan.',
+        'Seluruh produk sisa piring Anda sudah menggunakan diskon optimal yang direkomendasikan.',
         'info'
       );
     }
@@ -66,7 +66,7 @@ export const RescueDealsView: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-neutral-500 mt-1">
-            Optimalkan penyelamatan surplus makanan Kota Bandung sebelum batas aman kedaluwarsa dengan diskon bertingkat (50%, 70%, 90%, 100% Donasi).
+            Optimalkan penyelamatan sisa piring makanan Kota Bandung sebelum batas aman kedaluwarsa dengan diskon bertingkat (50%, 70%, 90%, 100% Donasi).
           </p>
         </div>
 

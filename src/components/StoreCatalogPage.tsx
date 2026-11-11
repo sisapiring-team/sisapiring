@@ -14,27 +14,27 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import {
-  SurplusItem,
+  SisaPiringItem,
   StoreReview,
   ComplaintReport,
   formatRupiah,
-} from '../data/surplusCatalog';
+} from '../data/sisaPiringCatalog';
 import { ResilientImage } from './ResilientImage';
 import { CartEntry } from './RescueModals';
 import { UserAccount } from './AuthPage';
 
 interface StoreCatalogPageProps {
   merchantName: string;
-  allItems: SurplusItem[];
+  allItems: SisaPiringItem[];
   cart: CartEntry[];
   currentUser: UserAccount | null;
   reviews: StoreReview[];
   complaints: ComplaintReport[];
   initialTab?: 'katalog' | 'ulasan';
   onBack: () => void;
-  onAddToCart: (item: SurplusItem, qty?: number) => void;
+  onAddToCart: (item: SisaPiringItem, qty?: number) => void;
   onUpdateCartQty: (id: string, delta: number) => void;
-  onOpenDetail: (item: SurplusItem) => void;
+  onOpenDetail: (item: SisaPiringItem) => void;
   onAddReview: (review: Omit<StoreReview, 'id' | 'date'>) => void;
   onAddComplaint: (
     complaint: Omit<ComplaintReport, 'id' | 'ticketCode' | 'createdAt' | 'status'>
@@ -318,7 +318,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm sm:text-base font-bold text-stone-900 font-display">
-                  Etalase Surplus Hari Ini di {merchantName}
+                  Etalase Sisa Piring Hari Ini di {merchantName}
                 </h2>
                 <span className="text-xs text-stone-500">
                   Klik produk untuk detail lengkap
@@ -427,7 +427,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                   Jaminan Kualitas & Keamanan Pangan {merchantName}
                 </h3>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  {primaryStoreItem.surplusReason} ({primaryStoreItem.dietaryNotes})
+                  {primaryStoreItem.sisaPiringReason} ({primaryStoreItem.dietaryNotes})
                 </p>
               </div>
               <button

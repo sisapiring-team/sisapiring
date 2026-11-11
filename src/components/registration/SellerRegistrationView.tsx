@@ -509,7 +509,7 @@ export const SellerRegistrationView: React.FC = () => {
                   <div className="flex-1 text-xs text-neutral-600">
                     <p className="font-semibold text-neutral-800">Foto Etalase Terpasang</p>
                     <p className="mt-0.5">
-                      Foto ini akan dilihat oleh pelanggan saat menjemput surplus food di lokasi Anda.
+                      Foto ini akan dilihat oleh pelanggan saat menjemput sisa piring di lokasi Anda.
                     </p>
                     <div className="mt-2 flex gap-2">
                       <button

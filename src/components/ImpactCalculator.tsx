@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatRupiah } from '../data/surplusCatalog';
+import { formatRupiah } from '../data/sisaPiringCatalog';
 
 export const ImpactCalculator: React.FC<{ onExploreClick: () => void }> = ({ onExploreClick }) => {
   const [mode, setMode] = useState<'pembeli' | 'umkm'>('pembeli');

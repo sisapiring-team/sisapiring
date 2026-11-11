@@ -25,7 +25,7 @@ import { ProductFormModal } from './components/products/ProductFormModal';
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ShoppingBag,
   CheckCircle2,
@@ -130,7 +130,16 @@ function CustomerAndAdminPortal() {
   // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store')
   const [activePage, setActivePage] = useState<
     'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store'
-  >('etalase');
+  >(activeTab === 'admin' ? 'admin' : 'etalase');
+
+  // Sync activeTab with activePage for direct routing between Seller, Customer, and Admin portals
+  useEffect(() => {
+    if (activeTab === 'admin') {
+      setActivePage('admin');
+    } else if (activeTab === 'marketplace') {
+      setActivePage('etalase');
+    }
+  }, [activeTab]);
   const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
     'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store'
   >('etalase');

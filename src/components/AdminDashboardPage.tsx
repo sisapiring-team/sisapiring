@@ -2,27 +2,34 @@ import React, { useState, useMemo } from 'react';
 import {
   ShieldCheck,
   Store,
+  ShoppingBag,
   PackageCheck,
-  ShieldAlert,
-  Receipt,
-  Users,
-  BarChart3,
-  Search,
+  AlertTriangle,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
-  Ban,
-  Eye,
   RotateCcw,
   Download,
+  Search,
+  SlidersHorizontal,
+  Eye,
   ArrowUpRight,
   FileText,
-  Lock,
-  Unlock,
-  SlidersHorizontal,
+  Users,
+  Star,
+  Clock,
   ExternalLink,
   X,
   Plus,
+  Ban,
+  TrendingUp,
+  Leaf,
+  Droplets,
+  Coins,
+  MessageSquare,
+  Check,
+  Receipt,
+  MapPin,
+  Sparkles,
 } from 'lucide-react';
 import {
   SisaPiringItem,
@@ -45,14 +52,16 @@ import {
   AccountStatus,
   MACRO_IMPACT_BY_PERIOD,
 } from '../data/adminData';
+import { useApp } from '../context/AppContext';
 
-export type AdminModuleTab =
-  | 'macro-impact'
-  | 'seller-verification'
-  | 'product-monitoring'
-  | 'report-management'
-  | 'transaction-monitoring'
-  | 'access-control';
+export type AdminTab =
+  | 'overview'
+  | 'seller-governance'
+  | 'product-curation'
+  | 'order-escrow'
+  | 'disputes-refund'
+  | 'reviews-moderation'
+  | 'user-access';
 
 interface AdminDashboardPageProps {
   catalogItems: SisaPiringItem[];
@@ -112,6 +121,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   transactions,
   discountHistory,
   userAccounts,
+  orders,
+  complaints,
   onUpdateUmkmStatus,
   onAddSimulatedUmkm,
   onUpdateProductMonitoring,
@@ -124,2759 +135,1787 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   onSwitchToSellerPortal,
   onOpenPublicStore,
 }) => {
-  const [activeTab, setActiveTab] = useState<AdminModuleTab>('macro-impact');
-  const [adminNotice, setAdminNotice] = useState<string | null>(null);
+  const { sellerProfile, products: sellerProducts, orders: liveSellerOrders } = useApp();
+  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
 
-  // Module 1: Seller Verification State
-  const [umkmFilter, setUmkmFilter] = useState<'Semua' | UmkmVerificationStatus>('Semua');
-  const [umkmSearch, setUmkmSearch] = useState('');
+  // Search & Filter States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sellerStatusFilter, setSellerStatusFilter] = useState<'all' | UmkmVerificationStatus>('all');
+  const [productStatusFilter, setProductStatusFilter] = useState<'all' | ProductMonitoringStatus>('all');
+  const [disputeStatusFilter, setDisputeStatusFilter] = useState<'all' | DisputeStatus>('all');
+  const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
+
+  // Interactive Modal States
   const [selectedUmkmModal, setSelectedUmkmModal] = useState<UmkmVerificationRecord | null>(null);
-  const [umkmNoteInput, setUmkmNoteInput] = useState('');
-  const [showAddUmkmModal, setShowAddUmkmModal] = useState(false);
-  const [newUmkmStore, setNewUmkmStore] = useState('');
-  const [newUmkmOwner, setNewUmkmOwner] = useState('');
-  const [newUmkmCategory, setNewUmkmCategory] = useState('Roti, Kue & Pastry');
-  const [newUmkmDistrict, setNewUmkmDistrict] = useState('Coblong (Dago / Dipatiukur)');
-  const [newUmkmNib, setNewUmkmNib] = useState('');
-
-  // Module 2: Product Monitoring State
-  const [productFilter, setProductFilter] = useState<'Semua' | ProductMonitoringStatus>('Semua');
-  const [productSearch, setProductSearch] = useState('');
   const [takedownModalItem, setTakedownModalItem] = useState<SisaPiringItem | null>(null);
-  const [takedownReasonInput, setTakedownReasonInput] = useState(
-    'Laporan Ketidaksesuaian Standar Keamanan Pangan / Risiko Basi'
-  );
-  const [takedownCustomNote, setTakedownCustomNote] = useState('');
-
-  // Module 3: Report Management (Dispute Resolution) State
-  const [disputeFilter, setDisputeFilter] = useState<'Semua' | 'Aktif' | 'Selesai'>('Semua');
-  const [disputeSearch, setDisputeSearch] = useState('');
-  const [selectedDispute, setSelectedDispute] = useState<AdminDisputeRecord | null>(null);
-  const [disputeNoteInput, setDisputeNoteInput] = useState('');
-  const [disputeAutoTakedown, setDisputeAutoTakedown] = useState(false);
-
-  // Module 4: Transaction & Anti-Manipulation State
-  const [trxSubTab, setTrxSubTab] = useState<'transactions' | 'discount-history'>('transactions');
-  const [trxFilter, setTrxFilter] = useState<'Semua' | 'Anomali' | 'Escrow' | 'Refunded'>('Semua');
-  const [trxSearch, setTrxSearch] = useState('');
-
-  // Module 5: Account Access Control State
-  const [roleFilter, setRoleFilter] = useState<'Semua' | UserRole>('Semua');
-  const [statusFilter, setStatusFilter] = useState<'Semua' | AccountStatus>('Semua');
-  const [userSearch, setUserSearch] = useState('');
-  const [selectedUserModal, setSelectedUserModal] = useState<UserAccessRecord | null>(null);
-  const [editUserRole, setEditUserRole] = useState<UserRole>('Buyer');
-  const [editUserStatus, setEditUserStatus] = useState<AccountStatus>('Aktif');
-  const [editUserSanction, setEditUserSanction] = useState('');
-  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [takedownReasonText, setTakedownReasonText] = useState('Melanggar standar kesegaran & batas aman konsumsi (prep window).');
+  const [selectedDisputeModal, setSelectedDisputeModal] = useState<AdminDisputeRecord | null>(null);
+  const [disputeResolutionNote, setDisputeResolutionNote] = useState('Refund 100% diproses langsung ke rekening pembeli dari dana escrow platform.');
+  const [priceCorrectionModalItem, setPriceCorrectionModalItem] = useState<DiscountHistoryEntry | null>(null);
+  const [correctedPriceInput, setCorrectedPriceInput] = useState<number>(0);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPhone, setNewUserPhone] = useState('');
-  const [newUserRole, setNewUserRole] = useState<UserRole>('UMKM');
+  const [newUserRole, setNewUserRole] = useState<UserRole>('Buyer');
+  const [newUserDistrict, setNewUserDistrict] = useState('Coblong (Dago / Dipatiukur)');
 
-  // Module 6: Macro Impact Dashboard State
-  const [macroPeriod, setMacroPeriod] = useState<'7d' | '30d' | 'quarter' | 'all'>('30d');
-
-  const showToast = (msg: string) => {
-    setAdminNotice(msg);
-    window.setTimeout(() => {
-      setAdminNotice((prev) => (prev === msg ? null : prev));
-    }, 3500);
+  // Notification Toast State
+  const [adminToast, setAdminToast] = useState<{ title: string; message: string } | null>(null);
+  const showToast = (title: string, message: string) => {
+    setAdminToast({ title, message });
+    window.setTimeout(() => setAdminToast(null), 3500);
   };
 
-  // Counts for Sidebar Navigation
-  const pendingUmkmCount = useMemo(
-    () => umkmVerifications.filter((u) => u.status === 'Menunggu Verifikasi').length,
-    [umkmVerifications]
-  );
-
-  const flaggedProductCount = useMemo(
-    () =>
-      Object.values(productMonitoring).filter(
-        (m) => m.monitoringStatus !== 'Aktif & Aman'
-      ).length,
-    [productMonitoring]
-  );
-
-  const openDisputesCount = useMemo(
-    () =>
-      disputes.filter(
-        (d) => d.status === 'Sedang Ditinjau' || d.status === 'Investigasi Mitra'
-      ).length,
-    [disputes]
-  );
-
-  const anomalyTrxCount = useMemo(
-    () =>
-      transactions.filter((t) => t.manipulationFlag !== 'Aman').length +
-      discountHistory.filter((d) => d.status === 'Peringatan Manipulasi Harga').length,
-    [transactions, discountHistory]
-  );
-
-  const suspendedUsersCount = useMemo(
-    () => userAccounts.filter((u) => u.status !== 'Aktif').length,
-    [userAccounts]
-  );
-
-  // Filtered Lists
-  const filteredUmkmList = useMemo(() => {
-    return umkmVerifications.filter((u) => {
-      const matchStatus = umkmFilter === 'Semua' || u.status === umkmFilter;
-      const q = umkmSearch.trim().toLowerCase();
-      const matchSearch =
-        !q ||
-        u.storeName.toLowerCase().includes(q) ||
-        u.ownerName.toLowerCase().includes(q) ||
-        u.district.toLowerCase().includes(q) ||
-        u.nibNumber.toLowerCase().includes(q);
-      return matchStatus && matchSearch;
-    });
-  }, [umkmVerifications, umkmFilter, umkmSearch]);
-
-  const filteredProducts = useMemo(() => {
-    return catalogItems.filter((item) => {
-      const meta = productMonitoring[item.id] || {
-        itemId: item.id,
-        monitoringStatus: 'Aktif & Aman',
-        reportCount: 0,
-        safetyFlag: 'Aman',
-        prepWindowVerified: true,
-        lastCheckedAt: 'Hari ini',
-      };
-      const matchStatus =
-        productFilter === 'Semua' || meta.monitoringStatus === productFilter;
-      const q = productSearch.trim().toLowerCase();
-      const matchSearch =
-        !q ||
-        item.title.toLowerCase().includes(q) ||
-        item.merchantName.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q);
-      return matchStatus && matchSearch;
-    });
-  }, [catalogItems, productMonitoring, productFilter, productSearch]);
-
-  const filteredDisputes = useMemo(() => {
-    return disputes.filter((d) => {
-      const isActive =
-        d.status === 'Sedang Ditinjau' || d.status === 'Investigasi Mitra';
-      const matchStatus =
-        disputeFilter === 'Semua' ||
-        (disputeFilter === 'Aktif' && isActive) ||
-        (disputeFilter === 'Selesai' && !isActive);
-      const q = disputeSearch.trim().toLowerCase();
-      const matchSearch =
-        !q ||
-        d.ticketCode.toLowerCase().includes(q) ||
-        d.orderCode.toLowerCase().includes(q) ||
-        d.merchantName.toLowerCase().includes(q) ||
-        d.reporterName.toLowerCase().includes(q) ||
-        d.category.toLowerCase().includes(q);
-      return matchStatus && matchSearch;
-    });
-  }, [disputes, disputeFilter, disputeSearch]);
-
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter((t) => {
-      const matchFilter =
-        trxFilter === 'Semua' ||
-        (trxFilter === 'Anomali' && t.manipulationFlag !== 'Aman') ||
-        (trxFilter === 'Escrow' && t.gatewayStatus === 'Dana Ditahan (Escrow)') ||
-        (trxFilter === 'Refunded' &&
-          (t.gatewayStatus === 'Refunded' || t.gatewayStatus === 'Dibatalkan'));
-      const q = trxSearch.trim().toLowerCase();
-      const matchSearch =
-        !q ||
-        t.orderCode.toLowerCase().includes(q) ||
-        t.merchantName.toLowerCase().includes(q) ||
-        t.buyerName.toLowerCase().includes(q) ||
-        t.paymentGatewayRef.toLowerCase().includes(q);
-      return matchFilter && matchSearch;
-    });
-  }, [transactions, trxFilter, trxSearch]);
-
-  const filteredUsers = useMemo(() => {
-    return userAccounts.filter((u) => {
-      const matchRole = roleFilter === 'Semua' || u.role === roleFilter;
-      const matchStatus = statusFilter === 'Semua' || u.status === statusFilter;
-      const q = userSearch.trim().toLowerCase();
-      const matchSearch =
-        !q ||
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.phone.toLowerCase().includes(q) ||
-        u.district.toLowerCase().includes(q);
-      return matchRole && matchStatus && matchSearch;
-    });
-  }, [userAccounts, roleFilter, statusFilter, userSearch]);
-
-  const currentMacroStats = useMemo(() => {
-    const base = MACRO_IMPACT_BY_PERIOD[macroPeriod];
-    const verifiedUmkmExtra = umkmVerifications.filter(
-      (u) => u.status === 'Verified'
+  // Macro Metrics (Bandung Aggregates)
+  const macroStats = useMemo(() => {
+    const period = MACRO_IMPACT_BY_PERIOD['30d'];
+    const totalOrdersCount = orders.length + transactions.length;
+    const totalRescuedPortions = orders.reduce(
+      (acc, o) => acc + o.items.reduce((sum, item) => sum + item.quantity, 0),
+      period.totalPortionsRescued
+    );
+    const activeProductsCount = catalogItems.filter(
+      (item) => (productMonitoring[item.id]?.monitoringStatus ?? 'Aktif & Aman') === 'Aktif & Aman'
     ).length;
-    return {
-      ...base,
-      activeUmkmPartners: base.activeUmkmPartners + Math.max(0, verifiedUmkmExtra - 2),
-    };
-  }, [macroPeriod, umkmVerifications]);
+    const pendingUmkmCount = umkmVerifications.filter((u) => u.status === 'Menunggu Verifikasi').length;
+    const openDisputesCount = disputes.filter(
+      (d) => d.status === 'Sedang Ditinjau' || d.status === 'Investigasi Mitra'
+    ).length;
+    const totalEscrowHeld = transactions
+      .filter((t) => t.gatewayStatus === 'Dana Ditahan (Escrow)')
+      .reduce((acc, t) => acc + t.totalPaid, 0);
 
-  const handleExportCsvReport = () => {
-    const rows = [
-      ['Indikator Dampak SisaPiring', 'Nilai', 'Periode'],
-      [
-        'Total Porsi Makanan Terselamatkan',
-        String(currentMacroStats.totalPortionsRescued),
-        currentMacroStats.periodLabel,
-      ],
-      [
-        'Total Transaksi Selesai',
-        String(currentMacroStats.totalTransactionsCompleted),
-        currentMacroStats.periodLabel,
-      ],
-      [
-        'Pengurangan Sampah Pangan (kg)',
-        String(currentMacroStats.foodWastePreventedKg),
-        currentMacroStats.periodLabel,
-      ],
-      [
-        'Pengurangan Emisi Karbon CO2e (kg)',
-        String(currentMacroStats.co2EmissionsSavedKg),
-        currentMacroStats.periodLabel,
-      ],
-      [
-        'Mitra UMKM Aktif Berpartisipasi',
-        String(currentMacroStats.activeUmkmPartners),
-        currentMacroStats.periodLabel,
-      ],
-      [
-        'Pendapatan UMKM Dipulihkan (IDR)',
-        String(currentMacroStats.umkmRevenueRecovered),
-        currentMacroStats.periodLabel,
-      ],
-    ];
+    return {
+      period,
+      totalOrdersCount,
+      totalRescuedPortions,
+      activeProductsCount,
+      pendingUmkmCount,
+      openDisputesCount,
+      totalEscrowHeld,
+    };
+  }, [orders, transactions, catalogItems, productMonitoring, umkmVerifications, disputes]);
+
+  // Combined Seller Data (Syncing Kala Bakehouse with list)
+  const displayUmkmList = useMemo(() => {
+    return umkmVerifications.filter((u) => {
+      if (sellerStatusFilter !== 'all' && u.status !== sellerStatusFilter) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        return (
+          u.storeName.toLowerCase().includes(q) ||
+          u.ownerName.toLowerCase().includes(q) ||
+          u.district.toLowerCase().includes(q) ||
+          u.nibNumber.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [umkmVerifications, sellerStatusFilter, searchQuery]);
+
+  // Combined Products (Catalog + Monitoring Status)
+  const displayProducts = useMemo(() => {
+    return catalogItems.filter((item) => {
+      const meta = productMonitoring[item.id] || { monitoringStatus: 'Aktif & Aman' };
+      if (productStatusFilter !== 'all' && meta.monitoringStatus !== productStatusFilter) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        return (
+          item.title.toLowerCase().includes(q) ||
+          item.merchantName.toLowerCase().includes(q) ||
+          item.category.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [catalogItems, productMonitoring, productStatusFilter, searchQuery]);
+
+  // Combined Disputes & Complaints
+  const displayDisputes = useMemo(() => {
+    return disputes.filter((d) => {
+      if (disputeStatusFilter !== 'all' && d.status !== disputeStatusFilter) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        return (
+          d.ticketCode.toLowerCase().includes(q) ||
+          d.orderCode.toLowerCase().includes(q) ||
+          d.reporterName.toLowerCase().includes(q) ||
+          d.merchantName.toLowerCase().includes(q) ||
+          d.category.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [disputes, disputeStatusFilter, searchQuery]);
+
+  // Filtered Users
+  const displayUsers = useMemo(() => {
+    return userAccounts.filter((u) => {
+      if (roleFilter !== 'all' && u.role !== roleFilter) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        return (
+          u.name.toLowerCase().includes(q) ||
+          u.email.toLowerCase().includes(q) ||
+          u.phone.toLowerCase().includes(q) ||
+          u.district.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [userAccounts, roleFilter, searchQuery]);
+
+  // Export CSV Handler
+  const handleExportCSV = () => {
     const csvContent =
       'data:text/csv;charset=utf-8,' +
-      rows.map((e) => e.join(',')).join('\n');
+      'Kecamatan,Porsi_Diselamatkan,Sampah_Dicegah_Kg,UMKM_Aktif,Tingkat_Partisipasi\n' +
+      macroStats.period.districtStats
+        .map(
+          (d) =>
+            `"${d.district}",${d.portionsRescued},${d.wasteReducedKg},${d.activeUmkm},"${d.participationRate}%"`
+        )
+        .join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Laporan_Dampak_SisaPiring_${macroPeriod}.csv`);
+    link.setAttribute('download', `laporan_sisapiring_bandung_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('Laporan CSV Dampak Makro SisaPiring berhasil diunduh.');
+    showToast('Laporan Diunduh', 'Berkas CSV laporan makro Kota Bandung berhasil diunduh.');
   };
 
-  const NAV_ITEMS: {
-    id: AdminModuleTab;
-    label: string;
-    shortDesc: string;
-    icon: React.FC<{ className?: string }>;
-    counter?: number;
-  }[] = [
-    {
-      id: 'macro-impact',
-      label: 'Dasbor Dampak Makro',
-      shortDesc: 'Food Rescue Statistics',
-      icon: BarChart3,
-    },
-    {
-      id: 'seller-verification',
-      label: 'Validasi UMKM',
-      shortDesc: 'Seller Verification',
-      icon: Store,
-      counter: pendingUmkmCount,
-    },
-    {
-      id: 'product-monitoring',
-      label: 'Pemantauan Produk',
-      shortDesc: 'Product & Food Safety',
-      icon: PackageCheck,
-      counter: flaggedProductCount,
-    },
-    {
-      id: 'report-management',
-      label: 'Penyelesaian Sengketa',
-      shortDesc: 'Report Management',
-      icon: ShieldAlert,
-      counter: openDisputesCount,
-    },
-    {
-      id: 'transaction-monitoring',
-      label: 'Transaksi & Anti-Manipulasi',
-      shortDesc: 'Discount History & Refund',
-      icon: Receipt,
-      counter: anomalyTrxCount,
-    },
-    {
-      id: 'access-control',
-      label: 'Manajemen Hak Akses',
-      shortDesc: 'Account Access Control',
-      icon: Users,
-      counter: suspendedUsersCount,
-    },
-  ];
-
-  const activeNavMeta =
-    NAV_ITEMS.find((n) => n.id === activeTab) || NAV_ITEMS[0];
-
   return (
-    <div className="min-h-screen bg-[#F4F3EF] text-stone-900 flex flex-col lg:flex-row">
-      {/* LEFT SIDEBAR NAVIGATION (268px Desktop) */}
-      <aside className="w-full lg:w-[272px] bg-[#122C22] text-stone-100 shrink-0 flex flex-col border-b lg:border-b-0 lg:border-r border-white/10">
-        {/* Brand Lockup */}
-        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+    <div className="min-h-screen bg-[#FAF9F6] text-neutral-900 flex flex-col font-sans">
+      {/* Toast Feedback */}
+      {adminToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#16382C] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-500/30 animate-in fade-in slide-in-from-bottom-4">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-amber-300 shrink-0" />
-              <span className="text-base font-bold tracking-tight font-display text-white">
-                SisaPiring Admin
-              </span>
-            </div>
-            <p className="text-[11px] text-emerald-200/80 mt-0.5">
-              Pusat Tata Kelola & Keamanan Pangan
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 lg:hidden">
-            <button
-              type="button"
-              onClick={onSwitchToPublicEtalase}
-              className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white cursor-pointer whitespace-nowrap"
-            >
-              Etalase
-            </button>
-            {onSwitchToSellerPortal && (
-              <button
-                type="button"
-                onClick={onSwitchToSellerPortal}
-                className="px-2.5 py-1.5 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-xs font-medium text-white cursor-pointer whitespace-nowrap"
-              >
-                Mitra UMKM
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Navigation Links */}
-        <nav
-          aria-label="Menu Modul Admin"
-          className="p-3 flex lg:flex-col gap-1.5 overflow-x-auto no-scrollbar"
-        >
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveTab(item.id)}
-                className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-left transition-colors cursor-pointer shrink-0 lg:w-full ${
-                  isActive
-                    ? 'bg-white text-[#122C22] font-semibold shadow-2xs'
-                    : 'text-stone-200 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <Icon
-                    className={`w-4 h-4 shrink-0 ${
-                      isActive ? 'text-[#122C22]' : 'text-amber-300/90'
-                    }`}
-                  />
-                  <div className="min-w-0">
-                    <span className="block text-xs font-semibold truncate">
-                      {item.label}
-                    </span>
-                    <span
-                      className={`hidden lg:block text-[11px] truncate ${
-                        isActive ? 'text-stone-600' : 'text-stone-400'
-                      }`}
-                    >
-                      {item.shortDesc}
-                    </span>
-                  </div>
-                </div>
-                {typeof item.counter === 'number' && item.counter > 0 && (
-                  <span
-                    className={`text-[11px] font-mono-tabular font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
-                      isActive
-                        ? 'bg-[#122C22] text-amber-300'
-                        : 'bg-white/15 text-amber-300'
-                    }`}
-                  >
-                    {item.counter}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Bottom Admin Identity & Quick Switch to Public App */}
-        <div className="hidden lg:flex flex-col mt-auto p-4 border-t border-white/10 space-y-3">
-          <div className="text-xs space-y-0.5">
-            <p className="font-semibold text-white">Nabil Rachman</p>
-            <p className="text-[11px] text-stone-300">
-              Pengelola Platform · Wilayah Bandung
-            </p>
+            <h5 className="font-bold text-xs">{adminToast.title}</h5>
+            <p className="text-[11px] text-emerald-200">{adminToast.message}</p>
           </div>
           <button
             type="button"
-            onClick={onSwitchToPublicEtalase}
-            className="w-full h-9 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium inline-flex items-center justify-between transition-colors cursor-pointer"
+            onClick={() => setAdminToast(null)}
+            className="ml-2 text-white/70 hover:text-white"
           >
-            <span>Buka Etalase Pembeli</span>
-            <ExternalLink className="w-3.5 h-3.5 text-amber-300" />
+            <X className="w-4 h-4" />
           </button>
-          {onSwitchToSellerPortal && (
-            <button
-              type="button"
-              onClick={onSwitchToSellerPortal}
-              className="w-full h-9 px-3 rounded-lg bg-emerald-900/60 hover:bg-emerald-900/90 text-emerald-200 text-xs font-medium inline-flex items-center justify-between transition-colors cursor-pointer border border-emerald-700/50"
-            >
-              <span>Buka Portal Mitra UMKM</span>
-              <Store className="w-3.5 h-3.5 text-emerald-300" />
-            </button>
-          )}
         </div>
-      </aside>
+      )}
 
-      {/* MAIN WORKSPACE VIEWPORT */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Contextual Top Bar Contract */}
-        <header className="bg-white border-b border-stone-200/90 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-stone-500 min-w-0">
-            <span className="font-medium text-stone-600 whitespace-nowrap">
-              Panel Pengelola
-            </span>
-            <span aria-hidden="true">/</span>
-            <span className="font-bold text-stone-900 truncate">
-              {activeNavMeta.label}
-            </span>
-            <span
-              aria-hidden="true"
-              className="hidden sm:inline text-stone-300"
-            >
-              ·
-            </span>
-            <span className="hidden sm:inline text-xs text-stone-500 truncate">
-              {activeNavMeta.shortDesc}
-            </span>
-          </div>
+      {/* Top Governance Navigation Bar */}
+      <header className="sticky top-0 z-40 bg-[#16382C] text-white border-b border-emerald-900 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 gap-4">
+            {/* Brand & Portal Role Identifier */}
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-300 font-bold shrink-0">
+                <ShieldCheck className="w-5 h-5 text-amber-300" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="font-extrabold text-sm sm:text-base tracking-tight text-white truncate">
+                    Pusat Tata Kelola Platform
+                  </h1>
+                  <span className="text-[10px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-300/30 shrink-0">
+                    Admin Console
+                  </span>
+                </div>
+                <p className="text-[11px] text-emerald-200/80 truncate">
+                  Penyelarasan Menu Konsumen (User) & Menu Mitra UMKM (Penjual) Bandung
+                </p>
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
-            {activeTab === 'macro-impact' && (
+            {/* Quick Cross-Portal Switcher Actions */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
-                onClick={handleExportCsvReport}
-                className="h-9 px-3.5 rounded-lg border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                onClick={onSwitchToPublicEtalase}
+                title="Buka Etalase Pembeli"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-emerald-100 transition-colors border border-white/10"
               >
-                <Download className="w-3.5 h-3.5 text-[#16382C]" />
-                <span>Unduh CSV Dampak</span>
+                <ShoppingBag className="w-3.5 h-3.5 text-amber-300" />
+                <span className="hidden sm:inline">Etalase Pembeli</span>
               </button>
-            )}
-            <button
-              type="button"
-              onClick={onSwitchToPublicEtalase}
-              className="h-9 px-3.5 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
-            >
-              <span>Lihat Etalase Publik</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-amber-300" />
-            </button>
-          </div>
-        </header>
 
-        {/* Feedback Banner */}
-        {adminNotice && (
-          <div className="mx-4 sm:mx-8 mt-4 px-4 py-3 rounded-xl bg-stone-900 text-white text-xs flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{adminNotice}</span>
+              <button
+                type="button"
+                onClick={onSwitchToSellerPortal}
+                title="Buka Portal Mitra UMKM"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-emerald-700/80 hover:bg-emerald-600 text-white transition-colors border border-emerald-500/30"
+              >
+                <Store className="w-3.5 h-3.5 text-emerald-200" />
+                <span className="hidden sm:inline">Portal Penjual</span>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setAdminNotice(null)}
-              className="text-stone-400 hover:text-white cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
+          </div>
+        </div>
+
+        {/* Tab Navigation Menu (Aligned to User & Seller Needs) */}
+        <div className="bg-[#122e24] border-t border-emerald-950/60 overflow-x-auto scrollbar-none">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1 sm:gap-2">
+            {[
+              { id: 'overview', label: 'Ringkasan & Dampak', icon: TrendingUp },
+              { id: 'seller-governance', label: 'Mitra UMKM (Sisi Penjual)', icon: Store, badge: macroStats.pendingUmkmCount },
+              { id: 'product-curation', label: 'Menu & Keamanan Pangan', icon: PackageCheck },
+              { id: 'order-escrow', label: 'Pesanan & Escrow', icon: Receipt },
+              { id: 'disputes-refund', label: 'Komplain & Refund (Sisi User)', icon: AlertTriangle, badge: macroStats.openDisputesCount, badgeColor: 'bg-rose-500' },
+              { id: 'reviews-moderation', label: 'Ulasan & Kepuasan', icon: Star },
+              { id: 'user-access', label: 'Manajemen Akun (RBAC)', icon: Users },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(tab.id as AdminTab);
+                    setSearchQuery('');
+                  }}
+                  className={`flex items-center gap-2 py-3 px-3 sm:px-4 text-xs font-semibold whitespace-nowrap transition-colors border-b-2 ${
+                    isActive
+                      ? 'border-amber-400 text-white bg-white/5 font-bold'
+                      : 'border-transparent text-emerald-200/70 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-400' : 'text-emerald-300/70'}`} />
+                  <span>{tab.label}</span>
+                  {tab.badge !== undefined && tab.badge > 0 && (
+                    <span
+                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold text-white ${
+                        tab.badgeColor || 'bg-amber-500'
+                      }`}
+                    >
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Admin Workspace Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* ========================================================
+            TAB 1: RINGKASAN EKOSISTEM & DAMPAK MAKRO
+        ======================================================== */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Welcome & Ecosystem Health Banner */}
+            <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                    Kota Bandung • Real-Time
+                  </span>
+                  <span className="text-xs text-neutral-400">Periode: {macroStats.period.periodLabel}</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 mt-1">
+                  Pusat Pengawasan Ekosistem SisaPiring
+                </h2>
+                <p className="text-xs sm:text-sm text-neutral-600 mt-1">
+                  Sinkronisasi menyeluruh antara transaksi konsumen, katalog sisa piring mitra UMKM, dan kepatuhan standar higienitas.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleExportCSV}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                >
+                  <Download className="w-4 h-4 text-emerald-400" />
+                  <span>Ekspor Laporan CSV</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 6 Key Macro Metrics Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+              <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-neutral-400">
+                  <span className="text-[11px] font-semibold">Porsi Diselamatkan</span>
+                  <ShoppingBag className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="text-xl font-black font-mono text-[#16382C]">
+                  {macroStats.totalRescuedPortions.toLocaleString('id-ID')}
+                </div>
+                <span className="text-[10px] text-emerald-600 font-semibold block">+12.4% minggu ini</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-neutral-400">
+                  <span className="text-[11px] font-semibold">Sampah Pangan Dicegah</span>
+                  <Leaf className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="text-xl font-black font-mono text-neutral-900">
+                  {macroStats.period.foodWastePreventedKg.toLocaleString('id-ID')} <span className="text-xs">kg</span>
+                </div>
+                <span className="text-[10px] text-neutral-500 block">TPA Sarimukti</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-neutral-400">
+                  <span className="text-[11px] font-semibold">Reduksi Gas CO2e</span>
+                  <TrendingUp className="w-4 h-4 text-emerald-700" />
+                </div>
+                <div className="text-xl font-black font-mono text-emerald-800">
+                  {macroStats.period.co2EmissionsSavedKg.toLocaleString('id-ID')} <span className="text-xs">kg</span>
+                </div>
+                <span className="text-[10px] text-neutral-500 block">Gas Metana Tercegah</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-neutral-400">
+                  <span className="text-[11px] font-semibold">Air Bersih Terlindungi</span>
+                  <Droplets className="w-4 h-4 text-sky-600" />
+                </div>
+                <div className="text-xl font-black font-mono text-sky-800">
+                  {macroStats.period.waterSavedLiters.toLocaleString('id-ID')} <span className="text-xs">L</span>
+                </div>
+                <span className="text-[10px] text-neutral-500 block">Virtual Water Footprint</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-neutral-400">
+                  <span className="text-[11px] font-semibold">Omzet UMKM Pulih</span>
+                  <Coins className="w-4 h-4 text-amber-600" />
+                </div>
+                <div className="text-xl font-black font-mono text-[#16382C]">
+                  {formatRupiah(macroStats.period.umkmRevenueRecovered)}
+                </div>
+                <span className="text-[10px] text-emerald-600 font-semibold block">Dipulihkan ke Pedagang</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-neutral-400">
+                  <span className="text-[11px] font-semibold">Dana Escrow Aktif</span>
+                  <Receipt className="w-4 h-4 text-indigo-600" />
+                </div>
+                <div className="text-xl font-black font-mono text-indigo-900">
+                  {formatRupiah(macroStats.totalEscrowHeld)}
+                </div>
+                <span className="text-[10px] text-indigo-600 font-semibold block">Terlindungi Pembeli</span>
+              </div>
+            </div>
+
+            {/* Ecosystem Balance Grid: User Needs vs Seller Needs */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column: Sisi Mitra UMKM (Penjual) */}
+              <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
+                      <Store className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm text-neutral-900">Sisi Mitra UMKM (Penjual)</h3>
+                      <p className="text-[11px] text-neutral-500">Legalitas, prep window, dan pelepasan dana penjualan</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('seller-governance')}
+                    className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1"
+                  >
+                    <span>Kelola Mitra</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-neutral-800 block">
+                        Mitra Aktif & Terverifikasi
+                      </span>
+                      <span className="text-[11px] text-neutral-500">
+                        {umkmVerifications.filter((u) => u.status === 'Verified').length} Gerai Resmi di 5 Kecamatan
+                      </span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                      Sesuai Standar
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-neutral-800 block">
+                        Pengajuan KYB Menunggu Review
+                      </span>
+                      <span className="text-[11px] text-neutral-500">
+                        {macroStats.pendingUmkmCount} UMKM baru mendaftar NIB & Halal
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('seller-governance');
+                        setSellerStatusFilter('Menunggu Verifikasi');
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500 hover:bg-amber-600 text-white"
+                    >
+                      Tinjau Sekarang
+                    </button>
+                  </div>
+
+                  <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-neutral-800 block">
+                        Menu Sisa Piring Tayang
+                      </span>
+                      <span className="text-[11px] text-neutral-500">
+                        {macroStats.activeProductsCount} menu dalam pengawasan prep window
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('product-curation')}
+                      className="text-xs font-bold text-emerald-700 hover:underline"
+                    >
+                      Buka Kurasi
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Sisi Konsumen (Pembeli) */}
+              <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center font-bold">
+                      <ShoppingBag className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm text-neutral-900">Sisi Konsumen (Pembeli)</h3>
+                      <p className="text-[11px] text-neutral-500">Pesanan, kepuasan ulasan, dan jaminan refund komplain</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('disputes-refund')}
+                    className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1"
+                  >
+                    <span>Pusat Komplain</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-neutral-800 block">
+                        Pesanan Masuk & Serah Terima
+                      </span>
+                      <span className="text-[11px] text-neutral-500">
+                        {macroStats.totalOrdersCount} pesanan konsumen telah terintegrasi
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('order-escrow')}
+                      className="text-xs font-bold text-emerald-700 hover:underline"
+                    >
+                      Cek Pesanan
+                    </button>
+                  </div>
+
+                  <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-neutral-800 block">
+                        Tiket Komplain & Proteksi Refund
+                      </span>
+                      <span className="text-[11px] text-neutral-500">
+                        {macroStats.openDisputesCount} tiket membutuhkan resolusi cepat
+                      </span>
+                    </div>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        macroStats.openDisputesCount > 0
+                          ? 'bg-rose-100 text-rose-800 font-bold'
+                          : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {macroStats.openDisputesCount > 0 ? 'Perlu Ditindak' : 'Semua Beres'}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-neutral-800 block">
+                        Indeks Kepuasan Konsumen
+                      </span>
+                      <span className="text-[11px] text-neutral-500">
+                        Rata-rata 4.8 / 5.0 dari ulasan pembeli Bandung
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('reviews-moderation')}
+                      className="text-xs font-bold text-emerald-700 hover:underline"
+                    >
+                      Buka Ulasan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* District Breakdown Table */}
+            <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-sm text-neutral-900">
+                    Sebaran Penyelamatan Pangan Per Kecamatan di Kota Bandung
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    Memantau serapan konsumsi warga dan kontribusi UMKM di wilayah Bandung
+                  </p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-neutral-200 text-neutral-400 font-semibold uppercase text-[10px]">
+                      <th className="py-3 px-3">Kecamatan</th>
+                      <th className="py-3 px-3">Porsi Diselamatkan</th>
+                      <th className="py-3 px-3">Sampah Dicegah</th>
+                      <th className="py-3 px-3">Reduksi CO2</th>
+                      <th className="py-3 px-3">Air Bersih</th>
+                      <th className="py-3 px-3">Mitra Aktif</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                    {macroStats.period.districtStats.map((d) => (
+                      <tr key={d.district} className="hover:bg-neutral-50/70 transition-colors">
+                        <td className="py-3 px-3 font-bold text-neutral-900 flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>{d.district}</span>
+                        </td>
+                        <td className="py-3 px-3 font-mono font-bold text-[#16382C]">
+                          {d.portionsRescued.toLocaleString('id-ID')} porsi
+                        </td>
+                        <td className="py-3 px-3 font-mono">{d.wasteReducedKg.toLocaleString('id-ID')} kg</td>
+                        <td className="py-3 px-3 font-mono text-emerald-700 font-semibold">
+                          {Math.round(d.portionsRescued * 0.45).toLocaleString('id-ID')} kg
+                        </td>
+                        <td className="py-3 px-3 font-mono text-sky-700">
+                          {Math.round(d.portionsRescued * 62).toLocaleString('id-ID')} L
+                        </td>
+                        <td className="py-3 px-3 font-semibold">
+                          {d.activeUmkm} Gerai <span className="text-[10px] text-neutral-400">({d.participationRate}%)</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* MODULE CONTENT CONTAINER */}
-        <div className="p-4 sm:p-8 space-y-6 max-w-[1360px] w-full mx-auto">
-          {/* =====================================================================
-              MODULE 6 (DEFAULT HOME): DASBOR DAMPAK MAKRO (FOOD RESCUE STATISTICS)
-             ===================================================================== */}
-          {activeTab === 'macro-impact' && (
-            <div className="space-y-6">
-              {/* Top Heading + Timeframe Selector */}
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                    Dasbor Dampak Makro & Food Rescue Tracker
-                  </h1>
-                  <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
-                    Pemantauan indikator keberhasilan penyelamatan pangan, reduksi emisi karbon, dan partisipasi mitra UMKM Bandung.
-                  </p>
-                </div>
-
-                {/* Interactive Period Filter Tabs */}
-                <div className="flex items-center gap-1 p-1 bg-stone-200/80 rounded-xl self-start">
-                  {(
-                    [
-                      { id: '7d', label: '7 Hari' },
-                      { id: '30d', label: '30 Hari' },
-                      { id: 'quarter', label: 'Kuartal Ini' },
-                      { id: 'all', label: 'Semua Waktu' },
-                    ] as const
-                  ).map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setMacroPeriod(p.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                        macroPeriod === p.id
-                          ? 'bg-white text-stone-900 shadow-2xs'
-                          : 'text-stone-600 hover:text-stone-900'
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4 Primary Macro Indicators */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white border border-stone-200 rounded-xl p-5 space-y-1.5">
-                  <span className="text-xs font-medium text-stone-500">
-                    Total Makanan Terselamatkan
-                  </span>
-                  <p className="text-2xl sm:text-3xl font-bold text-stone-900 font-mono-tabular">
-                    {currentMacroStats.totalPortionsRescued.toLocaleString('id-ID')}{' '}
-                    <span className="text-sm font-normal text-stone-500">Porsi</span>
-                  </p>
-                  <p className="text-xs text-emerald-800 font-medium">
-                    Setara {currentMacroStats.foodWastePreventedKg.toLocaleString('id-ID')} kg sampah pangan dicegah
-                  </p>
-                </div>
-
-                <div className="bg-white border border-stone-200 rounded-xl p-5 space-y-1.5">
-                  <span className="text-xs font-medium text-stone-500">
-                    Total Transaksi Selesai
-                  </span>
-                  <p className="text-2xl sm:text-3xl font-bold text-stone-900 font-mono-tabular">
-                    {currentMacroStats.totalTransactionsCompleted.toLocaleString('id-ID')}{' '}
-                    <span className="text-sm font-normal text-stone-500">Pesanan</span>
-                  </p>
-                  <p className="text-xs text-stone-600">
-                    Pendapatan UMKM pulih:{' '}
-                    <strong className="font-mono-tabular text-stone-900">
-                      {formatRupiah(currentMacroStats.umkmRevenueRecovered)}
-                    </strong>
-                  </p>
-                </div>
-
-                <div className="bg-white border border-stone-200 rounded-xl p-5 space-y-1.5">
-                  <span className="text-xs font-medium text-stone-500">
-                    Estimasi Pengurangan Emisi Gas Rumah Kaca
-                  </span>
-                  <p className="text-2xl sm:text-3xl font-bold text-[#16382C] font-mono-tabular">
-                    {currentMacroStats.co2EmissionsSavedKg.toLocaleString('id-ID')}{' '}
-                    <span className="text-sm font-normal text-stone-500">kg CO₂e</span>
-                  </p>
-                  <p className="text-xs text-stone-600">
-                    Hemat jejak air produksi:{' '}
-                    <strong className="font-mono-tabular">
-                      {(currentMacroStats.waterSavedLiters / 1000).toFixed(1)}k Liter
-                    </strong>
-                  </p>
-                </div>
-
-                <div className="bg-white border border-stone-200 rounded-xl p-5 space-y-1.5">
-                  <span className="text-xs font-medium text-stone-500">
-                    Partisipasi Mitra UMKM Bandung
-                  </span>
-                  <p className="text-2xl sm:text-3xl font-bold text-stone-900 font-mono-tabular">
-                    {currentMacroStats.activeUmkmPartners}{' '}
-                    <span className="text-sm font-normal text-stone-500">
-                      / {currentMacroStats.totalUmkmApplications} UMKM
-                    </span>
-                  </p>
-                  <p className="text-xs text-emerald-800 font-medium">
-                    Penghematan warga:{' '}
-                    <strong className="font-mono-tabular">
-                      {formatRupiah(currentMacroStats.citizenSavingsTotal)}
-                    </strong>
-                  </p>
-                </div>
-              </div>
-
-              {/* Actionable Governance Queue Strip (Links to the other 5 Admin Modules) */}
-              <div className="bg-white border border-stone-200 rounded-xl p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-100">
-                  <div>
-                    <h2 className="text-sm font-bold text-stone-900">
-                      Antrean Tugas Pengelola Platform Hari Ini
-                    </h2>
-                    <p className="text-xs text-stone-500">
-                      Ringkasan item operasional yang memerlukan tinjauan atau keputusan Admin.
-                    </p>
-                  </div>
-                  <span className="text-xs text-stone-500 font-mono-tabular">
-                    Periode Aktif: {currentMacroStats.periodLabel}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('seller-verification')}
-                    className="p-3.5 rounded-xl border border-stone-200 hover:border-[#16382C] text-left transition-colors cursor-pointer"
-                  >
-                    <span className="text-xs text-stone-500 block">Validasi UMKM</span>
-                    <span className="text-lg font-bold text-stone-900 font-mono-tabular mt-0.5 block">
-                      {pendingUmkmCount} Menunggu
-                    </span>
-                    <span className="text-[11px] text-[#16382C] font-semibold mt-1 inline-flex items-center gap-1">
-                      Periksa Dokumen <ArrowUpRight className="w-3 h-3" />
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('product-monitoring')}
-                    className="p-3.5 rounded-xl border border-stone-200 hover:border-[#16382C] text-left transition-colors cursor-pointer"
-                  >
-                    <span className="text-xs text-stone-500 block">Keamanan Produk</span>
-                    <span className="text-lg font-bold text-stone-900 font-mono-tabular mt-0.5 block">
-                      {flaggedProductCount} Perlu Audit
-                    </span>
-                    <span className="text-[11px] text-[#16382C] font-semibold mt-1 inline-flex items-center gap-1">
-                      Pantau Etalase <ArrowUpRight className="w-3 h-3" />
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('report-management')}
-                    className="p-3.5 rounded-xl border border-stone-200 hover:border-[#16382C] text-left transition-colors cursor-pointer"
-                  >
-                    <span className="text-xs text-stone-500 block">Sengketa Pembeli</span>
-                    <span className="text-lg font-bold text-red-700 font-mono-tabular mt-0.5 block">
-                      {openDisputesCount} Komplain Aktif
-                    </span>
-                    <span className="text-[11px] text-[#16382C] font-semibold mt-1 inline-flex items-center gap-1">
-                      Tindak Lanjuti <ArrowUpRight className="w-3 h-3" />
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('transaction-monitoring');
-                      setTrxSubTab('discount-history');
-                    }}
-                    className="p-3.5 rounded-xl border border-stone-200 hover:border-[#16382C] text-left transition-colors cursor-pointer"
-                  >
-                    <span className="text-xs text-stone-500 block">Anti-Manipulasi Harga</span>
-                    <span className="text-lg font-bold text-amber-800 font-mono-tabular mt-0.5 block">
-                      {anomalyTrxCount} Indikasi Markup
-                    </span>
-                    <span className="text-[11px] text-[#16382C] font-semibold mt-1 inline-flex items-center gap-1">
-                      Cek Discount History <ArrowUpRight className="w-3 h-3" />
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('access-control')}
-                    className="p-3.5 rounded-xl border border-stone-200 hover:border-[#16382C] text-left transition-colors cursor-pointer"
-                  >
-                    <span className="text-xs text-stone-500 block">Manajemen Akun</span>
-                    <span className="text-lg font-bold text-stone-900 font-mono-tabular mt-0.5 block">
-                      {userAccounts.length} Akun Terdaftar
-                    </span>
-                    <span className="text-[11px] text-[#16382C] font-semibold mt-1 inline-flex items-center gap-1">
-                      Kelola Hak Akses <ArrowUpRight className="w-3 h-3" />
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Two-Column Split: Timeline Trend + Culinary Category Breakdown */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-                {/* Left 7 Cols: Timeline Volume & Food Waste Prevented */}
-                <div className="lg:col-span-7 bg-white border border-stone-200 rounded-xl p-5 flex flex-col justify-between space-y-5">
-                  <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-3.5">
-                    <div>
-                      <h2 className="text-sm font-bold text-stone-900">
-                        Tren Penyelamatan Porsi & Pengurangan Food Waste
-                      </h2>
-                      <p className="text-xs text-stone-500">
-                        Perbandingan porsi terselamatkan, transaksi selesai, dan berat limbah pangan yang dicegah.
-                      </p>
-                    </div>
-                    <span className="text-xs font-mono-tabular text-stone-500">
-                      1 Porsi ≈ 0,45 kg Pangan
-                    </span>
-                  </div>
-
-                  <div className="space-y-3.5">
-                    {currentMacroStats.timelineData.map((row) => {
-                      const maxPortions = Math.max(
-                        ...currentMacroStats.timelineData.map((t) => t.portions),
-                        1
-                      );
-                      const widthPct = Math.round((row.portions / maxPortions) * 100);
-                      return (
-                        <div key={row.label} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-stone-800">
-                              {row.label}
-                            </span>
-                            <div className="flex items-center gap-3 font-mono-tabular text-stone-600">
-                              <span>
-                                <strong className="text-stone-900">{row.portions}</strong> porsi
-                              </span>
-                              <span>·</span>
-                              <span>{row.transactions} transaksi</span>
-                              <span>·</span>
-                              <span className="text-[#16382C] font-semibold">
-                                -{row.wasteKg} kg limbah
-                              </span>
-                            </div>
-                          </div>
-                          <div className="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-[#16382C] rounded-full transition-all duration-300"
-                              style={{ width: `${widthPct}%` }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
-                    <span>
-                      Formula Emisi: 1 kg makanan berlebih yang diselamatkan mencegah ≈ 2,5 kg emisi CO₂e di TPA.
-                    </span>
-                    <span className="font-mono-tabular font-semibold text-stone-800">
-                      Tingkat Keberhasilan Serah Terima: 98,4%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Right 5 Cols: Category Contribution */}
-                <div className="lg:col-span-5 bg-white border border-stone-200 rounded-xl p-5 flex flex-col justify-between space-y-4">
-                  <div className="border-b border-stone-100 pb-3.5">
-                    <h2 className="text-sm font-bold text-stone-900">
-                      Kontribusi Kategori Kuliner UMKM
-                    </h2>
-                    <p className="text-xs text-stone-500">
-                      Distribusi porsi terselamatkan dan rata-rata diskon per jenis usaha.
-                    </p>
-                  </div>
-
-                  <div className="divide-y divide-stone-100">
-                    {currentMacroStats.categoryImpact.map((cat) => (
-                      <div
-                        key={cat.category}
-                        className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3"
-                      >
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold text-stone-900 truncate">
-                            {cat.category}
-                          </p>
-                          <p className="text-[11px] text-stone-500 font-mono-tabular">
-                            {cat.transactions.toLocaleString('id-ID')} transaksi · Diskon rata-rata {cat.avgDiscountPercent}%
-                          </p>
-                        </div>
-                        <div className="text-right shrink-0 font-mono-tabular">
-                          <span className="block text-xs font-bold text-stone-900">
-                            {cat.portionsRescued.toLocaleString('id-ID')} porsi
-                          </span>
-                          <span className="block text-[11px] text-emerald-800">
-                            -{cat.co2SavedKg.toLocaleString('id-ID')} kg CO₂e
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* District Participation Table across Bandung */}
-              <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-                <div className="px-5 py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h2 className="text-sm font-bold text-stone-900">
-                      Partisipasi UMKM & Dampak Penyelamatan per Kecamatan di Kota Bandung
-                    </h2>
-                    <p className="text-xs text-stone-500">
-                      Indikator kepadatan mitra aktif dan rasio keaktifan unggah stok sore harian.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-stone-200 bg-[#FAF9F6] text-[11px] font-semibold text-stone-600">
-                        <th className="py-3 px-5">Wilayah Kecamatan</th>
-                        <th className="py-3 px-4 text-right">Mitra UMKM Aktif</th>
-                        <th className="py-3 px-4 text-right">Porsi Terselamatkan</th>
-                        <th className="py-3 px-4 text-right">Reduksi Food Waste</th>
-                        <th className="py-3 px-5 text-right">Tingkat Partisipasi Sore</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-200 text-xs">
-                      {currentMacroStats.districtStats.map((d) => (
-                        <tr key={d.district} className="hover:bg-stone-50/80">
-                          <td className="py-3 px-5 font-semibold text-stone-900">
-                            {d.district}
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono-tabular text-stone-700">
-                            {d.activeUmkm} Toko
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono-tabular font-bold text-stone-900">
-                            {d.portionsRescued.toLocaleString('id-ID')} Porsi
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono-tabular text-emerald-800 font-semibold">
-                            {d.wasteReducedKg.toLocaleString('id-ID')} kg
-                          </td>
-                          <td className="py-3 px-5 text-right font-mono-tabular">
-                            <span className="font-semibold text-stone-900">
-                              {d.participationRate}%
-                            </span>{' '}
-                            <span className="text-stone-400">konsisten</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* =====================================================================
-              MODULE 1: VALIDASI UMKM (SELLER VERIFICATION)
-             ===================================================================== */}
-          {activeTab === 'seller-verification' && (
-            <div className="space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                    Validasi UMKM (Seller Verification)
-                  </h1>
-                  <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
-                    Periksa keabsahan dokumen usaha (NIB, KTP, PIRT/Halal), setujui (Verified), tolak, atau tangguhkan (Suspended) akun mitra UMKM.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowAddUmkmModal(true)}
-                  className="h-10 px-4 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer self-start shrink-0"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Simulasi Pengajuan UMKM Baru</span>
-                </button>
-              </div>
-
-              {/* Filter & Search Bar */}
-              <div className="bg-white border border-stone-200 rounded-xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-1 p-1 bg-stone-100 rounded-lg">
-                  {(
-                    [
-                      'Semua',
-                      'Menunggu Verifikasi',
-                      'Verified',
-                      'Suspended',
-                      'Ditolak',
-                    ] as const
-                  ).map((st) => (
-                    <button
-                      key={st}
-                      type="button"
-                      onClick={() => setUmkmFilter(st)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                        umkmFilter === st
-                          ? 'bg-white text-stone-900 shadow-2xs'
-                          : 'text-stone-600 hover:text-stone-900'
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="relative w-full md:w-72">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={umkmSearch}
-                    onChange={(e) => setUmkmSearch(e.target.value)}
-                    placeholder="Cari nama toko, pemilik, NIB..."
-                    className="w-full h-9 pl-9 pr-3 text-xs bg-[#FAF9F6] border border-stone-300 rounded-lg focus:outline-none focus:border-[#16382C]"
-                  />
-                </div>
-              </div>
-
-              {/* UMKM Verification Table */}
-              <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-stone-200 bg-[#FAF9F6] text-[11px] font-semibold text-stone-600">
-                        <th className="py-3 px-4">Identitas Usaha UMKM</th>
-                        <th className="py-3 px-4">Penanggung Jawab & Kontak</th>
-                        <th className="py-3 px-4">Dokumen Legalitas (NIB / PIRT)</th>
-                        <th className="py-3 px-4">Status Validasi</th>
-                        <th className="py-3 px-4 text-right">Tindakan Admin</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-200 text-xs">
-                      {filteredUmkmList.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-10 text-center text-stone-500">
-                            Tidak ada pengajuan UMKM yang sesuai dengan filter pencarian.
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredUmkmList.map((umkm) => (
-                          <tr key={umkm.id} className="hover:bg-stone-50/80 align-top">
-                            <td className="py-3.5 px-4">
-                              <div className="flex items-start gap-3">
-                                <div className="w-11 h-11 rounded-lg overflow-hidden bg-stone-100 shrink-0">
-                                  <ResilientImage
-                                    src={umkm.storePhotoUrl}
-                                    alt={umkm.storeName}
-                                    fallbackTitle={umkm.storeName}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="min-w-0">
-                                  <p className="font-bold text-stone-900">
-                                    {umkm.storeName}
-                                  </p>
-                                  <p className="text-[11px] text-stone-500 mt-0.5">
-                                    {umkm.category} · {umkm.district}
-                                  </p>
-                                  <p className="text-[11px] text-stone-400 font-mono-tabular mt-0.5">
-                                    Diajukan: {umkm.submittedAt}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td className="py-3.5 px-4">
-                              <p className="font-semibold text-stone-900">
-                                {umkm.ownerName}
-                              </p>
-                              <p className="text-[11px] text-stone-500">{umkm.email}</p>
-                              <p className="text-[11px] font-mono-tabular text-stone-600 mt-0.5">
-                                {umkm.phone}
-                              </p>
-                            </td>
-
-                            <td className="py-3.5 px-4 font-mono-tabular">
-                              <p className="text-stone-800">
-                                <span className="text-stone-400 font-sans">NIB:</span>{' '}
-                                {umkm.nibNumber}
-                              </p>
-                              <p className="text-[11px] text-stone-600 mt-0.5">
-                                <span className="text-stone-400 font-sans">Izin:</span>{' '}
-                                {umkm.halalOrPirtNumber}
-                              </p>
-                              <p className="text-[11px] text-[#16382C] font-sans font-medium mt-0.5 truncate max-w-[210px]">
-                                Berkas: {umkm.docFileName}
-                              </p>
-                            </td>
-
-                            <td className="py-3.5 px-4">
-                              <div className="inline-flex items-center gap-1.5 font-semibold">
-                                {umkm.status === 'Verified' && (
-                                  <>
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                                    <span className="text-emerald-800">Verified</span>
-                                  </>
-                                )}
-                                {umkm.status === 'Menunggu Verifikasi' && (
-                                  <>
-                                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                                    <span className="text-amber-800">
-                                      Menunggu Verifikasi
-                                    </span>
-                                  </>
-                                )}
-                                {umkm.status === 'Suspended' && (
-                                  <>
-                                    <Ban className="w-4 h-4 text-red-600 shrink-0" />
-                                    <span className="text-red-700">Suspended</span>
-                                  </>
-                                )}
-                                {umkm.status === 'Ditolak' && (
-                                  <>
-                                    <XCircle className="w-4 h-4 text-stone-500 shrink-0" />
-                                    <span className="text-stone-600">Ditolak</span>
-                                  </>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-stone-500 mt-1 max-w-[220px] line-clamp-2">
-                                {umkm.adminNotes}
-                              </p>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right">
-                              <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedUmkmModal(umkm);
-                                    setUmkmNoteInput(umkm.adminNotes);
-                                  }}
-                                  className="h-8 px-2.5 rounded-lg border border-stone-300 bg-white hover:bg-stone-50 text-stone-700 text-xs font-medium inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                                >
-                                  <Eye className="w-3.5 h-3.5" />
-                                  <span>Periksa Dokumen</span>
-                                </button>
-
-                                {umkm.status !== 'Verified' && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      onUpdateUmkmStatus(
-                                        umkm.id,
-                                        'Verified',
-                                        'Dokumen NIB, KTP & standar kebersihan dapur telah diverifikasi dan disetujui Admin.'
-                                      );
-                                      showToast(
-                                        `Akun UMKM "${umkm.storeName}" berhasil disetujui (Verified).`
-                                      );
-                                    }}
-                                    className="h-8 px-2.5 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer whitespace-nowrap"
-                                  >
-                                    Setujui (Verify)
-                                  </button>
-                                )}
-
-                                {umkm.status !== 'Suspended' && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      onUpdateUmkmStatus(
-                                        umkm.id,
-                                        'Suspended',
-                                        'Akun UMKM ditangguhkan sementara oleh Admin untuk audit ulang dokumen/operasional.'
-                                      );
-                                      showToast(
-                                        `Akun UMKM "${umkm.storeName}" telah ditangguhkan (Suspended).`
-                                      );
-                                    }}
-                                    className="h-8 px-2.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold cursor-pointer whitespace-nowrap"
-                                  >
-                                    Suspend
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* =====================================================================
-              MODULE 2: PEMANTAUAN PRODUK & KEAMANAN (PRODUCT MONITORING)
-             ===================================================================== */}
-          {activeTab === 'product-monitoring' && (
-            <div className="space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                    Pemantauan Produk & Keamanan Pangan
-                  </h1>
-                  <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
-                    Awasi seluruh menu sisa piring yang diunggah UMKM dan nonaktifkan (Take Down) produk yang dilaporkan bermasalah atau melanggar keamanan pangan. Produk yang di-take down otomatis disembunyikan dari Etalase Pembeli.
-                  </p>
-                </div>
-              </div>
-
-              {/* Filter & Search */}
-              <div className="bg-white border border-stone-200 rounded-xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-1 p-1 bg-stone-100 rounded-lg">
-                  {(
-                    [
-                      'Semua',
-                      'Aktif & Aman',
-                      'Dalam Tinjauan',
-                      'Take Down',
-                    ] as const
-                  ).map((st) => (
-                    <button
-                      key={st}
-                      type="button"
-                      onClick={() => setProductFilter(st)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                        productFilter === st
-                          ? 'bg-white text-stone-900 shadow-2xs'
-                          : 'text-stone-600 hover:text-stone-900'
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="relative w-full md:w-72">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={productSearch}
-                    onChange={(e) => setProductSearch(e.target.value)}
-                    placeholder="Cari nama makanan atau toko UMKM..."
-                    className="w-full h-9 pl-9 pr-3 text-xs bg-[#FAF9F6] border border-stone-300 rounded-lg focus:outline-none focus:border-[#16382C]"
-                  />
-                </div>
-              </div>
-
-              {/* Product Monitoring Grid / Table */}
-              <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-stone-200 bg-[#FAF9F6] text-[11px] font-semibold text-stone-600">
-                        <th className="py-3 px-4">Produk Hidangan & UMKM</th>
-                        <th className="py-3 px-4">Jam Masak & Jendela Ambil</th>
-                        <th className="py-3 px-4 text-right">Harga & Kuota</th>
-                        <th className="py-3 px-4">Indikator Keamanan Pangan</th>
-                        <th className="py-3 px-4">Status Etalase</th>
-                        <th className="py-3 px-4 text-right">Kontrol Keamanan</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-200 text-xs">
-                      {filteredProducts.map((item) => {
-                        const meta = productMonitoring[item.id] || {
-                          itemId: item.id,
-                          monitoringStatus: 'Aktif & Aman',
-                          reportCount: 0,
-                          safetyFlag: 'Aman',
-                          prepWindowVerified: true,
-                          lastCheckedAt: 'Hari ini',
-                        };
-
-                        return (
-                          <tr key={item.id} className="hover:bg-stone-50/80 align-top">
-                            <td className="py-3.5 px-4">
-                              <div className="flex items-start gap-3">
-                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-stone-100 shrink-0">
-                                  <ResilientImage
-                                    src={item.imageUrl}
-                                    alt={item.title}
-                                    fallbackTitle={item.title}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="min-w-0 max-w-[250px]">
-                                  <p className="font-bold text-stone-900 line-clamp-1">
-                                    {item.title}
-                                  </p>
-                                  <button
-                                    type="button"
-                                    onClick={() => onOpenPublicStore(item.merchantName)}
-                                    className="text-[11px] font-semibold text-[#16382C] hover:underline cursor-pointer"
-                                  >
-                                    {item.merchantName}
-                                  </button>
-                                  <p className="text-[11px] text-stone-500">
-                                    {item.category} · {item.district}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td className="py-3.5 px-4 font-mono-tabular">
-                              <p className="text-stone-800 font-semibold">
-                                {item.freshBakedTime}
-                              </p>
-                              <p className="text-[11px] text-stone-500 mt-0.5">
-                                Ambil: {item.pickupWindow}
-                              </p>
-                              <p className="text-[11px] text-stone-400 font-sans mt-0.5">
-                                {item.dietaryNotes}
-                              </p>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right font-mono-tabular">
-                              <p className="font-bold text-[#16382C]">
-                                {formatRupiah(item.rescuePrice)}
-                              </p>
-                              <p className="text-[11px] text-stone-400 line-through">
-                                {formatRupiah(item.originalPrice)}
-                              </p>
-                              <p className="text-[11px] text-stone-600 mt-0.5">
-                                Sisa {item.remainingStock}/{item.initialQuota}
-                              </p>
-                            </td>
-
-                            <td className="py-3.5 px-4">
-                              <p className="font-medium text-stone-800 max-w-[220px]">
-                                {meta.safetyFlag}
-                              </p>
-                              <p className="text-[11px] text-stone-500 font-mono-tabular mt-0.5">
-                                Laporan masuk: {meta.reportCount} · Cek: {meta.lastCheckedAt}
-                              </p>
-                              {meta.takedownReason && (
-                                <p className="text-[11px] text-red-700 font-medium mt-1 max-w-[220px]">
-                                  Alasan Take Down: {meta.takedownReason}
-                                </p>
-                              )}
-                            </td>
-
-                            <td className="py-3.5 px-4">
-                              <div className="inline-flex items-center gap-1.5 font-semibold">
-                                {meta.monitoringStatus === 'Aktif & Aman' && (
-                                  <>
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                                    <span className="text-emerald-800">Aktif & Aman</span>
-                                  </>
-                                )}
-                                {meta.monitoringStatus === 'Dalam Tinjauan' && (
-                                  <>
-                                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                                    <span className="text-amber-800">Dalam Tinjauan</span>
-                                  </>
-                                )}
-                                {meta.monitoringStatus === 'Take Down' && (
-                                  <>
-                                    <Ban className="w-4 h-4 text-red-600 shrink-0" />
-                                    <span className="text-red-700">
-                                      Take Down (Nonaktif)
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
-                                {meta.monitoringStatus !== 'Take Down' ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setTakedownModalItem(item);
-                                      setTakedownCustomNote('');
-                                    }}
-                                    className="h-8 px-3 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                                  >
-                                    <Ban className="w-3.5 h-3.5" />
-                                    <span>Take Down</span>
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      onUpdateProductMonitoring(
-                                        item.id,
-                                        'Aktif & Aman'
-                                      );
-                                      showToast(
-                                        `Produk "${item.title}" telah diaktifkan kembali ke Etalase Publik.`
-                                      );
-                                    }}
-                                    className="h-8 px-3 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                                  >
-                                    <RotateCcw className="w-3.5 h-3.5" />
-                                    <span>Pulihkan ke Etalase</span>
-                                  </button>
-                                )}
-
-                                {meta.monitoringStatus === 'Dalam Tinjauan' && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      onUpdateProductMonitoring(
-                                        item.id,
-                                        'Aktif & Aman'
-                                      );
-                                      showToast(
-                                        `Audit keamanan "${item.title}" selesai dan dinyatakan Aman.`
-                                      );
-                                    }}
-                                    className="h-8 px-2.5 rounded-lg border border-stone-300 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold cursor-pointer whitespace-nowrap"
-                                  >
-                                    Verifikasi Aman
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* =====================================================================
-              MODULE 3: PENYELESAIAN SENGKETA (REPORT MANAGEMENT)
-             ===================================================================== */}
-          {activeTab === 'report-management' && (
-            <div className="space-y-5">
+        {/* ========================================================
+            TAB 2: TATA KELOLA MITRA UMKM (SISI PENJUAL)
+        ======================================================== */}
+        {activeTab === 'seller-governance' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header & Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                  Penyelesaian Sengketa & Komplain Pembeli (Report Management)
-                </h1>
-                <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
-                  Tinjau dan tindak lanjuti laporan pembeli terkait dugaan penipuan, makanan basi/tidak layak konsumsi, atau pesanan yang tidak diserahkan oleh toko.
+                <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
+                  Tata Kelola Mitra UMKM (Kebutuhan Penjual)
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Verifikasi legalitas NIB, sertifikasi Halal / PIRT, komitmen higienitas dapur, dan kontrol status toko.
                 </p>
               </div>
 
-              {/* Filter & Search */}
-              <div className="bg-white border border-stone-200 rounded-xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-1 p-1 bg-stone-100 rounded-lg">
-                  {(['Semua', 'Aktif', 'Selesai'] as const).map((st) => (
-                    <button
-                      key={st}
-                      type="button"
-                      onClick={() => setDisputeFilter(st)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                        disputeFilter === st
-                          ? 'bg-white text-stone-900 shadow-2xs'
-                          : 'text-stone-600 hover:text-stone-900'
-                      }`}
-                    >
-                      {st === 'Aktif' ? 'Perlu Tindakan (Aktif)' : st}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="relative w-full md:w-72">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              {/* Filter & Search Bar */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    value={disputeSearch}
-                    onChange={(e) => setDisputeSearch(e.target.value)}
-                    placeholder="Cari tiket #KL, pesanan, toko, pelapor..."
-                    className="w-full h-9 pl-9 pr-3 text-xs bg-[#FAF9F6] border border-stone-300 rounded-lg focus:outline-none focus:border-[#16382C]"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari toko, NIB, pemilik..."
+                    className="pl-8 pr-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700 w-52"
                   />
                 </div>
-              </div>
 
-              {/* Disputes List */}
-              <div className="space-y-3">
-                {filteredDisputes.length === 0 ? (
-                  <div className="bg-white border border-stone-200 rounded-xl p-10 text-center text-xs text-stone-500">
-                    Tidak ada tiket komplain/sengketa pada kategori filter ini.
-                  </div>
-                ) : (
-                  filteredDisputes.map((disp) => {
-                    const isResolved =
-                      disp.status !== 'Sedang Ditinjau' &&
-                      disp.status !== 'Investigasi Mitra';
-                    return (
-                      <div
-                        key={disp.id}
-                        className="bg-white border border-stone-200 rounded-xl p-4 sm:p-5 space-y-3.5"
-                      >
-                        <div className="flex flex-wrap items-start justify-between gap-2 pb-3 border-b border-stone-100">
-                          <div className="space-y-0.5">
-                            <div className="flex flex-wrap items-center gap-2 text-xs">
-                              <span className="font-bold font-mono-tabular text-stone-900">
-                                Tiket #{disp.ticketCode}
-                              </span>
-                              <span>·</span>
-                              <span className="font-mono-tabular text-stone-600">
-                                Pesanan #{disp.orderCode}
-                              </span>
-                              <span>·</span>
-                              <span
-                                className={`font-semibold ${
-                                  disp.severity.includes('Kritis')
-                                    ? 'text-red-700'
-                                    : disp.severity.includes('Tinggi')
-                                    ? 'text-amber-800'
-                                    : 'text-stone-700'
-                                }`}
-                              >
-                                Prioritas: {disp.severity}
-                              </span>
-                            </div>
-                            <p className="text-sm font-bold text-stone-900 pt-0.5">
-                              {disp.category} —{' '}
-                              <span className="text-[#16382C]">{disp.merchantName}</span>
-                            </p>
-                          </div>
-
-                          <div className="text-right font-mono-tabular">
-                            <span
-                              className={`inline-flex items-center gap-1 text-xs font-bold ${
-                                isResolved ? 'text-emerald-800' : 'text-amber-800'
-                              }`}
-                            >
-                              {isResolved ? (
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                              ) : (
-                                <AlertTriangle className="w-3.5 h-3.5" />
-                              )}
-                              <span>{disp.status}</span>
-                            </span>
-                            <p className="text-[11px] text-stone-400 mt-0.5">
-                              {disp.createdAt}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 text-xs">
-                          <div className="md:col-span-8 space-y-1.5">
-                            <p className="text-stone-500">
-                              Produk Terkait:{' '}
-                              <strong className="text-stone-800">{disp.itemName}</strong>{' '}
-                              · Nilai Transaksi:{' '}
-                              <strong className="font-mono-tabular text-stone-900">
-                                {formatRupiah(disp.amountPaid)}
-                              </strong>
-                            </p>
-                            <p className="text-stone-800 leading-relaxed bg-[#FAF9F6] p-3 rounded-lg border border-stone-200/80">
-                              "{disp.description}"
-                            </p>
-                            {disp.adminResolutionNote && (
-                              <p className="text-emerald-900 font-medium pt-1">
-                                Putusan Admin: {disp.adminResolutionNote}
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="md:col-span-4 flex flex-col justify-between bg-[#FAF9F6] p-3.5 rounded-lg border border-stone-200/70 space-y-3">
-                            <div className="space-y-1">
-                              <p className="text-[11px] text-stone-500">
-                                Pelapor (Pembeli):
-                              </p>
-                              <p className="font-semibold text-stone-900">
-                                {disp.reporterName} ({disp.reporterPhone})
-                              </p>
-                              {disp.evidenceFileName && (
-                                <p className="text-[11px] text-[#16382C] font-medium flex items-center gap-1 pt-1">
-                                  <FileText className="w-3.5 h-3.5 shrink-0" />
-                                  <span className="truncate">
-                                    Lampiran: {disp.evidenceFileName}
-                                  </span>
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-stone-200/70">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedDispute(disp);
-                                  setDisputeNoteInput(
-                                    disp.adminResolutionNote ||
-                                      'Bukti foto valid. Dana dikembalikan 100% ke pembeli dan peringatan keras diberikan ke UMKM.'
-                                  );
-                                  setDisputeAutoTakedown(
-                                    disp.category === 'Makanan Basi / Tidak Layak Konsumsi'
-                                  );
-                                }}
-                                className="w-full h-8 px-3 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer"
-                              >
-                                Putuskan Sengketa / Tindak Lanjut
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
+                <select
+                  value={sellerStatusFilter}
+                  onChange={(e) => setSellerStatusFilter(e.target.value as any)}
+                  className="px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700 font-semibold"
+                >
+                  <option value="all">Semua Status</option>
+                  <option value="Menunggu Verifikasi">Menunggu Verifikasi</option>
+                  <option value="Verified">Verified (Resmi)</option>
+                  <option value="Ditolak">Ditolak / Perbaikan</option>
+                  <option value="Suspended">Suspended (Dibekukan)</option>
+                </select>
               </div>
             </div>
-          )}
 
-          {/* =====================================================================
-              MODULE 4: PEMANTAUAN TRANSAKSI & ANTI-MANIPULASI
-             ===================================================================== */}
-          {activeTab === 'transaction-monitoring' && (
-            <div className="space-y-5">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                    Pemantauan Transaksi & Anti-Manipulasi Diskon
-                  </h1>
-                  <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
-                    Awasi log transaksi keseluruhan, audit Discount History untuk mencegah manipulasi kenaikan harga normal semu, dan kelola pembatalan/refund pembayaran.
-                  </p>
+            {/* Active Store Focus Banner (Kala Bakehouse) */}
+            <div className="bg-[#16382C] text-white p-5 rounded-3xl border border-emerald-900 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-amber-300 font-bold shrink-0">
+                  <Store className="w-6 h-6" />
                 </div>
-
-                {/* Sub-Tab Switcher: Log Transaksi vs Discount History */}
-                <div className="flex items-center gap-1 p-1 bg-stone-200/80 rounded-xl self-start">
-                  <button
-                    type="button"
-                    onClick={() => setTrxSubTab('transactions')}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                      trxSubTab === 'transactions'
-                        ? 'bg-white text-stone-900 shadow-2xs'
-                        : 'text-stone-600 hover:text-stone-900'
-                    }`}
-                  >
-                    Log Transaksi & Refund ({transactions.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTrxSubTab('discount-history')}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                      trxSubTab === 'discount-history'
-                        ? 'bg-white text-stone-900 shadow-2xs'
-                        : 'text-stone-600 hover:text-stone-900'
-                    }`}
-                  >
-                    Audit Discount History ({discountHistory.length})
-                  </button>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm sm:text-base text-white">
+                      {sellerProfile.businessName} (Toko Demo Aktif)
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-neutral-950">
+                      Sinkron Portal Seller
+                    </span>
+                  </div>
+                  <p className="text-xs text-emerald-200/90 mt-0.5">
+                    Pemilik: {sellerProfile.ownerName} • Wilayah: Kec. {sellerProfile.district} • Operasional:{' '}
+                    {sellerProfile.pickupWindow}
+                  </p>
                 </div>
               </div>
 
-              {trxSubTab === 'transactions' ? (
-                <>
-                  {/* Filter & Search Bar for Transactions */}
-                  <div className="bg-white border border-stone-200 rounded-xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-1 p-1 bg-stone-100 rounded-lg">
-                      {(
-                        [
-                          { id: 'Semua', label: 'Semua Transaksi' },
-                          { id: 'Anomali', label: 'Indikasi Manipulasi Harga' },
-                          { id: 'Escrow', label: 'Dana Ditahan (Escrow)' },
-                          { id: 'Refunded', label: 'Refund / Batal' },
-                        ] as const
-                      ).map((f) => (
-                        <button
-                          key={f.id}
-                          type="button"
-                          onClick={() => setTrxFilter(f.id)}
-                          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                            trxFilter === f.id
-                              ? 'bg-white text-stone-900 shadow-2xs'
-                              : 'text-stone-600 hover:text-stone-900'
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onOpenPublicStore(sellerProfile.businessName)}
+                  className="px-3.5 py-2 text-xs font-bold rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+                >
+                  Lihat Profil Publik
+                </button>
+                <button
+                  type="button"
+                  onClick={onSwitchToSellerPortal}
+                  className="px-3.5 py-2 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+                >
+                  Buka di Portal Penjual
+                </button>
+              </div>
+            </div>
+
+            {/* List of Registered UMKM Partners */}
+            <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-neutral-200 bg-neutral-50/70 text-neutral-400 font-semibold uppercase text-[10px]">
+                      <th className="py-3 px-4">Nama Gerai UMKM</th>
+                      <th className="py-3 px-4">Pemilik & Kontak</th>
+                      <th className="py-3 px-4">Legalitas (NIB / Halal)</th>
+                      <th className="py-3 px-4">Lokasi Bandung</th>
+                      <th className="py-3 px-4">Status Verifikasi</th>
+                      <th className="py-3 px-4 text-right">Aksi Admin</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                    {displayUmkmList.map((umkm) => (
+                      <tr key={umkm.id} className="hover:bg-neutral-50/70 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-3">
+                            <ResilientImage
+                              src={umkm.storePhotoUrl}
+                              alt={umkm.storeName}
+                              className="w-10 h-10 rounded-xl object-cover border border-neutral-200 shrink-0"
+                            />
+                            <div>
+                              <span className="font-bold text-neutral-900 block text-xs">
+                                {umkm.storeName}
+                              </span>
+                              <span className="text-[11px] text-neutral-400 block">{umkm.category}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="font-semibold text-neutral-800 block">{umkm.ownerName}</span>
+                          <span className="text-[11px] text-neutral-500 block font-mono">{umkm.phone}</span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="font-mono text-neutral-800 font-bold block text-[11px]">
+                            NIB: {umkm.nibNumber}
+                          </span>
+                          <span className="text-[11px] text-emerald-700 font-semibold block">
+                            Halal: {umkm.halalOrPirtNumber}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="font-semibold text-neutral-800 block">{umkm.district}</span>
+                          <span className="text-[11px] text-neutral-400 block line-clamp-1">{umkm.address}</span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                              umkm.status === 'Verified'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : umkm.status === 'Menunggu Verifikasi'
+                                ? 'bg-amber-100 text-amber-800'
+                                : umkm.status === 'Suspended'
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-neutral-100 text-neutral-700'
+                            }`}
+                          >
+                            {umkm.status === 'Verified' && <CheckCircle2 className="w-3 h-3 text-emerald-700" />}
+                            {umkm.status === 'Menunggu Verifikasi' && <Clock className="w-3 h-3 text-amber-700" />}
+                            {umkm.status === 'Suspended' && <Ban className="w-3 h-3 text-rose-700" />}
+                            <span>{umkm.status}</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedUmkmModal(umkm)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs transition-colors"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-neutral-600" />
+                            <span>Tinjau Legalitas</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 3: KURASI MENU & KEAMANAN PANGAN (SISI PENJUAL & USER)
+        ======================================================== */}
+        {activeTab === 'product-curation' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header & Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
+                  Kurasi Menu & Keamanan Pangan (Sisi Penjual & User)
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Awasi seluruh menu sisa piring yang diunggah UMKM. Nonaktifkan (Take Down) produk bermasalah secara instan dari etalase pembeli.
+                </p>
+              </div>
+
+              {/* Filter & Search Bar */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari menu, mitra, kategori..."
+                    className="pl-8 pr-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700 w-52"
+                  />
+                </div>
+
+                <select
+                  value={productStatusFilter}
+                  onChange={(e) => setProductStatusFilter(e.target.value as any)}
+                  className="px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700 font-semibold"
+                >
+                  <option value="all">Semua Status Menu</option>
+                  <option value="Aktif & Aman">Aktif & Aman (Tayang)</option>
+                  <option value="Dalam Tinjauan">Dalam Tinjauan</option>
+                  <option value="Take Down">Take Down (Dinonaktifkan)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Products Table */}
+            <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-neutral-200 bg-neutral-50/70 text-neutral-400 font-semibold uppercase text-[10px]">
+                      <th className="py-3 px-4">Menu Sisa Piring</th>
+                      <th className="py-3 px-4">Mitra UMKM</th>
+                      <th className="py-3 px-4">Harga Normal vs Hemat</th>
+                      <th className="py-3 px-4">Stok Porsi</th>
+                      <th className="py-3 px-4">Batas Konsumsi (Prep Window)</th>
+                      <th className="py-3 px-4">Status Pengawasan</th>
+                      <th className="py-3 px-4 text-right">Aksi Kontrol</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                    {displayProducts.map((item) => {
+                      const meta = productMonitoring[item.id] || {
+                        monitoringStatus: 'Aktif & Aman',
+                        reportCount: 0,
+                      };
+                      const isTakenDown = meta.monitoringStatus === 'Take Down';
+
+                      return (
+                        <tr
+                          key={item.id}
+                          className={`hover:bg-neutral-50/70 transition-colors ${
+                            isTakenDown ? 'bg-rose-50/40 opacity-80' : ''
                           }`}
                         >
-                          {f.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="relative w-full md:w-72">
-                      <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      <input
-                        type="text"
-                        value={trxSearch}
-                        onChange={(e) => setTrxSearch(e.target.value)}
-                        placeholder="Cari kode SP-, pembeli, referensi QRIS..."
-                        className="w-full h-9 pl-9 pr-3 text-xs bg-[#FAF9F6] border border-stone-300 rounded-lg focus:outline-none focus:border-[#16382C]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Transaction Log Table */}
-                  <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="border-b border-stone-200 bg-[#FAF9F6] text-[11px] font-semibold text-stone-600">
-                            <th className="py-3 px-4">Kode & Waktu</th>
-                            <th className="py-3 px-4">Pembeli & Mitra UMKM</th>
-                            <th className="py-3 px-4 text-right">Audit Harga Normal vs Diskon</th>
-                            <th className="py-3 px-4 text-right">Total Bayar</th>
-                            <th className="py-3 px-4">Gateway & Status Dana</th>
-                            <th className="py-3 px-4 text-right">Kontrol Gateway / Refund</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-stone-200 text-xs">
-                          {filteredTransactions.map((trx) => (
-                            <tr key={trx.id} className="hover:bg-stone-50/80 align-top">
-                              <td className="py-3.5 px-4 font-mono-tabular">
-                                <p className="font-bold text-stone-900">
-                                  #{trx.orderCode}
-                                </p>
-                                <p className="text-[11px] text-stone-500 mt-0.5">
-                                  {trx.timestamp}
-                                </p>
-                                <p className="text-[10px] text-stone-400 mt-0.5">
-                                  {trx.paymentGatewayRef}
-                                </p>
-                              </td>
-
-                              <td className="py-3.5 px-4">
-                                <p className="font-semibold text-stone-900">
-                                  {trx.buyerName}
-                                </p>
-                                <p className="text-[11px] text-[#16382C] font-semibold mt-0.5">
-                                  Toko: {trx.merchantName}
-                                </p>
-                                <p className="text-[11px] text-stone-500 line-clamp-1 max-w-[230px]">
-                                  {trx.quantity}x {trx.itemTitle}
-                                </p>
-                              </td>
-
-                              <td className="py-3.5 px-4 text-right font-mono-tabular">
-                                <p className="text-stone-800">
-                                  Klaim Normal:{' '}
-                                  <strong>{formatRupiah(trx.reportedNormalPrice)}</strong>{' '}
-                                  (-{trx.reportedDiscountPercent}%)
-                                </p>
-                                <p className="text-[11px] text-stone-500 mt-0.5">
-                                  Baseline Asli: {formatRupiah(trx.verifiedBaselinePrice)} (Diskon Riil {trx.realDiscountPercent}%)
-                                </p>
-                                {trx.manipulationFlag !== 'Aman' && (
-                                  <p className="text-[11px] text-red-700 font-sans font-semibold mt-1">
-                                    ⚠ {trx.manipulationFlag}
-                                  </p>
-                                )}
-                              </td>
-
-                              <td className="py-3.5 px-4 text-right font-mono-tabular">
-                                <span className="font-bold text-sm text-stone-900">
-                                  {formatRupiah(trx.totalPaid)}
-                                </span>
-                                <span className="block text-[11px] text-stone-500 font-sans">
-                                  {trx.paymentMethod}
-                                </span>
-                              </td>
-
-                              <td className="py-3.5 px-4">
-                                <span
-                                  className={`font-semibold ${
-                                    trx.gatewayStatus === 'Selesai (Settled)'
-                                      ? 'text-emerald-800'
-                                      : trx.gatewayStatus === 'Dana Ditahan (Escrow)'
-                                      ? 'text-amber-800'
-                                      : 'text-red-700'
-                                  }`}
-                                >
-                                  {trx.gatewayStatus}
-                                </span>
-                                {trx.adminActionNote && (
-                                  <p className="text-[11px] text-stone-500 mt-1 max-w-[210px]">
-                                    {trx.adminActionNote}
-                                  </p>
-                                )}
-                              </td>
-
-                              <td className="py-3.5 px-4 text-right">
-                                <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                                  {trx.gatewayStatus !== 'Refunded' &&
-                                    trx.gatewayStatus !== 'Dibatalkan' && (
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          onUpdateTransactionGateway(
-                                            trx.id,
-                                            'Refunded',
-                                            'Refund diproses oleh Admin via Payment Gateway ke akun pembeli.'
-                                          );
-                                          showToast(
-                                            `Refund otomatis untuk transaksi #${trx.orderCode} (${formatRupiah(
-                                              trx.totalPaid
-                                            )}) berhasil diterbitkan.`
-                                          );
-                                        }}
-                                        className="h-8 px-2.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold cursor-pointer whitespace-nowrap"
-                                      >
-                                        Proses Refund
-                                      </button>
-                                    )}
-
-                                  {trx.gatewayStatus === 'Dana Ditahan (Escrow)' && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        onUpdateTransactionGateway(
-                                          trx.id,
-                                          'Selesai (Settled)',
-                                          'Dana Escrow telah dicairkan (Settled) ke rekening mitra UMKM.'
-                                        );
-                                        showToast(
-                                          `Dana Escrow #${trx.orderCode} berhasil dicairkan ke ${trx.merchantName}.`
-                                        );
-                                      }}
-                                      className="h-8 px-2.5 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer whitespace-nowrap"
-                                    >
-                                      Cairkan Escrow
-                                    </button>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                /* SUB-TAB 2: DISCOUNT HISTORY & DETEKSI MANIPULASI HARGA */
-                <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-                  <div className="px-5 py-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <h2 className="text-sm font-bold text-stone-900">
-                        Riwayat Diskon & Deteksi Anti-Manipulasi Harga Normal (Discount History)
-                      </h2>
-                      <p className="text-xs text-stone-500">
-                        Sistem membandingkan harga normal yang diajukan mitra saat jam penyelamatan dengan rata-rata harga menu historis 30 hari terakhir.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="border-b border-stone-200 bg-[#FAF9F6] text-[11px] font-semibold text-stone-600">
-                          <th className="py-3 px-4">Produk & Mitra UMKM</th>
-                          <th className="py-3 px-4 text-right">Harga Normal Historis</th>
-                          <th className="py-3 px-4 text-right">Harga Normal Diajukan</th>
-                          <th className="py-3 px-4 text-right">Harga Penyelamatan</th>
-                          <th className="py-3 px-4 text-right">Deviasi Markup</th>
-                          <th className="py-3 px-4">Status Audit Harga</th>
-                          <th className="py-3 px-4 text-right">Tindakan Koreksi</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-stone-200 text-xs">
-                        {discountHistory.map((dh) => (
-                          <tr key={dh.id} className="hover:bg-stone-50/80 align-top">
-                            <td className="py-3.5 px-4">
-                              <p className="font-bold text-stone-900">{dh.itemTitle}</p>
-                              <p className="text-[11px] text-[#16382C] font-semibold">
-                                {dh.merchantName}
-                              </p>
-                              <p className="text-[11px] text-stone-400 font-mono-tabular">
-                                Tercatat: {dh.recordedDate}
-                              </p>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right font-mono-tabular font-semibold text-stone-800">
-                              {formatRupiah(dh.historicalNormalPrice)}
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right font-mono-tabular">
-                              <span
-                                className={
-                                  dh.markupDeviationPercent > 0
-                                    ? 'font-bold text-red-700'
-                                    : 'text-stone-800'
-                                }
-                              >
-                                {formatRupiah(dh.submittedNormalPrice)}
-                              </span>
-                              <span className="block text-[11px] text-stone-500">
-                                Klaim Diskon: {dh.claimedDiscountPercent}%
-                              </span>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right font-mono-tabular font-bold text-[#16382C]">
-                              {formatRupiah(dh.rescuePrice)}
-                              <span className="block text-[11px] font-normal text-stone-500">
-                                Diskon Riil: {dh.actualDiscountFromBaseline}%
-                              </span>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right font-mono-tabular">
-                              {dh.markupDeviationPercent > 0 ? (
-                                <span className="font-bold text-red-700">
-                                  +{dh.markupDeviationPercent}% Markup
-                                </span>
-                              ) : (
-                                <span className="text-emerald-800 font-semibold">
-                                  0% (Sesuai)
-                                </span>
-                              )}
-                            </td>
-
-                            <td className="py-3.5 px-4">
-                              <span
-                                className={`font-semibold ${
-                                  dh.status === 'Terverifikasi Wajar'
-                                    ? 'text-emerald-800'
-                                    : dh.status === 'Peringatan Manipulasi Harga'
-                                    ? 'text-red-700'
-                                    : 'text-stone-700'
-                                }`}
-                              >
-                                {dh.status}
-                              </span>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right">
-                              {dh.status === 'Peringatan Manipulasi Harga' ? (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    onCorrectProductPrice(
-                                      dh.itemId,
-                                      dh.historicalNormalPrice,
-                                      dh.id
-                                    );
-                                    showToast(
-                                      `Harga normal "${dh.itemTitle}" telah dikoreksi kembali ke baseline ${formatRupiah(
-                                        dh.historicalNormalPrice
-                                      )}.`
-                                    );
-                                  }}
-                                  className="h-8 px-3 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer whitespace-nowrap"
-                                >
-                                  Koreksi ke Harga Asli
-                                </button>
-                              ) : (
-                                <span className="text-[11px] text-stone-400">
-                                  Harga Terverifikasi
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* =====================================================================
-              MODULE 5: MANAJEMEN HAK AKSES (ACCOUNT ACCESS CONTROL)
-             ===================================================================== */}
-          {activeTab === 'access-control' && (
-            <div className="space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                    Manajemen Hak Akses (Account Access Control)
-                  </h1>
-                  <p className="text-xs sm:text-sm text-stone-600 mt-0.5">
-                    Kelola role pengguna (Buyer, UMKM, Admin), tinjau riwayat pelanggaran, dan berikan sanksi peringatan atau suspend akun yang melanggar aturan platform.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setShowAddUserModal(true)}
-                  className="h-10 px-4 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer self-start shrink-0"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Tambah Akun Pengguna / Role</span>
-                </button>
-              </div>
-
-              {/* Filter & Search Bar */}
-              <div className="bg-white border border-stone-200 rounded-xl p-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Role Filter */}
-                  <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-lg">
-                    {(['Semua', 'Buyer', 'UMKM', 'Admin'] as const).map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => setRoleFilter(r)}
-                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                          roleFilter === r
-                            ? 'bg-white text-stone-900 shadow-2xs'
-                            : 'text-stone-600 hover:text-stone-900'
-                        }`}
-                      >
-                        {r === 'Semua' ? 'Semua Role' : r}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Status Filter */}
-                  <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-lg">
-                    {(
-                      ['Semua', 'Aktif', 'Peringatan (Warning)', 'Suspended'] as const
-                    ).map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setStatusFilter(s)}
-                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                          statusFilter === s
-                            ? 'bg-white text-stone-900 shadow-2xs'
-                            : 'text-stone-600 hover:text-stone-900'
-                        }`}
-                      >
-                        {s === 'Semua' ? 'Semua Status' : s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="relative w-full lg:w-72">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={userSearch}
-                    onChange={(e) => setUserSearch(e.target.value)}
-                    placeholder="Cari nama, email, telepon, kecamatan..."
-                    className="w-full h-9 pl-9 pr-3 text-xs bg-[#FAF9F6] border border-stone-300 rounded-lg focus:outline-none focus:border-[#16382C]"
-                  />
-                </div>
-              </div>
-
-              {/* Accounts Table */}
-              <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-stone-200 bg-[#FAF9F6] text-[11px] font-semibold text-stone-600">
-                        <th className="py-3 px-4">Nama & Kontak Akun</th>
-                        <th className="py-3 px-4">Role Hak Akses</th>
-                        <th className="py-3 px-4">Wilayah & Aktivitas</th>
-                        <th className="py-3 px-4">Status & Catatan Sanksi</th>
-                        <th className="py-3 px-4 text-right">Manajemen Role & Sanksi</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-200 text-xs">
-                      {filteredUsers.map((u) => (
-                        <tr key={u.id} className="hover:bg-stone-50/80 align-top">
                           <td className="py-3.5 px-4">
-                            <p className="font-bold text-stone-900">{u.name}</p>
-                            <p className="text-[11px] text-stone-500">{u.email}</p>
-                            <p className="text-[11px] font-mono-tabular text-stone-600 mt-0.5">
-                              {u.phone}
-                            </p>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <span className="font-bold text-stone-900">{u.role}</span>
-                            <p className="text-[11px] text-stone-500">
-                               Terdaftar: {u.joinedAt}
-                            </p>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <p className="text-stone-800">{u.district}</p>
-                            <p className="text-[11px] text-stone-500 font-mono-tabular mt-0.5">
-                              Aktif: {u.lastActive}
-                            </p>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <div className="inline-flex items-center gap-1.5 font-semibold">
-                              {u.status === 'Aktif' && (
-                                <>
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                                  <span className="text-emerald-800">Aktif</span>
-                                </>
-                              )}
-                              {u.status === 'Peringatan (Warning)' && (
-                                <>
-                                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                                  <span className="text-amber-800">
-                                    Peringatan ({u.violationCount}x Pelanggaran)
-                                  </span>
-                                </>
-                              )}
-                              {u.status === 'Suspended' && (
-                                <>
-                                  <Lock className="w-4 h-4 text-red-600 shrink-0" />
-                                  <span className="text-red-700">
-                                    Suspended ({u.violationCount}x Pelanggaran)
-                                  </span>
-                                </>
-                              )}
+                            <div className="flex items-center gap-3">
+                              <ResilientImage
+                                src={item.imageUrl}
+                                alt={item.title}
+                                className="w-11 h-11 rounded-xl object-cover border border-neutral-200 shrink-0"
+                              />
+                              <div>
+                                <span className="font-bold text-neutral-900 block text-xs line-clamp-1">
+                                  {item.title}
+                                </span>
+                                <span className="text-[10px] text-neutral-400 block">ID: {item.id} • {item.category}</span>
+                              </div>
                             </div>
-                            {u.sanctionNote && (
-                              <p className="text-[11px] text-stone-500 mt-1 max-w-[240px]">
-                                {u.sanctionNote}
-                              </p>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="font-semibold text-neutral-800 block text-xs">{item.merchantName}</span>
+                            <span className="text-[11px] text-neutral-500 block">Kec. {item.district}</span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="font-bold font-mono text-[#16382C] text-xs">
+                                {formatRupiah(item.rescuePrice)}
+                              </span>
+                              <span className="line-through text-neutral-400 font-mono text-[11px]">
+                                {formatRupiah(item.originalPrice)}
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-bold text-[#EE4D2D]">
+                              Diskon {item.discountPercent}% OFF
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="font-bold font-mono text-neutral-900 text-xs">
+                              {item.remainingStock} porsi
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-1.5 text-neutral-700">
+                              <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                              <span className="font-semibold text-[11px]">{item.pickupWindow}</span>
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                meta.monitoringStatus === 'Aktif & Aman'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : meta.monitoringStatus === 'Dalam Tinjauan'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-rose-100 text-rose-800'
+                              }`}
+                            >
+                              {meta.monitoringStatus === 'Aktif & Aman' && <CheckCircle2 className="w-3 h-3 text-emerald-700" />}
+                              {meta.monitoringStatus === 'Take Down' && <AlertTriangle className="w-3 h-3 text-rose-700" />}
+                              <span>{meta.monitoringStatus}</span>
+                            </span>
+                            {meta.reportCount > 0 && (
+                              <span className="block text-[10px] text-rose-600 font-semibold mt-0.5">
+                                {meta.reportCount}x Laporan Pembeli
+                              </span>
                             )}
                           </td>
-
                           <td className="py-3.5 px-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
+                            {isTakenDown ? (
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setSelectedUserModal(u);
-                                  setEditUserRole(u.role);
-                                  setEditUserStatus(u.status);
-                                  setEditUserSanction(u.sanctionNote || '');
+                                  onUpdateProductMonitoring(item.id, 'Aktif & Aman');
+                                  showToast('Produk Dipulihkan', `"${item.title}" kembali tayang di etalase.`);
                                 }}
-                                className="h-8 px-3 rounded-lg border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 text-xs font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-xs transition-colors"
                               >
-                                <SlidersHorizontal className="w-3.5 h-3.5" />
-                                <span>Ubah Role / Sanksi</span>
+                                <RotateCcw className="w-3.5 h-3.5 text-emerald-700" />
+                                <span>Pulihkan</span>
                               </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setTakedownModalItem(item)}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition-colors border border-rose-200"
+                              >
+                                <Ban className="w-3.5 h-3.5 text-rose-600" />
+                                <span>Take Down</span>
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
 
-                              {u.status !== 'Suspended' ? (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    onUpdateUserAccess(
-                                      u.id,
-                                      u.role,
-                                      'Suspended',
-                                      'Akun dibekukan (Suspended) oleh Admin karena pelanggaran tata tertib platform.'
-                                    );
-                                    showToast(`Akun "${u.name}" telah di-Suspend.`);
-                                  }}
-                                  className="h-8 px-2.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold cursor-pointer whitespace-nowrap"
-                                >
-                                  Suspend
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    onUpdateUserAccess(
-                                      u.id,
-                                      u.role,
-                                      'Aktif',
-                                      'Penangguhan dicabut oleh Admin setelah verifikasi ulang.'
-                                    );
-                                    showToast(`Akun "${u.name}" telah diaktifkan kembali.`);
-                                  }}
-                                  className="h-8 px-2.5 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                                >
-                                  <Unlock className="w-3.5 h-3.5" />
-                                  <span>Pulihkan</span>
-                                </button>
-                              )}
-                            </div>
+        {/* ========================================================
+            TAB 4: MONITORING PESANAN & ESCROW (SISI USER & PENJUAL)
+        ======================================================== */}
+        {activeTab === 'order-escrow' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header & Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
+                  Monitoring Pesanan & Rekening Escrow Platform
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Dana konsumen tertahan aman di rekening bersama (escrow) hingga verifikasi serah terima paket makanan via QR Code.
+                </p>
+              </div>
+
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari kode pesanan, pembeli, toko..."
+                  className="pl-8 pr-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700 w-64"
+                />
+              </div>
+            </div>
+
+            {/* Escrow Health Stats Banner */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-xs space-y-1">
+                <span className="text-xs font-semibold text-neutral-500">Total Transaksi Dipantau</span>
+                <div className="text-xl font-black font-mono text-neutral-900">
+                  {transactions.length + orders.length} Pesanan
+                </div>
+                <span className="text-[11px] text-emerald-600 font-semibold block">Real-time sinkron</span>
+              </div>
+
+              <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-xs space-y-1">
+                <span className="text-xs font-semibold text-neutral-500">Dana Tertahan di Escrow</span>
+                <div className="text-xl font-black font-mono text-amber-700">
+                  {formatRupiah(macroStats.totalEscrowHeld)}
+                </div>
+                <span className="text-[11px] text-amber-600 font-semibold block">Menunggu verifikasi serah terima QR</span>
+              </div>
+
+              <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-xs space-y-1">
+                <span className="text-xs font-semibold text-neutral-500">Pencairan Dana (Settled)</span>
+                <div className="text-xl font-black font-mono text-[#16382C]">
+                  {formatRupiah(
+                    transactions
+                      .filter((t) => t.gatewayStatus === 'Selesai (Settled)')
+                      .reduce((acc, t) => acc + t.totalPaid, 0)
+                  )}
+                </div>
+                <span className="text-[11px] text-emerald-600 font-semibold block">Telah cair ke dompet UMKM</span>
+              </div>
+            </div>
+
+            {/* Unified Orders & Escrow Table */}
+            <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-neutral-200 bg-neutral-50/70 text-neutral-400 font-semibold uppercase text-[10px]">
+                      <th className="py-3 px-4">Kode Pesanan / Waktu</th>
+                      <th className="py-3 px-4">Pembeli (User)</th>
+                      <th className="py-3 px-4">Mitra UMKM (Penjual)</th>
+                      <th className="py-3 px-4">Menu & Porsi</th>
+                      <th className="py-3 px-4">Total Bayar & Metode</th>
+                      <th className="py-3 px-4">Status Rekening Escrow</th>
+                      <th className="py-3 px-4 text-right">Aksi Admin</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                    {transactions
+                      .filter((trx) => {
+                        if (!searchQuery.trim()) return true;
+                        const q = searchQuery.toLowerCase();
+                        return (
+                          trx.orderCode.toLowerCase().includes(q) ||
+                          trx.buyerName.toLowerCase().includes(q) ||
+                          trx.merchantName.toLowerCase().includes(q)
+                        );
+                      })
+                      .map((trx) => (
+                        <tr key={trx.id} className="hover:bg-neutral-50/70 transition-colors">
+                          <td className="py-3.5 px-4">
+                            <span className="font-mono font-bold text-neutral-900 block text-xs">
+                              {trx.orderCode}
+                            </span>
+                            <span className="text-[10px] text-neutral-400 block">{trx.timestamp}</span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="font-bold text-neutral-800 block text-xs">{trx.buyerName}</span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="font-semibold text-neutral-800 block text-xs">{trx.merchantName}</span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="text-neutral-900 font-semibold block text-xs line-clamp-1">
+                              {trx.quantity}x {trx.itemTitle}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="font-bold font-mono text-[#16382C] block text-xs">
+                              {formatRupiah(trx.totalPaid)}
+                            </span>
+                            <span className="text-[10px] text-neutral-500 block">{trx.paymentMethod}</span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                trx.gatewayStatus === 'Selesai (Settled)'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : trx.gatewayStatus === 'Dana Ditahan (Escrow)'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-rose-100 text-rose-800'
+                              }`}
+                            >
+                              {trx.gatewayStatus === 'Selesai (Settled)' && <CheckCircle2 className="w-3 h-3 text-emerald-700" />}
+                              {trx.gatewayStatus === 'Dana Ditahan (Escrow)' && <Clock className="w-3 h-3 text-amber-700" />}
+                              <span>{trx.gatewayStatus}</span>
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            {trx.gatewayStatus === 'Dana Ditahan (Escrow)' ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onUpdateTransactionGateway(
+                                    trx.id,
+                                    'Selesai (Settled)',
+                                    'Dilepaskan secara manual oleh Admin setelah audit serah terima barang.'
+                                  );
+                                  showToast('Escrow Dicairkan', `Dana pesanan ${trx.orderCode} diteruskan ke UMKM.`);
+                                }}
+                                className="px-3 py-1 text-[11px] font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+                              >
+                                Lepaskan Dana
+                              </button>
+                            ) : (
+                              <span className="text-[11px] text-neutral-400 font-medium">Beres</span>
+                            )}
                           </td>
                         </tr>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                  </tbody>
+                </table>
               </div>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        )}
 
-      {/* =========================================================================
-          MODAL 1: INSPEKSI DOKUMEN & VALIDASI UMKM
-         ========================================================================= */}
-      {selectedUmkmModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-xs p-4"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white border border-stone-200 rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between gap-2 pb-3 border-b border-stone-200">
+        {/* ========================================================
+            TAB 5: PUSAT KOMPLAIN & REFUND (SISI USER)
+        ======================================================== */}
+        {activeTab === 'disputes-refund' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header & Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h3 className="text-base font-bold text-stone-900 font-display">
-                  Pemeriksaan Dokumen Usaha UMKM
-                </h3>
-                <p className="text-xs text-stone-500">
-                  {selectedUmkmModal.storeName} · {selectedUmkmModal.ownerName}
+                <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
+                  Pusat Komplain & Garansi Refund Escrow (Kebutuhan User)
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Laporan pembeli atas makanan basi, porsi tidak sesuai, atau toko tutup saat penjemputan. Lindungi pembeli dengan refund 100%.
                 </p>
+              </div>
+
+              {/* Filter & Search Bar */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari tiket, nama, masalah..."
+                    className="pl-8 pr-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700 w-52"
+                  />
+                </div>
+
+                <select
+                  value={disputeStatusFilter}
+                  onChange={(e) => setDisputeStatusFilter(e.target.value as any)}
+                  className="px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700 font-semibold"
+                >
+                  <option value="all">Semua Status Tiket</option>
+                  <option value="Sedang Ditinjau">Sedang Ditinjau</option>
+                  <option value="Investigasi Mitra">Investigasi Mitra</option>
+                  <option value="Selesai (Refund Pembeli)">Selesai (Refund)</option>
+                  <option value="Ditolak (Bukti Tidak Valid)">Ditolak</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Disputes Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {displayDisputes.map((dispute) => {
+                const isPending =
+                  dispute.status === 'Sedang Ditinjau' || dispute.status === 'Investigasi Mitra';
+
+                return (
+                  <div
+                    key={dispute.id}
+                    className="bg-white rounded-3xl p-5 border border-neutral-200 shadow-xs space-y-4 hover:border-neutral-300 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-xs bg-neutral-100 text-neutral-800 px-2 py-0.5 rounded-md">
+                            #{dispute.ticketCode}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              dispute.severity.includes('Kritis')
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            {dispute.severity}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-sm text-neutral-900 mt-1.5">
+                          {dispute.category}
+                        </h4>
+                        <span className="text-[11px] text-neutral-500">
+                          Pesanan {dispute.orderCode} • Menu: {dispute.itemName}
+                        </span>
+                      </div>
+
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${
+                          isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                        }`}
+                      >
+                        {dispute.status}
+                      </span>
+                    </div>
+
+                    <div className="p-3 bg-neutral-50 rounded-2xl text-xs space-y-1.5">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-neutral-500">Pelapor:</span>
+                        <span className="font-bold text-neutral-800">{dispute.reporterName} ({dispute.reporterPhone})</span>
+                      </div>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-neutral-500">Mitra UMKM:</span>
+                        <span className="font-semibold text-neutral-800">{dispute.merchantName}</span>
+                      </div>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-neutral-500">Nominal Transaksi:</span>
+                        <span className="font-mono font-bold text-[#16382C]">{formatRupiah(dispute.amountPaid)}</span>
+                      </div>
+                      <div className="pt-2 border-t border-neutral-200/60 text-neutral-700 text-[11px] leading-relaxed">
+                        <strong className="text-neutral-900">Uraian Komplain:</strong> "{dispute.description}"
+                      </div>
+                    </div>
+
+                    {isPending ? (
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDisputeModal(dispute)}
+                          className="flex-1 py-2 text-xs font-bold rounded-xl bg-[#EE4D2D] hover:bg-[#D73C1C] text-white transition-colors shadow-xs"
+                        >
+                          Eksekusi Solusi & Refund
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onResolveDispute(
+                              dispute.id,
+                              'Ditolak (Bukti Tidak Valid)',
+                              'Bukti tidak memenuhi kriteria komplain garansi mutu makanan.'
+                            );
+                            showToast('Laporan Ditolak', `Tiket #${dispute.ticketCode} ditutup.`);
+                          }}
+                          className="px-3 py-2 text-xs font-semibold rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors"
+                        >
+                          Tolak
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="p-2.5 bg-emerald-50 rounded-xl text-[11px] text-emerald-900 font-medium">
+                        ✓ Catatan Resolusi: {dispute.adminResolutionNote || 'Selesai.'}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 6: ULASAN & KEPUASAN PELANGGAN (SISI USER & PENJUAL)
+        ======================================================== */}
+        {activeTab === 'reviews-moderation' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header & Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
+                  Ulasan & Kepuasan Pelanggan (Sisi User & Penjual)
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Pantau rating bintang dan testimoni pembeli Bandung untuk menjaga reputasi mutu makanan sisa piring.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-amber-100 text-amber-900 rounded-full font-bold text-xs flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                  Rata-rata Platform: 4.8 / 5.0
+                </span>
+              </div>
+            </div>
+
+            {/* Customer Reviews Feed */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                {
+                  id: 'rev-1',
+                  buyer: 'Siti Nurhaliza',
+                  store: 'Kala Bakehouse & Artisan Cafe',
+                  product: 'Artisan Butter Croissant & Pain au Chocolat',
+                  rating: 5,
+                  date: 'Hari ini, 18:30 WIB',
+                  comment: 'Croissant masih renyah banget pas dihangatkan! Beli jam 6 sore hemat 60%, rasa butter premium tetap terasa mewah.',
+                  tags: ['Masih Hangat & Segar', 'Sesuai Deskripsi'],
+                },
+                {
+                  id: 'rev-2',
+                  buyer: 'Dimas Prasetyo',
+                  store: 'Dapur Bu Siti Sunda Asli',
+                  product: 'Nasi Liwet Komplit Ayam Bakar Madu',
+                  rating: 5,
+                  date: 'Kemarin, 20:15 WIB',
+                  comment: 'Porsi katering event bersih dan tertutup rapat. Nasi liwetnya wangi, sambal lalap masih segar!',
+                  tags: ['Porsi Pas', 'Kemasan Rapi'],
+                },
+                {
+                  id: 'rev-3',
+                  buyer: 'Angga Wijaya',
+                  store: 'Kala Bakehouse & Artisan Cafe',
+                  product: 'Rustic Sourdough Loaf Gandum Utuh',
+                  rating: 4,
+                  date: '2 hari lalu',
+                  comment: 'Sourdough bagus, renyah dan empuk di dalam. Cocok untuk sarapan keluarga hemat.',
+                  tags: ['Sesuai Deskripsi'],
+                },
+              ].map((rev) => (
+                <div key={rev.id} className="bg-white rounded-3xl p-5 border border-neutral-200 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-[#16382C] text-white flex items-center justify-center font-bold text-xs">
+                        {rev.buyer[0]}
+                      </div>
+                      <div>
+                        <span className="font-bold text-neutral-900 block text-xs">{rev.buyer}</span>
+                        <span className="text-[10px] text-neutral-400 block">{rev.date}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-0.5 text-amber-500">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3.5 h-3.5 ${
+                            i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-neutral-200'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 bg-neutral-50 rounded-xl text-xs space-y-1">
+                    <span className="font-semibold text-neutral-800 block text-[11px] truncate">
+                      {rev.store}
+                    </span>
+                    <span className="text-neutral-500 text-[10px] block truncate">{rev.product}</span>
+                    <p className="text-neutral-700 text-xs italic mt-1">"{rev.comment}"</p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {rev.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-semibold rounded-md border border-emerald-100"
+                      >
+                        ✓ {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 7: MANAJEMEN AKUN & RBAC (PENGGUNA PLATFORM)
+        ======================================================== */}
+        {activeTab === 'user-access' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header & Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
+                  Manajemen Akun & Hak Akses (RBAC)
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Daftar akun konsumen (buyer), mitra UMKM (seller), dan admin platform Kota Bandung.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddUserModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Tambah Akun Demo</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Users Table */}
+            <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-neutral-200 bg-neutral-50/70 text-neutral-400 font-semibold uppercase text-[10px]">
+                      <th className="py-3 px-4">Nama Pengguna</th>
+                      <th className="py-3 px-4">Kontak</th>
+                      <th className="py-3 px-4">Peran (Role)</th>
+                      <th className="py-3 px-4">Wilayah Kecamatan</th>
+                      <th className="py-3 px-4">Status Akun</th>
+                      <th className="py-3 px-4 text-right">Kontrol Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                    {displayUsers.map((u) => (
+                      <tr key={u.id} className="hover:bg-neutral-50/70 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <span className="font-bold text-neutral-900 block text-xs">{u.name}</span>
+                          <span className="text-[10px] text-neutral-400 block font-mono">{u.id}</span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="text-neutral-800 block text-xs">{u.email}</span>
+                          <span className="text-[11px] text-neutral-500 block font-mono">{u.phone}</span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              u.role === 'Admin'
+                                ? 'bg-amber-100 text-amber-800'
+                                : u.role === 'UMKM'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-sky-100 text-sky-800'
+                            }`}
+                          >
+                            {u.role}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 font-semibold text-neutral-800">{u.district}</td>
+                        <td className="py-3.5 px-4">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              u.status === 'Aktif'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : u.status === 'Peringatan (Warning)'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-rose-100 text-rose-800'
+                            }`}
+                          >
+                            {u.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          {u.status === 'Aktif' ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onUpdateUserAccess(u.id, u.role, 'Suspended', 'Dibekukan oleh Admin');
+                                showToast('Akun Dibekukan', `Akun ${u.name} dinonaktifkan.`);
+                              }}
+                              className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors border border-rose-200"
+                            >
+                              Bekukan
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onUpdateUserAccess(u.id, u.role, 'Aktif');
+                                showToast('Akun Dipulihkan', `Akun ${u.name} aktif kembali.`);
+                              }}
+                              className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors"
+                            >
+                              Aktifkan
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* ========================================================
+          MODALS SECTION (INTERACTIVE DIALOGS)
+      ======================================================== */}
+
+      {/* 1. Modal Tinjau & Verifikasi KYB UMKM */}
+      {selectedUmkmModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-700" />
+                <h3 className="font-extrabold text-base text-neutral-900">
+                  Verifikasi Legalitas & KYB Mitra
+                </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedUmkmModal(null)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-800 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-600"
               >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-[#FAF9F6] p-4 rounded-xl border border-stone-200">
-              <div>
-                <span className="text-stone-400 block">Nomor Induk Berusaha (NIB)</span>
-                <strong className="font-mono-tabular text-stone-900">
-                  {selectedUmkmModal.nibNumber}
-                </strong>
-              </div>
-              <div>
-                <span className="text-stone-400 block">NIK KTP Penanggung Jawab</span>
-                <strong className="font-mono-tabular text-stone-900">
-                  {selectedUmkmModal.ktpMasked}
-                </strong>
-              </div>
-              <div>
-                <span className="text-stone-400 block">Sertifikat Halal / PIRT</span>
-                <strong className="font-mono-tabular text-stone-900">
-                  {selectedUmkmModal.halalOrPirtNumber}
-                </strong>
-              </div>
-              <div>
-                <span className="text-stone-400 block">Berkas Terlampir</span>
-                <strong className="text-[#16382C] truncate block">
-                  {selectedUmkmModal.docFileName}
-                </strong>
-              </div>
-              <div className="sm:col-span-2">
-                <span className="text-stone-400 block">Alamat Lokasi Dapur / Toko</span>
-                <strong className="text-stone-900">
-                  {selectedUmkmModal.address} ({selectedUmkmModal.district})
-                </strong>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-stone-700 mb-1">
-                Catatan Audit & Alasan Keputusan Admin
-              </label>
-              <textarea
-                rows={3}
-                value={umkmNoteInput}
-                onChange={(e) => setUmkmNoteInput(e.target.value)}
-                className="w-full p-3 text-xs bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-[#16382C]"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-stone-200">
-              <button
-                type="button"
-                onClick={() => {
-                  onUpdateUmkmStatus(
-                    selectedUmkmModal.id,
-                    'Ditolak',
-                    umkmNoteInput || 'Ditolak karena dokumen usaha tidak memenuhi syarat.'
-                  );
-                  showToast(`Pengajuan "${selectedUmkmModal.storeName}" telah Ditolak.`);
-                  setSelectedUmkmModal(null);
-                }}
-                className="h-9 px-3.5 rounded-xl border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold cursor-pointer"
-              >
-                Tolak Pengajuan
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  onUpdateUmkmStatus(
-                    selectedUmkmModal.id,
-                    'Suspended',
-                    umkmNoteInput || 'Akun UMKM ditangguhkan sementara (Suspended).'
-                  );
-                  showToast(`Akun "${selectedUmkmModal.storeName}" telah di-Suspend.`);
-                  setSelectedUmkmModal(null);
-                }}
-                className="h-9 px-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold cursor-pointer"
-              >
-                Tangguhkan (Suspend)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  onUpdateUmkmStatus(
-                    selectedUmkmModal.id,
-                    'Verified',
-                    umkmNoteInput || 'Dokumen usaha lengkap & terverifikasi (Verified).'
-                  );
-                  showToast(`UMKM "${selectedUmkmModal.storeName}" berhasil disetujui (Verified)!`);
-                  setSelectedUmkmModal(null);
-                }}
-                className="h-9 px-4 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer"
-              >
-                Setujui (Verified)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          MODAL 2: SIMULASI PENGAJUAN UMKM BARU
-         ========================================================================= */}
-      {showAddUmkmModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-xs p-4"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white border border-stone-200 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
-              <h3 className="text-base font-bold text-stone-900 font-display">
-                Tambah Pengajuan Verifikasi UMKM
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddUmkmModal(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-800 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!newUmkmStore.trim() || !newUmkmOwner.trim()) return;
-                const created: UmkmVerificationRecord = {
-                  id: `umkm-ver-${Date.now()}`,
-                  storeName: newUmkmStore.trim(),
-                  ownerName: newUmkmOwner.trim(),
-                  email: `${newUmkmStore
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]/g, '')}@umkm.bandung.id`,
-                  phone: '081223344556',
-                  category: newUmkmCategory,
-                  district: newUmkmDistrict,
-                  address: `Jl. Raya ${newUmkmDistrict.split(' ')[0]} No. 21, Bandung`,
-                  submittedAt: 'Baru saja · Hari ini',
-                  status: 'Menunggu Verifikasi',
-                  nibNumber: newUmkmNib.trim() || '9120558839201',
-                  ktpMasked: '327301******0009',
-                  halalOrPirtNumber: 'P-IRT 2063273091122-29',
-                  docType: 'NIB & Sertifikat PIRT',
-                  docFileName: `Berkas_${newUmkmStore.replace(/\s+/g, '_')}.pdf`,
-                  storePhotoUrl:
-                    '/src/assets/images/food_artisan_pastry_box_1794295651168.jpg',
-                  hygieneCommitmentSigned: true,
-                  adminNotes: 'Pengajuan baru masuk antrean verifikasi dokumen.',
-                };
-                onAddSimulatedUmkm(created);
-                setNewUmkmStore('');
-                setNewUmkmOwner('');
-                setNewUmkmNib('');
-                setShowAddUmkmModal(false);
-                showToast(
-                  `Pengajuan UMKM "${created.storeName}" masuk ke daftar Menunggu Verifikasi.`
-                );
-              }}
-              className="space-y-3.5 text-xs"
-            >
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Nama Toko / Usaha UMKM
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newUmkmStore}
-                  onChange={(e) => setNewUmkmStore(e.target.value)}
-                  placeholder="Contoh: Roti Kukus & Kopi Kosambi"
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Nama Pemilik / Penanggung Jawab
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newUmkmOwner}
-                  onChange={(e) => setNewUmkmOwner(e.target.value)}
-                  placeholder="Contoh: Kang Lukman Hakim"
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Nomor NIB / SKU
-                </label>
-                <input
-                  type="text"
-                  value={newUmkmNib}
-                  onChange={(e) => setNewUmkmNib(e.target.value)}
-                  placeholder="Contoh: 9120558839201"
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl font-mono-tabular"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddUmkmModal(false)}
-                  className="h-9 px-4 rounded-xl border border-stone-300 text-stone-700 font-medium cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="h-9 px-4 rounded-xl bg-[#16382C] text-white font-semibold cursor-pointer"
-                >
-                  Simpan ke Antrean Validasi
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          MODAL 3: KONFIRMASI TAKE DOWN PRODUK BERMASALAH
-         ========================================================================= */}
-      {takedownModalItem && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-xs p-4"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white border border-red-200 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-xl">
-            <div className="flex items-start justify-between gap-2 pb-3 border-b border-red-100">
-              <div className="text-red-700">
-                <h3 className="text-base font-bold font-display">
-                  Nonaktifkan Produk (Take Down)
-                </h3>
-                <p className="text-xs text-stone-500 mt-0.5">
-                  {takedownModalItem.title} · {takedownModalItem.merchantName}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setTakedownModalItem(null)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-800 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Kategori Pelanggaran Keamanan Pangan / Etalase
-                </label>
-                <select
-                  value={takedownReasonInput}
-                  onChange={(e) => setTakedownReasonInput(e.target.value)}
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                >
-                  <option value="Laporan Ketidaksesuaian Standar Keamanan Pangan / Risiko Basi">
-                    Laporan Ketidaksesuaian Standar Keamanan Pangan / Risiko Basi
-                  </option>
-                  <option value="Melewati Batas Jam Konsumsi Aman Harian">
-                    Melewati Batas Jam Konsumsi Aman Harian
-                  </option>
-                  <option value="Indikasi Manipulasi Harga Normal / Diskon Semu">
-                    Indikasi Manipulasi Harga Normal / Diskon Semu
-                  </option>
-                  <option value="Deskripsi & Isi Paket Tidak Sesuai Ketentuan">
-                    Deskripsi & Isi Paket Tidak Sesuai Ketentuan
-                  </option>
-                </select>
+              <div className="flex items-center gap-3">
+                <ResilientImage
+                  src={selectedUmkmModal.storePhotoUrl}
+                  alt={selectedUmkmModal.storeName}
+                  className="w-16 h-16 rounded-2xl object-cover border border-neutral-200 shrink-0"
+                />
+                <div>
+                  <h4 className="font-extrabold text-sm text-neutral-900">{selectedUmkmModal.storeName}</h4>
+                  <p className="text-neutral-500">Pemilik: {selectedUmkmModal.ownerName} • {selectedUmkmModal.phone}</p>
+                  <p className="text-neutral-500">Kec. {selectedUmkmModal.district} • {selectedUmkmModal.address}</p>
+                </div>
               </div>
 
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Catatan Instruksi untuk Mitra UMKM (Opsional)
-                </label>
-                <textarea
-                  rows={2}
-                  value={takedownCustomNote}
-                  onChange={(e) => setTakedownCustomNote(e.target.value)}
-                  placeholder="Contoh: Mohon perbarui bukti suhu penyimpanan sebelum mengaktifkan produk kembali..."
-                  className="w-full p-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                />
+              <div className="p-3.5 bg-neutral-50 rounded-2xl space-y-2 border border-neutral-100">
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Nomor Induk Berusaha (NIB):</span>
+                  <span className="font-mono font-bold text-neutral-900">{selectedUmkmModal.nibNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Sertifikasi Halal / PIRT:</span>
+                  <span className="font-mono font-bold text-emerald-800">{selectedUmkmModal.halalOrPirtNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Verifikasi KTP Pemilik:</span>
+                  <span className="font-mono text-neutral-800">{selectedUmkmModal.ktpMasked}</span>
+                </div>
+                <div className="flex justify-between items-center pt-1 border-t border-neutral-200/60">
+                  <span className="text-neutral-500">Deklarasi Higienitas Dapur:</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                    ✓ Bertandatangan Digital
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100">
+              <button
+                type="button"
+                onClick={() => {
+                  onUpdateUmkmStatus(selectedUmkmModal.id, 'Ditolak', 'Dokumen belum lengkap / perlu pembaharuan.');
+                  showToast('Verifikasi Ditolak', `Status ${selectedUmkmModal.storeName} diubah.`);
+                  setSelectedUmkmModal(null);
+                }}
+                className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors"
+              >
+                Minta Perbaikan
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onUpdateUmkmStatus(selectedUmkmModal.id, 'Verified', 'Semua berkas legalitas dan uji higienitas disetujui.');
+                  showToast('Mitra Disetujui', `${selectedUmkmModal.storeName} resmi berstatus Verified.`);
+                  setSelectedUmkmModal(null);
+                }}
+                className="px-5 py-2 text-xs font-bold rounded-xl bg-[#16382C] hover:bg-[#214F3F] text-white transition-colors"
+              >
+                Setujui Menjadi Mitra Resmi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Modal Take Down Menu Bermasalah */}
+      {takedownModalItem && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center gap-3 text-rose-700">
+              <div className="w-10 h-10 rounded-2xl bg-rose-100 flex items-center justify-center font-bold">
+                <AlertTriangle className="w-5 h-5 text-rose-700" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-sm text-neutral-900">Konfirmasi Take Down Menu</h3>
+                <p className="text-xs text-neutral-500">Produk akan langsung dicabut dari etalase pembeli</p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-neutral-50 rounded-2xl text-xs space-y-1">
+              <span className="font-bold text-neutral-900 block">{takedownModalItem.title}</span>
+              <span className="text-neutral-500 block">{takedownModalItem.merchantName}</span>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-700">Alasan Resmi Penarikan Produk:</label>
+              <textarea
+                value={takedownReasonText}
+                onChange={(e) => setTakedownReasonText(e.target.value)}
+                rows={3}
+                className="w-full p-3 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-rose-600"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setTakedownModalItem(null)}
-                className="h-9 px-4 rounded-xl border border-stone-300 text-xs font-medium text-stone-700 cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 rounded-xl"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  const fullReason = takedownCustomNote.trim()
-                    ? `${takedownReasonInput} (${takedownCustomNote.trim()})`
-                    : takedownReasonInput;
-                  onUpdateProductMonitoring(
-                    takedownModalItem.id,
-                    'Take Down',
-                    fullReason
-                  );
-                  showToast(
-                    `Produk "${takedownModalItem.title}" telah di-Take Down dari Etalase Publik.`
-                  );
+                  onUpdateProductMonitoring(takedownModalItem.id, 'Take Down', takedownReasonText);
+                  showToast('Produk Di-Takedown', `"${takedownModalItem.title}" dinonaktifkan dari etalase.`);
                   setTakedownModalItem(null);
                 }}
-                className="h-9 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs"
               >
-                Konfirmasi Take Down
+                Eksekusi Take Down
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* =========================================================================
-          MODAL 4: PUTUSAN PENYELESAIAN SENGKETA (DISPUTE RESOLUTION)
-         ========================================================================= */}
-      {selectedDispute && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-xs p-4"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white border border-stone-200 rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-xl">
-            <div className="flex items-start justify-between gap-2 pb-3 border-b border-stone-200">
-              <div>
-                <h3 className="text-base font-bold text-stone-900 font-display">
-                  Tindak Lanjut Sengketa #{selectedDispute.ticketCode}
+      {/* 3. Modal Eksekusi Solusi Komplain & Refund Escrow */}
+      {selectedDisputeModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+                <h3 className="font-extrabold text-base text-neutral-900">
+                  Resolusi Tiket #{selectedDisputeModal.ticketCode}
                 </h3>
-                <p className="text-xs text-stone-500">
-                  Pesanan #{selectedDispute.orderCode} · {selectedDispute.merchantName}
-                </p>
               </div>
               <button
                 type="button"
-                onClick={() => setSelectedDispute(null)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-800 cursor-pointer"
+                onClick={() => setSelectedDisputeModal(null)}
+                className="text-neutral-400 hover:text-neutral-600"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-3.5 text-xs space-y-1">
-              <p className="font-semibold text-stone-900">
-                Kategori: {selectedDispute.category}
+            <div className="p-3.5 bg-neutral-50 rounded-2xl text-xs space-y-1.5 border border-neutral-100">
+              <div className="flex justify-between">
+                <span className="text-neutral-500">Pelapor:</span>
+                <span className="font-bold text-neutral-900">{selectedDisputeModal.reporterName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-500">Toko Terkait:</span>
+                <span className="font-semibold text-neutral-800">{selectedDisputeModal.merchantName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-500">Nominal Refund Escrow:</span>
+                <span className="font-mono font-bold text-emerald-800">{formatRupiah(selectedDisputeModal.amountPaid)}</span>
+              </div>
+              <p className="pt-2 border-t border-neutral-200/60 text-neutral-700 italic">
+                "{selectedDisputeModal.description}"
               </p>
-              <p className="text-stone-600">"{selectedDispute.description}"</p>
-              <p className="text-stone-500 pt-1">
-                Dana Pembeli Terkait:{' '}
-                <strong className="font-mono-tabular text-stone-900">
-                  {formatRupiah(selectedDispute.amountPaid)}
-                </strong>
-              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-700">Catatan Resmi Admin & Rekomendasi Solusi:</label>
+              <textarea
+                value={disputeResolutionNote}
+                onChange={(e) => setDisputeResolutionNote(e.target.value)}
+                rows={3}
+                className="w-full p-3 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-700"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  onResolveDispute(
+                    selectedDisputeModal.id,
+                    'Selesai (Refund Pembeli)',
+                    disputeResolutionNote,
+                    true,
+                    selectedDisputeModal.itemName
+                  );
+                  showToast('Refund Berhasil', `Dana ${formatRupiah(selectedDisputeModal.amountPaid)} dikembalikan ke pembeli.`);
+                  setSelectedDisputeModal(null);
+                }}
+                className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white transition-colors"
+              >
+                Proses Refund 100% Escrow
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onResolveDispute(
+                    selectedDisputeModal.id,
+                    'Selesai (Sanksi UMKM)',
+                    'Sanksi peringatan diterbitkan ke gerai terkait.',
+                    false
+                  );
+                  showToast('Sanksi Diterbitkan', `Peringatan dikirim ke ${selectedDisputeModal.merchantName}.`);
+                  setSelectedDisputeModal(null);
+                }}
+                className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white transition-colors"
+              >
+                Kirim Sanksi Mitra
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Modal Tambah Akun Demo Baru */}
+      {isAddUserModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <h3 className="font-extrabold text-sm text-neutral-900">Tambah Akun Pengguna Demo</h3>
+              <button
+                type="button"
+                onClick={() => setIsAddUserModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={disputeAutoTakedown}
-                  onChange={(e) => setDisputeAutoTakedown(e.target.checked)}
-                  className="rounded border-stone-300 text-[#16382C]"
-                />
-                <span className="font-medium text-stone-800">
-                  Otomatis Take Down produk "{selectedDispute.itemName}" dari etalase
-                </span>
-              </label>
-
               <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Catatan Keputusan Resmi Admin
-                </label>
-                <textarea
-                  rows={3}
-                  value={disputeNoteInput}
-                  onChange={(e) => setDisputeNoteInput(e.target.value)}
-                  className="w-full p-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-stone-200">
-              <button
-                type="button"
-                onClick={() => {
-                  onResolveDispute(
-                    selectedDispute.id,
-                    'Ditolak (Bukti Tidak Valid)',
-                    disputeNoteInput || 'Laporan ditolak karena bukti tidak sesuai.',
-                    false
-                  );
-                  showToast(
-                    `Tiket #${selectedDispute.ticketCode} ditutup (Bukti Tidak Valid).`
-                  );
-                  setSelectedDispute(null);
-                }}
-                className="h-9 px-3 rounded-xl border border-stone-300 text-xs font-semibold text-stone-700 hover:bg-stone-100 cursor-pointer"
-              >
-                Tolak Komplain
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  onResolveDispute(
-                    selectedDispute.id,
-                    'Selesai (Sanksi UMKM)',
-                    disputeNoteInput ||
-                      'Sanksi teguran keras diberikan ke mitra UMKM & produk dievaluasi.',
-                    true,
-                    disputeAutoTakedown ? selectedDispute.itemName : undefined
-                  );
-                  showToast(
-                    `Tiket #${selectedDispute.ticketCode}: Sanksi UMKM diterapkan & Refund pembeli diproses.`
-                  );
-                  setSelectedDispute(null);
-                }}
-                className="h-9 px-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold cursor-pointer"
-              >
-                Sanksi UMKM & Refund
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  onResolveDispute(
-                    selectedDispute.id,
-                    'Selesai (Refund Pembeli)',
-                    disputeNoteInput ||
-                      'Dana dikembalikan penuh ke pembeli melalui gateway pembayaran.',
-                    true,
-                    disputeAutoTakedown ? selectedDispute.itemName : undefined
-                  );
-                  showToast(
-                    `Tiket #${selectedDispute.ticketCode} selesai: Refund ${formatRupiah(
-                      selectedDispute.amountPaid
-                    )} diterbitkan.`
-                  );
-                  setSelectedDispute(null);
-                }}
-                className="h-9 px-4 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer"
-              >
-                Setujui Refund Pembeli
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          MODAL 5: UBAH ROLE & SANKSI HAK AKSES PENGGUNA
-         ========================================================================= */}
-      {selectedUserModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-xs p-4"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white border border-stone-200 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-xl">
-            <div className="flex items-start justify-between gap-2 pb-3 border-b border-stone-200">
-              <div>
-                <h3 className="text-base font-bold text-stone-900 font-display">
-                  Atur Hak Akses & Sanksi Akun
-                </h3>
-                <p className="text-xs text-stone-500">
-                  {selectedUserModal.name} · {selectedUserModal.email}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedUserModal(null)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-800 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                onUpdateUserAccess(
-                  selectedUserModal.id,
-                  editUserRole,
-                  editUserStatus,
-                  editUserSanction.trim() || undefined
-                );
-                showToast(
-                  `Hak akses "${selectedUserModal.name}" diperbarui menjadi Role: ${editUserRole} (${editUserStatus}).`
-                );
-                setSelectedUserModal(null);
-              }}
-              className="space-y-3.5 text-xs"
-            >
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Role Pengguna (Account Access Level)
-                </label>
-                <select
-                  value={editUserRole}
-                  onChange={(e) => setEditUserRole(e.target.value as UserRole)}
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                >
-                  <option value="Buyer">Buyer (Pembeli Warga)</option>
-                  <option value="UMKM">UMKM (Mitra Penjual Kuliner)</option>
-                  <option value="Admin">Admin (Pengelola Platform)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Status Akun & Penegakan Disiplin
-                </label>
-                <select
-                  value={editUserStatus}
-                  onChange={(e) =>
-                    setEditUserStatus(e.target.value as AccountStatus)
-                  }
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                >
-                  <option value="Aktif">Aktif (Normal)</option>
-                  <option value="Peringatan (Warning)">
-                    Peringatan (Warning / Pembatasan Kuota)
-                  </option>
-                  <option value="Suspended">
-                    Suspended (Bekukan Akses Masuk & Transaksi)
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Catatan Sanksi / Audit Hak Akses
-                </label>
-                <textarea
-                  rows={3}
-                  value={editUserSanction}
-                  onChange={(e) => setEditUserSanction(e.target.value)}
-                  placeholder="Tuliskan alasan perubahan role, pemberian peringatan, atau suspend akun..."
-                  className="w-full p-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedUserModal(null)}
-                  className="h-9 px-4 rounded-xl border border-stone-300 text-stone-700 font-medium cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="h-9 px-4 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white font-semibold cursor-pointer"
-                >
-                  Simpan Perubahan Akses
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          MODAL 6: TAMBAH AKUN PENGGUNA BARU
-         ========================================================================= */}
-      {showAddUserModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-xs p-4"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white border border-stone-200 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
-              <h3 className="text-base font-bold text-stone-900 font-display">
-                Tambah Akun & tetapkan Role
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddUserModal(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:text-stone-800 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!newUserName.trim() || !newUserEmail.trim()) return;
-                const created: UserAccessRecord = {
-                  id: `usr-${Date.now()}`,
-                  name: newUserName.trim(),
-                  email: newUserEmail.trim(),
-                  phone: newUserPhone.trim() || '081298765432',
-                  role: newUserRole,
-                  status: 'Aktif',
-                  district: 'Coblong (Dago / Dipatiukur)',
-                  joinedAt: 'Hari ini',
-                  lastActive: 'Baru saja dibuat',
-                  violationCount: 0,
-                };
-                onAddUserAccount(created);
-                setNewUserName('');
-                setNewUserEmail('');
-                setNewUserPhone('');
-                setShowAddUserModal(false);
-                showToast(
-                  `Akun "${created.name}" dengan role ${created.role} berhasil ditambahkan.`
-                );
-              }}
-              className="space-y-3.5 text-xs"
-            >
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Nama Lengkap / Nama Mitra
-                </label>
+                <label className="block font-semibold text-neutral-700 mb-1">Nama Lengkap</label>
                 <input
                   type="text"
-                  required
                   value={newUserName}
                   onChange={(e) => setNewUserName(e.target.value)}
-                  placeholder="Contoh: Fauzan Hakim"
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
+                  placeholder="Misal: Budi Santoso"
+                  className="w-full p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl"
                 />
               </div>
 
               <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Alamat Email
-                </label>
+                <label className="block font-semibold text-neutral-700 mb-1">Alamat Email</label>
                 <input
                   type="email"
-                  required
                   value={newUserEmail}
                   onChange={(e) => setNewUserEmail(e.target.value)}
-                  placeholder="Contoh: fauzan@sisapiring.id"
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
+                  placeholder="budi@example.com"
+                  className="w-full p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl"
                 />
               </div>
 
               <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Nomor Telepon
-                </label>
+                <label className="block font-semibold text-neutral-700 mb-1">Nomor WhatsApp</label>
                 <input
-                  type="tel"
+                  type="text"
                   value={newUserPhone}
                   onChange={(e) => setNewUserPhone(e.target.value)}
-                  placeholder="Contoh: 08123456789"
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl font-mono-tabular"
+                  placeholder="08123456789"
+                  className="w-full p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl"
                 />
               </div>
 
-              <div>
-                <label className="block font-medium text-stone-700 mb-1">
-                  Tetapkan Role Hak Akses
-                </label>
-                <select
-                  value={newUserRole}
-                  onChange={(e) => setNewUserRole(e.target.value as UserRole)}
-                  className="w-full h-10 px-3 bg-[#FAF9F6] border border-stone-300 rounded-xl"
-                >
-                  <option value="Buyer">Buyer</option>
-                  <option value="UMKM">UMKM</option>
-                  <option value="Admin">Admin</option>
-                </select>
-              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-neutral-700 mb-1">Peran (Role)</label>
+                  <select
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value as any)}
+                    className="w-full p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl font-bold"
+                  >
+                    <option value="Buyer">Buyer (Konsumen)</option>
+                    <option value="UMKM">UMKM (Penjual)</option>
+                    <option value="Admin">Admin Platform</option>
+                  </select>
+                </div>
 
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddUserModal(false)}
-                  className="h-9 px-4 rounded-xl border border-stone-300 text-stone-700 font-medium cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="h-9 px-4 rounded-xl bg-[#16382C] text-white font-semibold cursor-pointer"
-                >
-                  Simpan Akun
-                </button>
+                <div>
+                  <label className="block font-semibold text-neutral-700 mb-1">Wilayah Kecamatan</label>
+                  <input
+                    type="text"
+                    value={newUserDistrict}
+                    onChange={(e) => setNewUserDistrict(e.target.value)}
+                    className="w-full p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl"
+                  />
+                </div>
               </div>
-            </form>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3">
+              <button
+                type="button"
+                onClick={() => setIsAddUserModalOpen(false)}
+                className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 rounded-xl"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!newUserName.trim()) return;
+                  onAddUserAccount({
+                    id: `usr-${Date.now().toString().slice(-4)}`,
+                    name: newUserName,
+                    email: newUserEmail || `${newUserName.toLowerCase().replace(/\s+/g, '')}@sisapiring.id`,
+                    phone: newUserPhone || '+62 812-8899-7711',
+                    role: newUserRole,
+                    status: 'Aktif',
+                    district: newUserDistrict,
+                    joinedAt: 'Hari ini',
+                    lastActive: 'Baru saja',
+                    violationCount: 0,
+                  });
+                  showToast('Akun Ditambahkan', `Akun ${newUserName} berhasil dibuat.`);
+                  setIsAddUserModalOpen(false);
+                  setNewUserName('');
+                  setNewUserEmail('');
+                  setNewUserPhone('');
+                }}
+                className="px-4 py-2 text-xs font-bold bg-[#16382C] hover:bg-[#214F3F] text-white rounded-xl shadow-xs"
+              >
+                Simpan Akun
+              </button>
+            </div>
           </div>
         </div>
       )}

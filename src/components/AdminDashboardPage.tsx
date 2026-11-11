@@ -23,7 +23,11 @@ import { useApp } from '../context/AppContext';
 
 // Modular Admin Sub-Components
 import { AdminTab, AdminMacroStats } from './admin/types';
-import { AdminHeader } from './admin/AdminHeader';
+import { AdminSidebar } from './admin/AdminSidebar';
+import { AdminMobileDrawer } from './admin/AdminMobileDrawer';
+import { AdminTopInfoBar } from './admin/AdminTopInfoBar';
+
+// Modular Admin Tab Views
 import { OverviewTab } from './admin/tabs/OverviewTab';
 import { SellerGovernanceTab } from './admin/tabs/SellerGovernanceTab';
 import { ProductCurationTab } from './admin/tabs/ProductCurationTab';
@@ -108,6 +112,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
 }) => {
   const { sellerProfile } = useApp();
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -257,8 +262,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     showToast('Laporan Diunduh', 'Berkas CSV laporan makro Kota Bandung berhasil diunduh.');
   };
 
+  const handleTabChange = (tab: AdminTab) => {
+    setActiveTab(tab);
+    setSearchQuery('');
+  };
+
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-neutral-900 flex flex-col font-sans">
+    <div className="flex h-screen w-full bg-[#FAF9F6] text-neutral-900 overflow-hidden font-sans">
       {/* Toast Feedback */}
       {adminToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#16382C] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-500/30 animate-in fade-in slide-in-from-bottom-4">
@@ -277,124 +287,144 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
       )}
 
-      {/* Top Governance Header */}
-      <AdminHeader
+      {/* 1. Desktop Left Sidebar (Navigation Moved Here!) */}
+      <div className="hidden lg:flex shrink-0 h-full">
+        <AdminSidebar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          macroStats={macroStats}
+          onSwitchToPublicEtalase={onSwitchToPublicEtalase}
+          onSwitchToSellerPortal={onSwitchToSellerPortal}
+        />
+      </div>
+
+      {/* 2. Mobile Drawer Navigation */}
+      <AdminMobileDrawer
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
         activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          setSearchQuery('');
-        }}
+        onTabChange={handleTabChange}
         macroStats={macroStats}
         onSwitchToPublicEtalase={onSwitchToPublicEtalase}
         onSwitchToSellerPortal={onSwitchToSellerPortal}
       />
 
-      {/* Tab Content Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {activeTab === 'overview' && (
-          <OverviewTab
-            macroStats={macroStats}
-            umkmVerifications={umkmVerifications}
-            onSelectTab={setActiveTab}
-            onExportCSV={handleExportCSV}
-            onFilterPendingUmkm={() => {
-              setActiveTab('seller-governance');
-              setSellerStatusFilter('Menunggu Verifikasi');
-            }}
-          />
-        )}
+      {/* 3. Main Workspace Viewport */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Top Header (Full of Information Only!) */}
+        <AdminTopInfoBar
+          activeTab={activeTab}
+          macroStats={macroStats}
+          onMobileMenuToggle={() => setMobileSidebarOpen(true)}
+        />
 
-        {activeTab === 'seller-governance' && (
-          <SellerGovernanceTab
-            displayUmkmList={displayUmkmList}
-            sellerStatusFilter={sellerStatusFilter}
-            onStatusFilterChange={setSellerStatusFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            sellerProfile={sellerProfile}
-            onSelectUmkm={setSelectedUmkmModal}
-            onOpenPublicStore={onOpenPublicStore}
-            onSwitchToSellerPortal={onSwitchToSellerPortal}
-          />
-        )}
+        {/* Scrollable Tab Workspace */}
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          {activeTab === 'overview' && (
+            <OverviewTab
+              macroStats={macroStats}
+              umkmVerifications={umkmVerifications}
+              onSelectTab={setActiveTab}
+              onExportCSV={handleExportCSV}
+              onFilterPendingUmkm={() => {
+                setActiveTab('seller-governance');
+                setSellerStatusFilter('Menunggu Verifikasi');
+              }}
+            />
+          )}
 
-        {activeTab === 'product-curation' && (
-          <ProductCurationTab
-            displayProducts={displayProducts}
-            productMonitoring={productMonitoring}
-            productStatusFilter={productStatusFilter}
-            onStatusFilterChange={setProductStatusFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onRestoreProduct={(itemId, title) => {
-              onUpdateProductMonitoring(itemId, 'Aktif & Aman');
-              showToast('Produk Dipulihkan', `"${title}" kembali tayang di etalase.`);
-            }}
-            onRequestTakedown={setTakedownModalItem}
-          />
-        )}
+          {activeTab === 'seller-governance' && (
+            <SellerGovernanceTab
+              displayUmkmList={displayUmkmList}
+              sellerStatusFilter={sellerStatusFilter}
+              onStatusFilterChange={setSellerStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              sellerProfile={sellerProfile}
+              onSelectUmkm={setSelectedUmkmModal}
+              onOpenPublicStore={onOpenPublicStore}
+              onSwitchToSellerPortal={onSwitchToSellerPortal}
+            />
+          )}
 
-        {activeTab === 'order-escrow' && (
-          <OrderEscrowTab
-            transactions={transactions}
-            orders={orders}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            macroStats={macroStats}
-            onReleaseEscrow={(trx) => {
-              onUpdateTransactionGateway(
-                trx.id,
-                'Selesai (Settled)',
-                'Dilepaskan secara manual oleh Admin setelah audit serah terima barang.'
-              );
-              showToast('Escrow Dicairkan', `Dana pesanan ${trx.orderCode} diteruskan ke UMKM.`);
-            }}
-          />
-        )}
+          {activeTab === 'product-curation' && (
+            <ProductCurationTab
+              displayProducts={displayProducts}
+              productMonitoring={productMonitoring}
+              productStatusFilter={productStatusFilter}
+              onStatusFilterChange={setProductStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onRestoreProduct={(itemId, title) => {
+                onUpdateProductMonitoring(itemId, 'Aktif & Aman');
+                showToast('Produk Dipulihkan', `"${title}" kembali tayang di etalase.`);
+              }}
+              onRequestTakedown={setTakedownModalItem}
+            />
+          )}
 
-        {activeTab === 'disputes-refund' && (
-          <DisputesRefundTab
-            displayDisputes={displayDisputes}
-            disputeStatusFilter={disputeStatusFilter}
-            onStatusFilterChange={setDisputeStatusFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onSelectDispute={setSelectedDisputeModal}
-            onRejectDispute={(dispute) => {
-              onResolveDispute(
-                dispute.id,
-                'Ditolak (Bukti Tidak Valid)',
-                'Bukti tidak memenuhi kriteria komplain garansi mutu makanan.'
-              );
-              showToast('Laporan Ditolak', `Tiket #${dispute.ticketCode} ditutup.`);
-            }}
-          />
-        )}
+          {activeTab === 'order-escrow' && (
+            <OrderEscrowTab
+              transactions={transactions}
+              orders={orders}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              macroStats={macroStats}
+              onReleaseEscrow={(trx) => {
+                onUpdateTransactionGateway(
+                  trx.id,
+                  'Selesai (Settled)',
+                  'Dilepaskan secara manual oleh Admin setelah audit serah terima barang.'
+                );
+                showToast('Escrow Dicairkan', `Dana pesanan ${trx.orderCode} diteruskan ke UMKM.`);
+              }}
+            />
+          )}
 
-        {activeTab === 'reviews-moderation' && <ReviewsModerationTab />}
+          {activeTab === 'disputes-refund' && (
+            <DisputesRefundTab
+              displayDisputes={displayDisputes}
+              disputeStatusFilter={disputeStatusFilter}
+              onStatusFilterChange={setDisputeStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onSelectDispute={setSelectedDisputeModal}
+              onRejectDispute={(dispute) => {
+                onResolveDispute(
+                  dispute.id,
+                  'Ditolak (Bukti Tidak Valid)',
+                  'Bukti tidak memenuhi kriteria komplain garansi mutu makanan.'
+                );
+                showToast('Laporan Ditolak', `Tiket #${dispute.ticketCode} ditutup.`);
+              }}
+            />
+          )}
 
-        {activeTab === 'user-access' && (
-          <UserAccessTab
-            displayUsers={displayUsers}
-            roleFilter={roleFilter}
-            onRoleFilterChange={setRoleFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onOpenAddUserModal={() => setIsAddUserModalOpen(true)}
-            onToggleUserStatus={(u) => {
-              if (u.status === 'Aktif') {
-                onUpdateUserAccess(u.id, u.role, 'Suspended', 'Dibekukan oleh Admin');
-                showToast('Akun Dibekukan', `Akun ${u.name} dinonaktifkan.`);
-              } else {
-                onUpdateUserAccess(u.id, u.role, 'Aktif');
-                showToast('Akun Dipulihkan', `Akun ${u.name} aktif kembali.`);
-              }
-            }}
-          />
-        )}
-      </main>
+          {activeTab === 'reviews-moderation' && <ReviewsModerationTab />}
 
-      {/* Interactive Modals */}
+          {activeTab === 'user-access' && (
+            <UserAccessTab
+              displayUsers={displayUsers}
+              roleFilter={roleFilter}
+              onRoleFilterChange={setRoleFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onOpenAddUserModal={() => setIsAddUserModalOpen(true)}
+              onToggleUserStatus={(u) => {
+                if (u.status === 'Aktif') {
+                  onUpdateUserAccess(u.id, u.role, 'Suspended', 'Dibekukan oleh Admin');
+                  showToast('Akun Dibekukan', `Akun ${u.name} dinonaktifkan.`);
+                } else {
+                  onUpdateUserAccess(u.id, u.role, 'Aktif');
+                  showToast('Akun Dipulihkan', `Akun ${u.name} aktif kembali.`);
+                }
+              }}
+            />
+          )}
+        </main>
+      </div>
+
+      {/* 4. Interactive Dialog Modals */}
       <UmkmVerificationModal
         umkm={selectedUmkmModal}
         onClose={() => setSelectedUmkmModal(null)}

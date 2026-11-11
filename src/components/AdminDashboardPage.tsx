@@ -140,7 +140,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     window.setTimeout(() => setAdminToast(null), 3500);
   };
 
-  // Macro Metrics (Bandung Aggregates)
+  // Macro Metrics (Bandung Aggregates - Dynamic LCA Calculation)
   const macroStats: AdminMacroStats = useMemo(() => {
     const period = MACRO_IMPACT_BY_PERIOD['30d'];
     const totalOrdersCount = orders.length + transactions.length;
@@ -148,6 +148,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
       (acc, o) => acc + o.items.reduce((sum, item) => sum + item.quantity, 0),
       period.totalPortionsRescued
     );
+
+    // Algorithmic Derivation based on LCA & Bappenas Standards:
+    // 1 portion = 0.45 kg food waste prevented
+    // 1 kg food waste = 2.5 kg CO2e methane prevented from TPA Sarimukti
+    // 1 kg food waste = 800 L virtual water footprint saved
+    const dynamicWasteKg = Math.round(totalRescuedPortions * 0.45 * 10) / 10;
+    const dynamicCo2Kg = Math.round(dynamicWasteKg * 2.5 * 10) / 10;
+    const dynamicWaterLiters = Math.round(dynamicWasteKg * 800);
+
     const activeProductsCount = catalogItems.filter(
       (item) => (productMonitoring[item.id]?.monitoringStatus ?? 'Aktif & Aman') === 'Aktif & Aman'
     ).length;
@@ -162,7 +171,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
       .reduce((acc, t) => acc + t.totalPaid, 0);
 
     return {
-      period,
+      period: {
+        ...period,
+        totalPortionsRescued: totalRescuedPortions,
+        foodWastePreventedKg: dynamicWasteKg,
+        co2EmissionsSavedKg: dynamicCo2Kg,
+        waterSavedLiters: dynamicWaterLiters,
+      },
       totalOrdersCount,
       totalRescuedPortions,
       activeProductsCount,

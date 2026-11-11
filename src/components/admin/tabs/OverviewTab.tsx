@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Download,
   ShoppingBag,
@@ -10,6 +10,9 @@ import {
   Store,
   ArrowUpRight,
   MapPin,
+  Info,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { formatRupiah } from '../../../data/sisaPiringCatalog';
 import { AdminTab, AdminMacroStats } from '../types';
@@ -30,6 +33,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
   onExportCSV,
   onFilterPendingUmkm,
 }) => {
+  const [showMethodology, setShowMethodology] = useState(false);
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Welcome & Ecosystem Health Banner */}
@@ -130,6 +134,83 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
           <span className="text-[10px] text-indigo-600 font-semibold block">Terlindungi Pembeli</span>
         </div>
+      </div>
+
+      {/* Environmental & ESG Methodology Transparency Bar */}
+      <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-2.5">
+            <div className="w-7 h-7 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+              <Info className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-neutral-900">
+                  Metodologi Sains Transparansi Dampak Lingkungan (LCA & Bappenas)
+                </span>
+                <span className="text-[10px] font-mono font-bold bg-white px-2 py-0.5 rounded border border-emerald-300 text-emerald-800">
+                  Algorithmic Engine
+                </span>
+              </div>
+              <p className="text-xs text-neutral-600 mt-0.5 leading-relaxed">
+                Pembeli tidak perlu menginput data teknis. Sistem secara otomatis mengonversi kuantitas porsi transaksi riil ke metrik ekologis standar <strong>IPCC, FAO, & Bappenas</strong>.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowMethodology(!showMethodology)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-emerald-100/60 border border-emerald-300 text-emerald-850 text-xs font-bold rounded-xl transition-colors shrink-0 self-start sm:self-center cursor-pointer shadow-2xs"
+          >
+            <span>{showMethodology ? 'Tutup Formula' : 'Buka Formula Hitungan'}</span>
+            {showMethodology ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+
+        {/* Collapsible Formula Breakdown */}
+        {showMethodology && (
+          <div className="mt-3.5 pt-3.5 border-t border-emerald-200/70 grid grid-cols-1 md:grid-cols-3 gap-3 animate-in fade-in duration-150">
+            <div className="bg-white p-3 rounded-xl border border-emerald-100">
+              <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-xs mb-1">
+                <Leaf className="w-3.5 h-3.5" />
+                <span>1. Sampah Dicegah (kg)</span>
+              </div>
+              <p className="text-[11px] text-neutral-600 leading-normal">
+                Setiap <strong>1 porsi</strong> makanan siap santap dihitung setara bobot <strong>0,45 kg (450 g)</strong> mengacu kajian timbulan sampah pangan Bappenas & UNEP.
+              </p>
+              <div className="mt-1.5 text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                Porsi × 0,45 kg = kg Sampah
+              </div>
+            </div>
+
+            <div className="bg-white p-3 rounded-xl border border-emerald-100">
+              <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-xs mb-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>2. Reduksi Emisi CO₂e (kg)</span>
+              </div>
+              <p className="text-[11px] text-neutral-600 leading-normal">
+                Setiap <strong>1 kg sampah makanan</strong> yang urung membusuk anaerobik di TPA Sarimukti mencegah pelepasan <strong>2,5 kg CO₂e gas metana</strong> (standar FAO/IPCC).
+              </p>
+              <div className="mt-1.5 text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                kg Sampah × 2,5 = kg CO₂e
+              </div>
+            </div>
+
+            <div className="bg-white p-3 rounded-xl border border-emerald-100">
+              <div className="flex items-center gap-1.5 text-sky-800 font-bold text-xs mb-1">
+                <Droplets className="w-3.5 h-3.5" />
+                <span>3. Air Bersih Terlindungi (L)</span>
+              </div>
+              <p className="text-[11px] text-neutral-600 leading-normal">
+                Konsep <em>Virtual Water Footprint</em> (Hoekstra, WFN): memproduksi <strong>1 kg makanan olahan</strong> membutuhkan rata-rata <strong>800 Liter air tawar</strong> (hulu ke hilir).
+              </p>
+              <div className="mt-1.5 text-[10px] font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded">
+                kg Sampah × 800 = Liter Air
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Ecosystem Balance Grid: User Needs vs Seller Needs */}

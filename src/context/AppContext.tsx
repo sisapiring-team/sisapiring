@@ -1,0 +1,532 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { INITIAL_ORDERS, INITIAL_PRODUCTS, INITIAL_SELLER_PROFILE } from '../data/initialData';
+import { Order, OrderStatus, SellerProfile, SurplusProduct, VerificationStatus } from '../types/seller';
+
+export type ActiveTab =
+  | 'dashboard'
+  | 'products'
+  | 'orders'
+  | 'rescue_deals'
+  | 'qr_pickup'
+  | 'analytics'
+  | 'profile'
+  | 'settings'
+  | 'registration'
+  | 'marketplace';
+
+export interface ToastMessage {
+  id: string;
+  title: string;
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+}
+
+interface AppContextType {
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
+  sellerProfile: SellerProfile;
+  updateSellerProfile: (updates: Partial<SellerProfile>) => void;
+  setVerificationStatus: (status: VerificationStatus, notes?: string) => void;
+  products: SurplusProduct[];
+  addProduct: (productData: Omit<SurplusProduct, 'id' | 'createdAt' | 'portionsRescuedCount'>) => SurplusProduct;
+  updateProduct: (id: string, updates: Partial<SurplusProduct>) => void;
+  deleteProduct: (id: string) => void;
+  toggleProductStatus: (id: string) => void;
+  updateStock: (id: string, delta: number) => void;
+  applyDiscount: (id: string, discount: 50 | 70 | 90 | 100) => void;
+  orders: Order[];
+  updateOrderStatus: (orderId: string, status: OrderStatus, note?: string) => void;
+  cancelOrder: (orderId: string, reason: string) => void;
+  verifyPickupCode: (codeOrQr: string) => { success: boolean; message: string; order?: Order };
+  createCustomerOrder: (
+    items: { productId: string; quantity: number }[],
+    customerName: string,
+    customerPhone: string
+  ) => Order;
+  ordersFilterStatus: 'all' | OrderStatus;
+  setOrdersFilterStatus: (status: 'all' | OrderStatus) => void;
+  navigateToOrdersWithFilter: (status: 'all' | OrderStatus) => void;
+  isAddProductModalOpen: boolean;
+  setIsAddProductModalOpen: (open: boolean) => void;
+  isVerificationModalOpen: boolean;
+  setIsVerificationModalOpen: (open: boolean) => void;
+  isFoodSafetyModalOpen: boolean;
+  setIsFoodSafetyModalOpen: (open: boolean) => void;
+  toasts: ToastMessage[];
+  showToast: (title: string, message: string, type?: 'success' | 'error' | 'warning' | 'info') => void;
+  removeToast: (id: string) => void;
+  resetAllDemoData: () => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+const STORAGE_KEY_SELLER = 'sisapiring_seller_profile_v2';
+const STORAGE_KEY_PRODUCTS = 'sisapiring_products_v2';
+const STORAGE_KEY_ORDERS = 'sisapiring_orders_v2';
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [ordersFilterStatus, setOrdersFilterStatus] = useState<'all' | OrderStatus>('all');
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [isFoodSafetyModalOpen, setIsFoodSafetyModalOpen] = useState(false);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Initialize seller profile
+  const [sellerProfile, setSellerProfile] = useState<SellerProfile>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_SELLER);
+      return saved ? JSON.parse(saved) : INITIAL_SELLER_PROFILE;
+    } catch {
+      return INITIAL_SELLER_PROFILE;
+    }
+  });
+
+  // Initialize products
+  const [products, setProducts] = useState<SurplusProduct[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+      return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+    } catch {
+      return INITIAL_PRODUCTS;
+    }
+  });
+
+  // Initialize orders
+  const [orders, setOrders] = useState<Order[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_ORDERS);
+      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+    } catch {
+      return INITIAL_ORDERS;
+    }
+  });
+
+  // Sync to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_SELLER, JSON.stringify(sellerProfile));
+    } catch (e) {
+      console.warn('Storage sync error', e);
+    }
+  }, [sellerProfile]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+    } catch (e) {
+      console.warn('Storage sync error', e);
+    }
+  }, [products]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(orders));
+    } catch (e) {
+      console.warn('Storage sync error', e);
+    }
+  }, [orders]);
+
+  const showToast = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    const id = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const newToast: ToastMessage = { id, title, message, type };
+    setToasts((prev) => [...prev, newToast]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4500);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const updateSellerProfile = (updates: Partial<SellerProfile>) => {
+    setSellerProfile((prev) => ({ ...prev, ...updates }));
+    showToast('Profil Berhasil Diperbarui', 'Data profil usaha UMKM Anda telah disimpan.', 'success');
+  };
+
+  const setVerificationStatus = (status: VerificationStatus, notes?: string) => {
+    setSellerProfile((prev) => ({
+      ...prev,
+      verificationStatus: status,
+      verificationNotes: notes || prev.verificationNotes,
+    }));
+    const statusLabel =
+      status === 'verified' ? 'Terverifikasi' : status === 'pending_review' ? 'Menunggu Peninjauan' : 'Ditolak';
+    showToast('Status Verifikasi Berubah', `Status akun UMKM saat ini: ${statusLabel}`, 'info');
+  };
+
+  const addProduct = (
+    productData: Omit<SurplusProduct, 'id' | 'createdAt' | 'portionsRescuedCount'>
+  ): SurplusProduct => {
+    const newProduct: SurplusProduct = {
+      ...productData,
+      id: `PRD-${Date.now().toString().slice(-4)}`,
+      createdAt: new Date().toISOString(),
+      portionsRescuedCount: 0,
+    };
+    setProducts((prev) => [newProduct, ...prev]);
+    showToast(
+      'Produk Surplus Berhasil Diterbitkan',
+      `"${newProduct.name}" kini tayang di etalase SisaPiring Bandung.`,
+      'success'
+    );
+    return newProduct;
+  };
+
+  const updateProduct = (id: string, updates: Partial<SurplusProduct>) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === id) {
+          const updated = { ...p, ...updates };
+          // If discount changed, recalculate discountedPrice
+          if (updates.discountPercentage !== undefined || updates.originalPrice !== undefined) {
+            const disc = updates.discountPercentage ?? p.discountPercentage;
+            const orig = updates.originalPrice ?? p.originalPrice;
+            updated.discountedPrice = disc === 100 ? 0 : Math.round(orig * (1 - disc / 100));
+          }
+          return updated;
+        }
+        return p;
+      })
+    );
+    showToast('Produk Diperbarui', 'Perubahan produk surplus berhasil disimpan.', 'success');
+  };
+
+  const deleteProduct = (id: string) => {
+    const p = products.find((prod) => prod.id === id);
+    setProducts((prev) => prev.filter((prod) => prod.id !== id));
+    showToast('Produk Dihapus', `Produk "${p?.name || id}" telah dihapus dari etalase.`, 'info');
+  };
+
+  const toggleProductStatus = (id: string) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === id) {
+          const nextState = !p.isActive;
+          showToast(
+            nextState ? 'Produk Diaktifkan' : 'Produk Dinonaktifkan',
+            `Status "${p.name}" sekarang ${nextState ? 'Aktif' : 'Nonaktif'}.`,
+            'info'
+          );
+          return { ...p, isActive: nextState };
+        }
+        return p;
+      })
+    );
+  };
+
+  const updateStock = (id: string, delta: number) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === id) {
+          const newStock = Math.max(0, p.stock + delta);
+          return { ...p, stock: newStock };
+        }
+        return p;
+      })
+    );
+  };
+
+  const applyDiscount = (id: string, discount: 50 | 70 | 90 | 100) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === id) {
+          const discountedPrice = discount === 100 ? 0 : Math.round(p.originalPrice * (1 - discount / 100));
+          return {
+            ...p,
+            discountPercentage: discount,
+            discountedPrice,
+          };
+        }
+        return p;
+      })
+    );
+    showToast('Diskon Penyelamatan Diterapkan', `Diskon ${discount}% berhasil diatur untuk produk.`, 'success');
+  };
+
+  const updateOrderStatus = (orderId: string, status: OrderStatus, note?: string) => {
+    const timestamp = new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date()) + ' WIB';
+
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            status,
+            statusHistory: [...o.statusHistory, { status, timestamp, note }],
+          };
+        }
+        return o;
+      })
+    );
+
+    const labels: Record<OrderStatus, string> = {
+      waiting_confirmation: 'Menunggu Konfirmasi',
+      confirmed: 'Dikonfirmasi',
+      ready_for_pickup: 'Siap Diambil',
+      completed: 'Selesai',
+      cancelled: 'Dibatalkan',
+    };
+    showToast('Status Pesanan Diperbarui', `Pesanan ${orderId} diubah menjadi "${labels[status]}".`, 'success');
+  };
+
+  const cancelOrder = (orderId: string, reason: string) => {
+    const timestamp = new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date()) + ' WIB';
+
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            status: 'cancelled',
+            cancellationReason: reason,
+            statusHistory: [
+              ...o.statusHistory,
+              { status: 'cancelled', timestamp, note: `Dibatalkan: ${reason}` },
+            ],
+          };
+        }
+        return o;
+      })
+    );
+    showToast('Pesanan Dibatalkan', `Pesanan ${orderId} telah dibatalkan.`, 'warning');
+  };
+
+  const verifyPickupCode = (rawInput: string): { success: boolean; message: string; order?: Order } => {
+    const cleanCode = rawInput.trim().toUpperCase();
+    if (!cleanCode) {
+      return { success: false, message: 'Harap masukkan kode pengambilan atau scan QR code pelanggan.' };
+    }
+
+    // Match either by pickupCode (e.g. SP-7842) or full orderId (e.g. SP-BDG-2026-081)
+    const order = orders.find(
+      (o) => o.pickupCode.toUpperCase() === cleanCode || o.id.toUpperCase() === cleanCode
+    );
+
+    if (!order) {
+      return {
+        success: false,
+        message: `Kode "${cleanCode}" tidak ditemukan dalam sistem pesanan SisaPiring. Periksa kembali kode pengambilan.`,
+      };
+    }
+
+    if (order.status === 'completed') {
+      return {
+        success: false,
+        message: `Kode "${order.pickupCode}" SUDAH PERNAH DIGUNAKAN sebelumnya pada ${order.verifiedAt || 'transaksi sebelumnya'}. Pengambilan ganda tidak diperbolehkan.`,
+        order,
+      };
+    }
+
+    if (order.status === 'cancelled') {
+      return {
+        success: false,
+        message: `Pesanan ${order.id} telah berstatus DIBATALKAN. Tidak dapat melakukan verifikasi pengambilan.`,
+        order,
+      };
+    }
+
+    // Success: mark as completed and verified
+    const timestamp = new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date()) + ' WIB';
+
+    let rescuedItemsCount = 0;
+    order.items.forEach((item) => {
+      rescuedItemsCount += item.quantity;
+    });
+
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id === order.id) {
+          return {
+            ...o,
+            status: 'completed',
+            isVerifiedByQR: true,
+            verifiedAt: timestamp,
+            statusHistory: [
+              ...o.statusHistory,
+              {
+                status: 'completed',
+                timestamp,
+                note: 'Verifikasi sukses melalui Scan QR / Kode PIN Kasir',
+              },
+            ],
+          };
+        }
+        return o;
+      })
+    );
+
+    // Update portionsRescuedCount for the products
+    setProducts((prev) =>
+      prev.map((p) => {
+        const matchingItem = order.items.find((item) => item.productId === p.id);
+        if (matchingItem) {
+          return {
+            ...p,
+            portionsRescuedCount: p.portionsRescuedCount + matchingItem.quantity,
+          };
+        }
+        return p;
+      })
+    );
+
+    showToast(
+      'Pengambilan Berhasil Diverifikasi!',
+      `Pesanan ${order.id} untuk ${order.customerName} telah resmi diserahkan. Sebanyak ${rescuedItemsCount} porsi makanan berhasil diselamatkan!`,
+      'success'
+    );
+
+    return {
+      success: true,
+      message: `Verifikasi sukses! Pesanan ${order.id} (${order.customerName}) telah selesai diambil.`,
+      order: {
+        ...order,
+        status: 'completed',
+        isVerifiedByQR: true,
+        verifiedAt: timestamp,
+      },
+    };
+  };
+
+  const createCustomerOrder = (
+    cartItems: { productId: string; quantity: number }[],
+    customerName: string,
+    customerPhone: string
+  ): Order => {
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    const pickupCode = `SP-${randomDigits}`;
+    const orderNumber = Math.floor(100 + Math.random() * 900);
+    const id = `SP-BDG-2026-${orderNumber}`;
+
+    const items: Order['items'] = [];
+    let totalPayment = 0;
+
+    cartItems.forEach((ci) => {
+      const prod = products.find((p) => p.id === ci.productId);
+      if (prod) {
+        items.push({
+          productId: prod.id,
+          productName: prod.name,
+          category: prod.category,
+          pricePerItem: prod.discountedPrice,
+          quantity: ci.quantity,
+          image: prod.image,
+        });
+        totalPayment += prod.discountedPrice * ci.quantity;
+
+        // Decrease stock
+        updateStock(prod.id, -ci.quantity);
+      }
+    });
+
+    const timestamp = new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date()) + ' WIB';
+
+    const newOrder: Order = {
+      id,
+      pickupCode,
+      customerName,
+      customerPhone,
+      items,
+      totalPayment,
+      orderDate: timestamp,
+      pickupDeadline: 'Hari ini, 21:00 WIB',
+      status: 'waiting_confirmation',
+      statusHistory: [
+        { status: 'waiting_confirmation', timestamp, note: 'Pesanan dibuat oleh pembeli di Marketplace SisaPiring' },
+      ],
+      isVerifiedByQR: false,
+    };
+
+    setOrders((prev) => [newOrder, ...prev]);
+    showToast('Pesanan Baru Diterima!', `Pesanan ${newOrder.id} dari ${customerName} telah masuk.`, 'info');
+    return newOrder;
+  };
+
+  const resetAllDemoData = () => {
+    setSellerProfile(INITIAL_SELLER_PROFILE);
+    setProducts(INITIAL_PRODUCTS);
+    setOrders(INITIAL_ORDERS);
+    localStorage.removeItem(STORAGE_KEY_SELLER);
+    localStorage.removeItem(STORAGE_KEY_PRODUCTS);
+    localStorage.removeItem(STORAGE_KEY_ORDERS);
+    showToast('Data Demo Direset', 'Semua data contoh produk dan pesanan telah dikembalikan ke awal.', 'info');
+  };
+
+  const navigateToOrdersWithFilter = (status: 'all' | OrderStatus) => {
+    setOrdersFilterStatus(status);
+    setActiveTab('orders');
+  };
+
+  return (
+    <AppContext.Provider
+      value={{
+        activeTab,
+        setActiveTab,
+        ordersFilterStatus,
+        setOrdersFilterStatus,
+        navigateToOrdersWithFilter,
+        isAddProductModalOpen,
+        setIsAddProductModalOpen,
+        isVerificationModalOpen,
+        setIsVerificationModalOpen,
+        isFoodSafetyModalOpen,
+        setIsFoodSafetyModalOpen,
+        sellerProfile,
+        updateSellerProfile,
+        setVerificationStatus,
+        products,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+        toggleProductStatus,
+        updateStock,
+        applyDiscount,
+        orders,
+        updateOrderStatus,
+        cancelOrder,
+        verifyPickupCode,
+        createCustomerOrder,
+        toasts,
+        showToast,
+        removeToast,
+        resetAllDemoData,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
+};

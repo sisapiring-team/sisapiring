@@ -1,0 +1,6 @@
+{
+  "name": "SisaPiring — Portal Mitra & Dashboard UMKM",
+  "description": "Portal manajemen bisnis surplus food rescue untuk pelaku UMKM kuliner di Kota Bandung. Kelola produk surplus, deklarasi keamanan pangan, diskon pintar, dan verifikasi pengambilan pesanan QR.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

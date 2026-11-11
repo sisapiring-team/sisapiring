@@ -22,6 +22,7 @@ import {
   Package,
   Upload,
   X,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   SURPLUS_CATALOG,
@@ -34,6 +35,26 @@ import {
   ComplaintReport,
   formatRupiah,
 } from './data/surplusCatalog';
+import {
+  INITIAL_UMKM_VERIFICATIONS,
+  INITIAL_PRODUCT_MONITORING,
+  INITIAL_ADMIN_DISPUTES,
+  INITIAL_ADMIN_TRANSACTIONS,
+  INITIAL_DISCOUNT_HISTORY,
+  INITIAL_USER_ACCESS_LIST,
+  UmkmVerificationRecord,
+  UmkmVerificationStatus,
+  ProductMonitoringMeta,
+  ProductMonitoringStatus,
+  AdminDisputeRecord,
+  DisputeStatus,
+  AdminTransactionRecord,
+  DiscountHistoryEntry,
+  UserAccessRecord,
+  UserRole,
+  AccountStatus,
+  mapComplaintToAdminDispute,
+} from './data/adminData';
 import { ResilientImage } from './components/ResilientImage';
 import { ImpactCalculator } from './components/ImpactCalculator';
 import {
@@ -45,6 +66,7 @@ import {
 import { MarketplaceDisplayPage } from './components/MarketplaceDisplayPage';
 import { StoreCatalogPage } from './components/StoreCatalogPage';
 import { AuthPage, UserAccount } from './components/AuthPage';
+import { AdminDashboardPage } from './components/AdminDashboardPage';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -74,12 +96,12 @@ const DELIVERY_STAGES: {
 ];
 
 export default function App() {
-  // Active Page View ('etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store')
+  // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store')
   const [activePage, setActivePage] = useState<
-    'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store'
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store'
   >('etalase');
   const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
-    'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store'
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store'
   >('etalase');
   const [selectedStoreName, setSelectedStoreName] = useState<string>(
     SURPLUS_CATALOG[0].merchantName
@@ -109,8 +131,26 @@ export default function App() {
   const [editNameText, setEditNameText] = useState<string>('');
   const [editPhoneText, setEditPhoneText] = useState<string>('');
 
-  // Dynamic Catalog State
-  const [catalogItems] = useState<SurplusItem[]>(SURPLUS_CATALOG);
+  // Dynamic Catalog State & Admin Governance States
+  const [catalogItems, setCatalogItems] = useState<SurplusItem[]>(SURPLUS_CATALOG);
+  const [productMonitoring, setProductMonitoring] = useState<
+    Record<string, ProductMonitoringMeta>
+  >(INITIAL_PRODUCT_MONITORING);
+  const [umkmVerifications, setUmkmVerifications] = useState<
+    UmkmVerificationRecord[]
+  >(INITIAL_UMKM_VERIFICATIONS);
+  const [adminDisputes, setAdminDisputes] = useState<AdminDisputeRecord[]>(
+    INITIAL_ADMIN_DISPUTES
+  );
+  const [adminTransactions, setAdminTransactions] = useState<
+    AdminTransactionRecord[]
+  >(INITIAL_ADMIN_TRANSACTIONS);
+  const [discountHistory, setDiscountHistory] = useState<
+    DiscountHistoryEntry[]
+  >(INITIAL_DISCOUNT_HISTORY);
+  const [userAccounts, setUserAccounts] = useState<UserAccessRecord[]>(
+    INITIAL_USER_ACCESS_LIST
+  );
 
   // Interactive Cart & Modal States
   const [cart, setCart] = useState<CartEntry[]>([
@@ -294,11 +334,47 @@ export default function App() {
 
   const handleOrderCreated = (newOrder: OrderRecord) => {
     setOrders((prev) => [newOrder, ...prev]);
+    const firstEntry = newOrder.items[0];
+    if (firstEntry) {
+      const newTrx: AdminTransactionRecord = {
+        id: `trx-${Date.now()}`,
+        orderCode: newOrder.orderCode,
+        timestamp: newOrder.createdAt,
+        buyerName: newOrder.name,
+        merchantName: firstEntry.item.merchantName,
+        itemTitle: firstEntry.item.title,
+        quantity: firstEntry.quantity,
+        reportedNormalPrice: firstEntry.item.originalPrice,
+        verifiedBaselinePrice: firstEntry.item.originalPrice,
+        rescuePrice: firstEntry.item.rescuePrice,
+        reportedDiscountPercent: firstEntry.item.discountPercent,
+        realDiscountPercent: firstEntry.item.discountPercent,
+        totalPaid: newOrder.totalPaid,
+        paymentMethod:
+          newOrder.payment === 'qris'
+            ? 'QRIS Terintegrasi'
+            : 'COD Kasir Mitra',
+        paymentGatewayRef: `${newOrder.payment.toUpperCase()}-BDG-${Date.now()
+          .toString()
+          .slice(-4)}`,
+        gatewayStatus:
+          newOrder.payment === 'qris'
+            ? 'Dana Ditahan (Escrow)'
+            : 'Selesai (Settled)',
+        manipulationFlag: 'Aman',
+      };
+      setAdminTransactions((prev) => [newTrx, ...prev]);
+    }
   };
 
   const openStorePage = (merchantName: string) => {
     setSelectedStoreName(merchantName);
     setActivePage('store');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openAdminPage = () => {
+    setActivePage('admin');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -323,9 +399,184 @@ export default function App() {
       status: 'Sedang Ditinjau',
     };
     setComplaints((prev) => [created, ...prev]);
+    setAdminDisputes((prev) => [mapComplaintToAdminDispute(created), ...prev]);
     setRecentToast(`Laporan #${ticketCode} berhasil dikirim ke Tim Keamanan`);
     window.setTimeout(() => setRecentToast(null), 3000);
   };
+
+  // Admin Governance Handlers
+  const handleUpdateUmkmStatus = (
+    id: string,
+    status: UmkmVerificationStatus,
+    notes: string
+  ) => {
+    setUmkmVerifications((prev) =>
+      prev.map((u) =>
+        u.id === id ? { ...u, status, adminNotes: notes } : u
+      )
+    );
+  };
+
+  const handleAddSimulatedUmkm = (record: UmkmVerificationRecord) => {
+    setUmkmVerifications((prev) => [record, ...prev]);
+  };
+
+  const handleUpdateProductMonitoring = (
+    itemId: string,
+    status: ProductMonitoringStatus,
+    reason?: string
+  ) => {
+    setProductMonitoring((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...(prev[itemId] || {
+          itemId,
+          reportCount: 0,
+          safetyFlag: 'Aman',
+          prepWindowVerified: true,
+        }),
+        monitoringStatus: status,
+        lastCheckedAt: 'Baru saja · Oleh Admin',
+        takedownReason: status === 'Take Down' ? reason : undefined,
+      },
+    }));
+  };
+
+  const handleCorrectProductPrice = (
+    itemId: string,
+    correctedOriginalPrice: number,
+    discountEntryId: string
+  ) => {
+    setCatalogItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+        const nextDiscount = Math.round(
+          ((correctedOriginalPrice - item.rescuePrice) /
+            correctedOriginalPrice) *
+            100
+        );
+        return {
+          ...item,
+          originalPrice: correctedOriginalPrice,
+          discountPercent: nextDiscount,
+        };
+      })
+    );
+    setDiscountHistory((prev) =>
+      prev.map((dh) =>
+        dh.id === discountEntryId
+          ? {
+              ...dh,
+              submittedNormalPrice: correctedOriginalPrice,
+              claimedDiscountPercent: dh.actualDiscountFromBaseline,
+              markupDeviationPercent: 0,
+              status: 'Harga Dikoreksi Admin',
+            }
+          : dh
+      )
+    );
+  };
+
+  const handleResolveDispute = (
+    disputeId: string,
+    nextStatus: DisputeStatus,
+    resolutionNote: string,
+    triggerRefund?: boolean,
+    takedownItemName?: string
+  ) => {
+    const targetDispute = adminDisputes.find((d) => d.id === disputeId);
+    setAdminDisputes((prev) =>
+      prev.map((d) =>
+        d.id === disputeId
+          ? { ...d, status: nextStatus, adminResolutionNote: resolutionNote }
+          : d
+      )
+    );
+    if (targetDispute) {
+      setComplaints((prev) =>
+        prev.map((c) =>
+          c.ticketCode === targetDispute.ticketCode
+            ? { ...c, status: 'Selesai Ditindaklanjuti' }
+            : c
+        )
+      );
+      if (triggerRefund) {
+        setAdminTransactions((prev) =>
+          prev.map((t) =>
+            t.orderCode === targetDispute.orderCode
+              ? {
+                  ...t,
+                  gatewayStatus: 'Refunded',
+                  adminActionNote: `Refund otomatis dari penyelesaian sengketa #${targetDispute.ticketCode}.`,
+                }
+              : t
+          )
+        );
+      }
+      if (takedownItemName) {
+        const matchedItem = catalogItems.find(
+          (i) => i.title.toLowerCase() === takedownItemName.toLowerCase()
+        );
+        if (matchedItem) {
+          handleUpdateProductMonitoring(
+            matchedItem.id,
+            'Take Down',
+            `Di-take down otomatis melalui putusan sengketa #${targetDispute.ticketCode}`
+          );
+        }
+      }
+    }
+  };
+
+  const handleUpdateTransactionGateway = (
+    trxId: string,
+    nextStatus: AdminTransactionRecord['gatewayStatus'],
+    note: string
+  ) => {
+    setAdminTransactions((prev) =>
+      prev.map((t) =>
+        t.id === trxId
+          ? { ...t, gatewayStatus: nextStatus, adminActionNote: note }
+          : t
+      )
+    );
+  };
+
+  const handleUpdateUserAccess = (
+    userId: string,
+    nextRole: UserRole,
+    nextStatus: AccountStatus,
+    sanctionNote?: string
+  ) => {
+    setUserAccounts((prev) =>
+      prev.map((u) =>
+        u.id === userId
+          ? {
+              ...u,
+              role: nextRole,
+              status: nextStatus,
+              sanctionNote:
+                nextStatus === 'Aktif' ? undefined : sanctionNote || u.sanctionNote,
+              violationCount:
+                nextStatus !== 'Aktif' ? u.violationCount + 1 : u.violationCount,
+            }
+          : u
+      )
+    );
+  };
+
+  const handleAddUserAccount = (newUser: UserAccessRecord) => {
+    setUserAccounts((prev) => [newUser, ...prev]);
+  };
+
+  // Public Marketplace Catalog excludes products that Admin has Taken Down
+  const publicVisibleCatalogItems = useMemo(
+    () =>
+      catalogItems.filter(
+        (item) => productMonitoring[item.id]?.monitoringStatus !== 'Take Down'
+      ),
+    [catalogItems, productMonitoring]
+  );
 
   const activeOrders = useMemo(
     () => orders.filter((o) => o.status === 'siap-diambil'),
@@ -340,11 +591,11 @@ export default function App() {
   return (
     <div
       className={`min-h-screen flex flex-col bg-[#FAF9F6] text-stone-900 overflow-x-hidden ${
-        currentUser && activePage !== 'auth' ? 'pb-16' : ''
+        currentUser && activePage !== 'auth' && activePage !== 'admin' ? 'pb-16' : ''
       }`}
     >
-      {/* Top Navigation Bar — Hidden on Login/Register Page */}
-      {activePage !== 'auth' && (
+      {/* Top Navigation Bar — Hidden on Login/Register Page & Admin Workspace */}
+      {activePage !== 'auth' && activePage !== 'admin' && (
         <header className="sticky top-0 z-30 h-14 md:h-16 bg-[#16382C] text-white border-b border-white/10 flex items-center">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4 md:gap-8 px-4 sm:px-6">
           {/* Zone 1: Single text element wordmark */}
@@ -393,10 +644,27 @@ export default function App() {
             >
               Dampak UMKM
             </button>
+            <button
+              type="button"
+              onClick={openAdminPage}
+              className="hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              Panel Admin
+            </button>
           </nav>
 
-          {/* Zone 3: Cart Icon + Login/Register Button Beside It */}
+          {/* Zone 3: Quick Admin Toggle + Cart Icon + Login/Register */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={openAdminPage}
+              title="Akses Panel Admin & Tata Kelola Platform"
+              className="h-10 px-2.5 sm:px-3 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-amber-300/30 bg-white/10 hover:bg-white/20 text-amber-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <ShieldCheck className="w-4 h-4 text-amber-300 shrink-0" />
+              <span className="hidden sm:inline">Panel Admin</span>
+            </button>
+
             <button
               type="button"
               onClick={openCartPage}
@@ -503,6 +771,18 @@ export default function App() {
                         <ShoppingBag className="w-4 h-4 text-[#16382C] shrink-0" />
                         <span>Kantong Penyelamatan ({totalCartItems})</span>
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAccountMenuOpen(false);
+                          openAdminPage();
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
+                      >
+                        <ShieldCheck className="w-4 h-4 text-[#16382C] shrink-0" />
+                        <span>Panel Admin (Pengelola)</span>
+                      </button>
                     </div>
 
                     {/* Logout Action */}
@@ -550,7 +830,32 @@ export default function App() {
         </div>
       )}
 
-      {activePage === 'auth' ? (
+      {activePage === 'admin' ? (
+        /* PAGE 8: DEDICATED PLATFORM ADMIN GOVERNANCE CONSOLE */
+        <main className="flex-1">
+          <AdminDashboardPage
+            catalogItems={catalogItems}
+            productMonitoring={productMonitoring}
+            umkmVerifications={umkmVerifications}
+            disputes={adminDisputes}
+            transactions={adminTransactions}
+            discountHistory={discountHistory}
+            userAccounts={userAccounts}
+            orders={orders}
+            complaints={complaints}
+            onUpdateUmkmStatus={handleUpdateUmkmStatus}
+            onAddSimulatedUmkm={handleAddSimulatedUmkm}
+            onUpdateProductMonitoring={handleUpdateProductMonitoring}
+            onCorrectProductPrice={handleCorrectProductPrice}
+            onResolveDispute={handleResolveDispute}
+            onUpdateTransactionGateway={handleUpdateTransactionGateway}
+            onUpdateUserAccess={handleUpdateUserAccess}
+            onAddUserAccount={handleAddUserAccount}
+            onSwitchToPublicEtalase={openEtalasePage}
+            onOpenPublicStore={openStorePage}
+          />
+        </main>
+      ) : activePage === 'auth' ? (
         /* PAGE 4: SEPARATE LOGIN & REGISTER PAGE */
         <main className="flex-1">
           <AuthPage
@@ -581,7 +886,7 @@ export default function App() {
         <main className="flex-1">
           <StoreCatalogPage
             merchantName={selectedStoreName}
-            allItems={catalogItems}
+            allItems={publicVisibleCatalogItems}
             cart={cart}
             currentUser={currentUser}
             reviews={storeReviews}
@@ -978,7 +1283,7 @@ export default function App() {
         /* PAGE 2: SEPARATE DEDICATED PRODUCT DISPLAY PAGE */
         <main className="flex-1">
           <MarketplaceDisplayPage
-            items={catalogItems}
+            items={publicVisibleCatalogItems}
             cart={cart}
             onAddToCart={handleAddToCart}
             onUpdateCartQty={handleUpdateCartQty}
@@ -1453,8 +1758,8 @@ export default function App() {
         </main>
       )}
 
-      {/* QUIET FOOTER (Hidden on Login/Register Page) */}
-      {activePage !== 'auth' && (
+      {/* QUIET FOOTER (Hidden on Login/Register Page & Admin Workspace) */}
+      {activePage !== 'auth' && activePage !== 'admin' && (
         <footer className="border-t border-stone-200 bg-[#FAF9F6] py-10 md:py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-1">
@@ -1494,6 +1799,13 @@ export default function App() {
                 className="hover:text-stone-900 transition-colors cursor-pointer"
               >
                 Kisah Mitra UMKM
+              </button>
+              <button
+                type="button"
+                onClick={openAdminPage}
+                className="hover:text-stone-900 font-semibold text-[#16382C] transition-colors cursor-pointer"
+              >
+                Panel Admin
               </button>
             </div>
 
@@ -1957,7 +2269,7 @@ export default function App() {
       )}
 
       {/* POST-LOGIN BOTTOM NAVBAR: UTAMA, PESANAN, DAN HISTORY */}
-      {currentUser && activePage !== 'auth' && (
+      {currentUser && activePage !== 'auth' && activePage !== 'admin' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"

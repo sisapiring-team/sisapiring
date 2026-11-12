@@ -96,6 +96,7 @@ import { FloatingChatButton } from './components/chat/FloatingChatButton';
 import { BotChatView } from './components/chat/BotChatView';
 import { parseRoute, pushRoute } from './utils/navigation';
 import { Footer } from './components/Footer';
+import { FoodWasteFunFacts } from './components/FoodWasteFunFacts';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -941,7 +942,7 @@ function CustomerAndAdminPortal() {
                   onClick={() => navigateToSection('dampak-umkm')}
                   className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  Dampak UMKM
+                  Fakta Limbah Pangan
                 </button>
               </>
             ) : (
@@ -1266,7 +1267,7 @@ function CustomerAndAdminPortal() {
                       }}
                       className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
                     >
-                      Dampak UMKM
+                      Fakta Limbah Pangan
                     </button>
                     <div className="pt-2">
                       <button
@@ -2181,70 +2182,14 @@ function CustomerAndAdminPortal() {
             className="border-t border-[#8DA249]/20 bg-[#F4F6EC] py-12 sm:py-16 md:py-24"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
-              {/* Top Sub-Block: Documentary Portrait + Attributable Testimonials */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-                <div className="lg:col-span-5">
-                  <div className="relative h-full min-h-[280px] sm:min-h-[320px] rounded-2xl overflow-hidden border border-[#8DA249]/30">
-                    <ResilientImage
-                      src={PARTNER_PORTRAIT_PATH}
-                      alt="Ibu Sari Rahmawati mengemas roti segar ke dalam kantong kertas di Sari Bakery Kotagede"
-                      fallbackTitle="Ibu Sari Rahmawati — Sari Bakery Kotagede"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 text-white">
-                      <p className="text-xs text-stone-200">
-                        Potret Mitra · Sari Bakery Kotagede, Berdiri Sejak 1998
-                      </p>
-                      <p className="text-sm font-medium mt-1">
-                        Menyelamatkan rata-rata 450 potong roti dan donat kampung setiap bulan.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-7 flex flex-col justify-between space-y-5 sm:space-y-6">
-                  <div>
-                    <p className="text-xs text-stone-500 mb-1.5">
-                      Suara Pemilik Dapur Lokal · Bukti Dampak Terukur
-                    </p>
-                    <h2
-                      className="text-2xl md:text-3xl font-semibold text-stone-900 tracking-tight"
-                      style={{ textWrap: 'balance' }}
-                    >
-                      Menjaga Jerih Payah UMKM Agar Tidak Berakhir di Tempat Sampah
-                    </h2>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                    {MERCHANT_STORIES.map((story) => (
-                      <div
-                        key={story.id}
-                        className="p-5 sm:p-6 bg-white border border-[#8DA249]/20 rounded-2xl space-y-3 shadow-xs"
-                      >
-                        <div className="text-xs text-stone-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-                          <strong className="text-stone-900">{story.ownerName}</strong>
-                          <span aria-hidden="true">·</span>
-                          <span>
-                            {story.role}, {story.businessName} ({story.city})
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span className="text-[#8DA249] font-mono-tabular font-bold">
-                            +{story.monthlyRecoveredRupiah}
-                          </span>
-                        </div>
-
-                        <blockquote className="text-xs sm:text-sm text-stone-800 leading-relaxed">
-                          “{story.quote}”
-                        </blockquote>
-
-                        <p className="text-xs text-stone-500 pt-2 border-t border-stone-200/70">
-                          {story.beforeAfterSummary}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {/* MENU FUN FACT DARI DAMPAK PEMBUANGAN MAKANAN / LIMBAH PANGAN */}
+              <FoodWasteFunFacts
+                onOpenEtalase={openEtalasePage}
+                onOpenPartnerForm={() => {
+                  const el = document.getElementById('gabung-mitra');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              />
 
               {/* Bottom Sub-Block: Interactive Partner / Community Lead Capture Form */}
               <div

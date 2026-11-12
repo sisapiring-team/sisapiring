@@ -124,7 +124,7 @@ export const Footer: React.FC<FooterProps> = ({
             onClick={() => handleSectionClick('dampak-umkm')}
             className="hover:text-[#8DA249] transition-colors cursor-pointer"
           >
-            Dampak UMKM
+            Fakta Limbah Pangan
           </button>
           <span className="text-stone-600 select-none" aria-hidden="true">·</span>
 
@@ -221,3 +221,4 @@ export const Footer: React.FC<FooterProps> = ({
     </footer>
   );
 };
+

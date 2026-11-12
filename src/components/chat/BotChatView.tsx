@@ -202,11 +202,10 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
               className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
             >
               <div
-                className={`max-w-[90%] sm:max-w-[75%] rounded-3xl p-4 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${
-                  isUser
+                className={`max-w-[90%] sm:max-w-[75%] rounded-3xl p-4 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${isUser
                     ? 'bg-[#16382C] text-white rounded-br-xs'
                     : 'bg-white text-stone-800 border border-stone-200/90 rounded-bl-xs'
-                }`}
+                  }`}
               >
                 {!isUser && (
                   <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-stone-100 text-[11px] font-bold text-[#16382C]">
@@ -262,9 +261,8 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
                 )}
 
                 <div
-                  className={`flex items-center justify-end gap-1 mt-2 text-[10px] font-mono ${
-                    isUser ? 'text-emerald-200' : 'text-stone-400'
-                  }`}
+                  className={`flex items-center justify-end gap-1 mt-2 text-[10px] font-mono ${isUser ? 'text-emerald-200' : 'text-stone-400'
+                    }`}
                 >
                   <span>{msg.timestamp}</span>
                 </div>
@@ -339,3 +337,4 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
     </div>
   );
 };
+

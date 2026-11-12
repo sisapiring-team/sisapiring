@@ -146,11 +146,9 @@ function CustomerAndAdminPortal() {
   const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
     'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store' | 'chat'
   >('etalase');
-  const [chatInitialMode, setChatInitialMode] = useState<'seller' | 'bot'>('seller');
   const [chatTargetMerchant, setChatTargetMerchant] = useState<string | undefined>(undefined);
 
-  const openChatPage = (mode: 'seller' | 'bot' = 'seller', merchantName?: string) => {
-    setChatInitialMode(mode);
+  const openChatPage = (merchantName?: string) => {
     setChatTargetMerchant(merchantName);
     setActivePage('chat');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -790,12 +788,12 @@ function CustomerAndAdminPortal() {
             </button>
             <button
               type="button"
-              onClick={() => openChatPage('seller')}
+              onClick={() => openChatPage()}
               className={`hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activePage === 'chat' ? 'text-amber-300 underline' : ''
               }`}
             >
-              Chat & AI Bot
+              Chat Penjual
             </button>
             <button
               type="button"
@@ -851,9 +849,9 @@ function CustomerAndAdminPortal() {
 
             <button
               type="button"
-              onClick={() => openChatPage('seller')}
-              title="Pusat Pesan & Chat Bot"
-              aria-label="Pusat Pesan & Chat Bot"
+              onClick={() => openChatPage()}
+              title="Pusat Pesan & Chat Penjual"
+              aria-label="Pusat Pesan & Chat Penjual"
               className={`relative w-10 h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
                 activePage === 'chat'
                   ? 'bg-white/30 border-amber-300'
@@ -1109,14 +1107,13 @@ function CustomerAndAdminPortal() {
             onOpenDetail={(item) => setActiveProductModal(item)}
             onAddReview={handleAddStoreReview}
             onAddComplaint={handleAddComplaint}
-            onChatStore={(mName) => openChatPage('seller', mName)}
+            onChatStore={(mName) => openChatPage(mName)}
           />
         </main>
       ) : activePage === 'chat' ? (
-        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL & CHAT DENGAN BOT) */
+        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
         <main className="flex-1 bg-[#FAF9F6] pb-24">
           <ChatContainerPage
-            initialMode={chatInitialMode}
             initialMerchantName={chatTargetMerchant}
             catalog={publicVisibleCatalogItems}
             onBack={openEtalasePage}
@@ -2059,7 +2056,7 @@ function CustomerAndAdminPortal() {
         onClose={() => setActiveProductModal(null)}
         onAddToCart={handleAddToCart}
         onOpenStore={openStorePage}
-        onChatStore={(mName) => openChatPage('seller', mName)}
+        onChatStore={(mName) => openChatPage(mName)}
       />
 
       {/* MODAL BERI RATING & ULASAN UMKM SETELAH PESANAN SELESAI */}
@@ -2550,7 +2547,7 @@ function CustomerAndAdminPortal() {
 
           <button
             type="button"
-            onClick={() => openChatPage('seller')}
+            onClick={() => openChatPage()}
             className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'chat'
                 ? 'text-[#16382C] font-bold'
@@ -2561,7 +2558,7 @@ function CustomerAndAdminPortal() {
               <MessageSquare className="w-5 h-5" />
               <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-[#EE4D2D]" />
             </div>
-            <span className="text-[11px]">Chat & AI</span>
+            <span className="text-[11px]">Chat Penjual</span>
           </button>
 
           <button
@@ -2582,9 +2579,18 @@ function CustomerAndAdminPortal() {
         </nav>
       )}
 
-      {/* FLOATING CHAT & AI BOT WIDGET (USER SIDE) */}
-      {activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && (
-        <FloatingChatButton onOpenChat={(mode) => openChatPage(mode)} />
+      {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE) */}
+      {activePage !== 'admin' && activePage !== 'auth' && (
+        <FloatingChatButton
+          catalog={publicVisibleCatalogItems}
+          onOpenEtalase={openEtalasePage}
+          onOpenOrders={() => {
+            setActivePage('pesanan');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenSellerChat={(merchantName) => openChatPage(merchantName)}
+          onSelectProduct={(item) => setActiveProductModal(item)}
+        />
       )}
     </div>
   );

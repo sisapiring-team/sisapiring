@@ -1,20 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  MessageSquare,
-  Bot,
   Store,
   ArrowLeft,
-  Sparkles,
+  Users,
   ShieldCheck,
 } from 'lucide-react';
 import { SellerChatView } from './SellerChatView';
-import { BotChatView } from './BotChatView';
 import { SellerConversation, ChatMessage } from './types';
 import { INITIAL_SELLER_CONVERSATIONS } from './chatData';
 import { SisaPiringItem } from '../../data/sisaPiringCatalog';
 
 interface ChatContainerPageProps {
-  initialMode?: 'seller' | 'bot';
   initialMerchantName?: string;
   catalog: SisaPiringItem[];
   onBack: () => void;
@@ -25,16 +21,12 @@ interface ChatContainerPageProps {
 }
 
 export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
-  initialMode = 'seller',
   initialMerchantName,
   catalog,
   onBack,
   onOpenStore,
   onOpenOrder,
-  onOpenEtalase,
-  onSelectProduct,
 }) => {
-  const [chatMode, setChatMode] = useState<'seller' | 'bot'>(initialMode);
   const [conversations, setConversations] = useState<SellerConversation[]>(() => {
     // If opened for a specific merchant not yet in conversation list, add or activate them
     if (initialMerchantName) {
@@ -73,18 +65,29 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
     return INITIAL_SELLER_CONVERSATIONS;
   });
 
-  const [activeConvId, setActiveConvId] = useState<string>(() => {
+  // If initialMerchantName is passed (e.g. from store detail/product modal), select it directly;
+  // otherwise null so user sees the seller contact list first!
+  const [activeConvId, setActiveConvId] = useState<string | null>(() => {
     if (initialMerchantName) {
-      const found = conversations.find(
+      const found = INITIAL_SELLER_CONVERSATIONS.find(
         (c) => c.merchantName.toLowerCase() === initialMerchantName.toLowerCase()
       );
       if (found) return found.id;
     }
-    return conversations[0]?.id || 'conv-kala-bakehouse';
+    return null; // Start with contact list!
   });
 
-  // Total unread messages across seller conversations
-  const totalSellerUnread = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
+  // When initialMerchantName changes
+  useEffect(() => {
+    if (initialMerchantName) {
+      const found = conversations.find(
+        (c) => c.merchantName.toLowerCase() === initialMerchantName.toLowerCase()
+      );
+      if (found) {
+        setActiveConvId(found.id);
+      }
+    }
+  }, [initialMerchantName]);
 
   // Send message to seller with realistic auto-reply simulation
   const handleSendSellerMessage = (
@@ -163,11 +166,9 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-4 animate-in fade-in duration-200">
-      {/* ======================================================== */}
-      {/* 1. TOP HEADER & NAVIGATION BAR */}
-      {/* ======================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl border border-stone-200/90 shadow-xs">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 animate-in fade-in duration-200">
+      {/* Top Banner Navigation (Dedicated to Seller Chat Only) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-3xl border border-stone-200/90 shadow-xs">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -179,83 +180,30 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
           </button>
           <div>
             <h2 className="text-lg sm:text-xl font-extrabold text-stone-900 tracking-tight flex items-center gap-2">
-              Pusat Pesan & Bantuan
+              <Store className="w-5 h-5 text-[#16382C]" />
+              <span>Chat Penjual Mitra UMKM</span>
             </h2>
             <p className="text-xs text-stone-500 mt-0.5">
-              Komunikasi langsung dengan Mitra UMKM dan panduan cerdas Asisten AI
+              Hubungi gerai makanan langsung untuk memastikan porsi sisa piring dan waktu pengambilan
             </p>
           </div>
         </div>
 
-        {/* 2-Option Segmented Tab Switcher (Chat Penjual vs Chat AI Bot) */}
-        <div className="flex items-center bg-stone-100/90 p-1.5 rounded-2xl border border-stone-200/80 self-start sm:self-auto">
-          {/* Tab 1: Chat Penjual */}
-          <button
-            type="button"
-            onClick={() => setChatMode('seller')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              chatMode === 'seller'
-                ? 'bg-white text-[#16382C] shadow-sm'
-                : 'text-stone-600 hover:text-stone-900'
-            }`}
-          >
-            <Store className="w-4 h-4 text-emerald-800" />
-            <span>Chat Penjual</span>
-            {totalSellerUnread > 0 && (
-              <span className="w-4 h-4 rounded-full bg-[#EE4D2D] text-white text-[9px] font-mono font-bold flex items-center justify-center">
-                {totalSellerUnread}
-              </span>
-            )}
-          </button>
-
-          {/* Tab 2: Chat AI Bot */}
-          <button
-            type="button"
-            onClick={() => setChatMode('bot')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              chatMode === 'bot'
-                ? 'bg-[#16382C] text-white shadow-sm'
-                : 'text-stone-600 hover:text-stone-900'
-            }`}
-          >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>Chat dengan Bot</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-              AI 24/7
-            </span>
-          </button>
+        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-950 bg-emerald-50 px-3.5 py-1.5 rounded-2xl border border-emerald-200/80 self-start sm:self-auto">
+          <ShieldCheck className="w-4 h-4 text-emerald-700" />
+          <span>Mitra Kuliner Terverifikasi Kota Bandung</span>
         </div>
       </div>
 
-      {/* ======================================================== */}
-      {/* 2. CHAT VIEW CONTENT (SWITCHABLE) */}
-      {/* ======================================================== */}
-      {chatMode === 'seller' ? (
-        <SellerChatView
-          conversations={conversations}
-          activeConversationId={activeConvId}
-          onSelectConversation={setActiveConvId}
-          onSendMessage={handleSendSellerMessage}
-          onOpenStore={onOpenStore}
-          onOpenOrder={onOpenOrder}
-        />
-      ) : (
-        <BotChatView
-          catalog={catalog}
-          onOpenEtalase={onOpenEtalase}
-          onOpenOrders={() => onOpenOrder && onOpenOrder('list')}
-          onOpenSellerChat={(merchantName) => {
-            if (merchantName) {
-              const target = conversations.find(
-                (c) => c.merchantName.toLowerCase() === merchantName.toLowerCase()
-              );
-              if (target) setActiveConvId(target.id);
-            }
-            setChatMode('seller');
-          }}
-          onSelectProduct={onSelectProduct}
-        />
-      )}
+      {/* Main Seller Chat View: Contact list first, then thread when clicked */}
+      <SellerChatView
+        conversations={conversations}
+        activeConversationId={activeConvId}
+        onSelectConversation={setActiveConvId}
+        onSendMessage={handleSendSellerMessage}
+        onOpenStore={onOpenStore}
+        onOpenOrder={onOpenOrder}
+      />
     </div>
   );
 };

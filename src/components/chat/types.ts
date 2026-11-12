@@ -48,3 +48,4 @@ export interface BotQuickPrompt {
   icon: string;
   query: string;
 }
+

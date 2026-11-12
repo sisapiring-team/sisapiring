@@ -203,6 +203,21 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
 
         {/* Contacts List Scrollable */}
         <div className="flex-1 overflow-y-auto divide-y divide-stone-100">
+          {/* Mobile Quick Hint Banner */}
+          <div className="md:hidden px-3.5 py-2.5 bg-emerald-50/70 border-b border-emerald-100/80 flex items-center justify-between text-[11px] text-stone-700">
+            <span className="flex items-center gap-1.5 font-medium truncate">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
+              Pilih toko untuk mulai kirim pesan:
+            </span>
+            <button
+              type="button"
+              onClick={() => onSelectConversation(conversations[0]?.id)}
+              className="text-[11px] font-bold text-[#1F281A] hover:underline cursor-pointer shrink-0 ml-2"
+            >
+              Buka Chat Pertama →
+            </button>
+          </div>
+
           {filteredConversations.length === 0 ? (
             <div className="p-8 text-center text-stone-400 space-y-2">
               <Store className="w-8 h-8 text-stone-300 mx-auto" />
@@ -407,8 +422,8 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                     <div
                       className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${
                         isUser
-                          ? 'bg-[#1F281A] text-white rounded-br-xs'
-                          : 'bg-white text-stone-800 border border-stone-200/80 rounded-bl-xs'
+                          ? 'bg-[#1F281A] text-white border-2 border-[#1F281A] rounded-br-xs'
+                          : 'bg-white text-stone-900 border-2 border-[#8da249]/70 rounded-bl-xs shadow-xs'
                       }`}
                     >
                       {msg.attachmentName && (
@@ -485,12 +500,12 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
             {/* 4. Message Input Form */}
             <form
               onSubmit={handleSend}
-              className="p-3 bg-white border-t border-stone-200 flex items-center gap-2 shrink-0"
+              className="p-3 sm:p-3.5 bg-white border-t border-stone-200/90 shadow-[0_-2px_10px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 flex items-center gap-2 shrink-0"
             >
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer shrink-0"
+                className="p-2 sm:p-2.5 text-stone-500 hover:text-[#1F281A] hover:bg-stone-100 rounded-xl transition-colors cursor-pointer shrink-0"
                 title="Lampirkan Foto"
                 aria-label="Lampirkan Foto"
               >
@@ -506,7 +521,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
 
               <div className="flex-1 relative">
                 {selectedAttachment && (
-                  <div className="absolute -top-9 left-0 right-0 bg-[#8da249]/10 border border-[#8da249]/30 rounded-lg px-2.5 py-1 text-[11px] text-[#1F281A] flex items-center justify-between">
+                  <div className="absolute -top-9 left-0 right-0 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1 text-[11px] text-[#1F281A] flex items-center justify-between shadow-xs">
                     <span className="truncate">Lampiran: {selectedAttachment}</span>
                     <button
                       type="button"
@@ -521,15 +536,15 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  placeholder={`Kirim pesan ke ${activeConv.merchantName}...`}
-                  className="w-full px-4 py-2.5 text-xs sm:text-sm bg-stone-50 border border-stone-300 rounded-2xl focus:outline-none focus:border-[#8da249] focus:bg-white transition-colors"
+                  placeholder={`Ketik pesan ke ${activeConv.merchantName}...`}
+                  className="w-full px-4 py-2.5 sm:py-3 text-xs sm:text-sm bg-stone-50 hover:bg-white focus:bg-white border border-stone-300 focus:border-[#8da249] rounded-2xl focus:outline-none transition-colors text-stone-900 placeholder:text-stone-400 shadow-inner"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={!inputText.trim() && !selectedAttachment}
-                className="w-10 h-10 rounded-2xl bg-[#8da249] hover:bg-[#7b8e3d] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer shrink-0"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#1F281A] hover:bg-emerald-900 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-sm cursor-pointer shrink-0"
                 aria-label="Kirim Pesan"
               >
                 <Send className="w-4 h-4 ml-0.5" />
@@ -545,9 +560,19 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
             <h3 className="text-base sm:text-lg font-extrabold text-stone-900 mb-1">
               Pusat Chat Mitra UMKM
             </h3>
-            <p className="text-xs text-stone-500 max-w-sm mb-6 leading-relaxed">
+            <p className="text-xs text-stone-500 max-w-sm mb-4 leading-relaxed">
               Pilih salah satu toko mitra di daftar sebelah kiri untuk menanyakan stok sisa piring, konfirmasi pesanan, atau koordinasi waktu ambil langsung.
             </p>
+            {conversations.length > 0 && (
+              <button
+                type="button"
+                onClick={() => onSelectConversation(conversations[0]?.id)}
+                className="mb-6 px-5 py-2.5 bg-[#1F281A] text-white text-xs font-bold rounded-xl hover:bg-emerald-900 transition-colors shadow-xs cursor-pointer flex items-center gap-2"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Mulai Chat dengan {conversations[0]?.merchantName}</span>
+              </button>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md w-full text-left">
               <div className="p-3 bg-white border border-stone-200/80 rounded-2xl shadow-2xs">
                 <div className="flex items-center gap-2 mb-1">

@@ -47,7 +47,7 @@ const PROMO_BANNERS = [
     tag: 'Spesial Sore Bandung · Diskon s/d 63%',
     title: 'Selamatkan Kuliner UMKM Segar Mulai Rp 25.000',
     subtitle: 'Jemput langsung di toko roti, kafe & warung sekitar Dago, Braga, dan Buahbatu.',
-    imageUrl: '/src/assets/images/hero_umkm_bakery_1794295650050.jpg',
+    imageUrl: '/assets/images/hero_umkm_bakery_1794295650050.jpg',
     ctaLabel: 'Lihat Paket ≤ Rp 30rb',
     actionType: 'price30k' as const,
   },
@@ -56,7 +56,7 @@ const PROMO_BANNERS = [
     tag: 'Artisan Bakery & Roti Kampung',
     title: 'Kotak Kejutan Croissant & Sourdough Hemat 60%',
     subtitle: 'Dipanggang segar pagi ini tanpa bahan pengawet, siap dijemput pukul 18.00 WIB.',
-    imageUrl: '/src/assets/images/food_artisan_pastry_box_1794295651168.jpg',
+    imageUrl: '/assets/images/food_artisan_pastry_box_1794295651168.jpg',
     ctaLabel: 'Pilih Kategori Roti',
     actionType: 'catRoti' as const,
   },
@@ -65,7 +65,7 @@ const PROMO_BANNERS = [
     tag: 'Menu Favorit Keluarga Bandung',
     title: 'Martabak Legit, Bakso Urat & Nasi Kapau Sore',
     subtitle: 'Porsi lengkap hangat dengan harga kurang dari separuh harga etalase.',
-    imageUrl: '/src/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
+    imageUrl: '/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
     ctaLabel: 'Semua Kuliner Hemat',
     actionType: 'all' as const,
   },
@@ -126,7 +126,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
   };
 
   const visibleCulinaryCategories = useMemo(
-    () => (showAllCategories ? CULINARY_CATEGORIES : CULINARY_CATEGORIES.slice(0, 6)),
+    () => (showAllCategories ? CULINARY_CATEGORIES : CULINARY_CATEGORIES.slice(0, 3)),
     [showAllCategories]
   );
 
@@ -485,7 +485,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
             <button
               type="button"
               onClick={() => setShowAllCategories((prev) => !prev)}
-              className="w-full min-h-[40px] py-2.5 px-4 bg-[#E7F7EC] hover:bg-[#D5F0DD] text-[#00880C] text-xs sm:text-sm font-semibold rounded-full transition-colors cursor-pointer"
+              className="w-full min-h-[40px] py-2.5 px-4 bg-[#8da249]/15 hover:bg-[#8da249]/25 text-[#1F281A] border border-[#8da249]/30 text-xs sm:text-sm font-semibold rounded-full transition-colors cursor-pointer"
             >
               {showAllCategories
                 ? 'Sembunyikan sebagian kuliner'

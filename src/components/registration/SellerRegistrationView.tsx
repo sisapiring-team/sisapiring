@@ -517,7 +517,7 @@ export const SellerRegistrationView: React.FC = () => {
                         onClick={() =>
                           setFormData({
                             ...formData,
-                            businessPhoto: '/src/assets/images/sisapiring_storefront_1794322286782.jpg',
+                            businessPhoto: '/assets/images/sisapiring_storefront_1794322286782.jpg',
                           })
                         }
                         className="px-2.5 py-1 bg-neutral-100 rounded text-[11px] font-medium text-neutral-700 hover:bg-neutral-200"
@@ -529,7 +529,7 @@ export const SellerRegistrationView: React.FC = () => {
                         onClick={() =>
                           setFormData({
                             ...formData,
-                            businessPhoto: '/src/assets/images/sisapiring_bakery_1794322284427.jpg',
+                            businessPhoto: '/assets/images/sisapiring_bakery_1794322284427.jpg',
                           })
                         }
                         className="px-2.5 py-1 bg-neutral-100 rounded text-[11px] font-medium text-neutral-700 hover:bg-neutral-200"

@@ -46,6 +46,7 @@ import {
   X,
   ShieldCheck,
   MessageSquare,
+  Menu,
 } from 'lucide-react';
 import {
   SISA_PIRING_CATALOG,
@@ -79,7 +80,6 @@ import {
   mapComplaintToAdminDispute,
 } from './data/adminData';
 import { ResilientImage } from './components/ResilientImage';
-import { ImpactCalculator } from './components/ImpactCalculator';
 import {
   ProductDetailModal,
   RescueCartPage,
@@ -89,11 +89,14 @@ import {
 import { MarketplaceDisplayPage } from './components/MarketplaceDisplayPage';
 import { StoreCatalogPage } from './components/StoreCatalogPage';
 import { AuthPage, UserAccount } from './components/AuthPage';
+import { fetchCatalog } from './lib/api';
 import { AdminDashboardPage } from './components/AdminDashboardPage';
 import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
 import { BotChatView } from './components/chat/BotChatView';
 import { parseRoute, pushRoute } from './utils/navigation';
+import { Footer } from './components/Footer';
+import { FoodWasteFunFacts } from './components/FoodWasteFunFacts';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -153,7 +156,7 @@ function CustomerAndAdminPortal() {
         return route.page;
       }
     }
-    return activeTab === 'admin' ? 'admin' : 'etalase';
+    return activeTab === 'admin' ? 'admin' : 'landing';
   });
 
   // Sync activeTab with activePage for direct routing between Seller, Customer, and Admin portals
@@ -243,6 +246,7 @@ function CustomerAndAdminPortal() {
   const [modalComplaintFile, setModalComplaintFile] = useState<string>('');
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState<boolean>(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
   const [accountModalMode, setAccountModalMode] = useState<'address' | 'profile' | null>(null);
   const [editAddressText, setEditAddressText] = useState<string>('');
   const [editDistrictText, setEditDistrictText] = useState<string>('Coblong (Dago / Dipatiukur)');
@@ -251,6 +255,24 @@ function CustomerAndAdminPortal() {
 
   // Dynamic Catalog State & Admin Governance States
   const [catalogItems, setCatalogItems] = useState<SisaPiringItem[]>(SISA_PIRING_CATALOG);
+
+  // Load the live marketplace catalog from the Laravel API, keeping the bundled
+  // sample catalog as a resilient fallback when the backend is unavailable.
+  useEffect(() => {
+    let active = true;
+
+    fetchCatalog()
+      .then((items) => {
+        if (active && items.length > 0) {
+          setCatalogItems(items);
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, []);
   const [productMonitoring, setProductMonitoring] = useState<
     Record<string, ProductMonitoringMeta>
   >(INITIAL_PRODUCT_MONITORING);
@@ -455,6 +477,8 @@ function CustomerAndAdminPortal() {
 
   const navigateToSection = (sectionId: string) => {
     if (activePage !== 'landing') {
+      pushRoute('/');
+      setActiveTab('marketplace');
       setActivePage('landing');
       window.setTimeout(() => {
         const el = document.getElementById(sectionId);
@@ -864,14 +888,20 @@ function CustomerAndAdminPortal() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-white text-stone-900 overflow-x-hidden ${
-        currentUser && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' ? 'pb-16' : ''
+      className={`${
+        activePage === 'chat' || activePage === 'chat-bot'
+          ? 'h-[100dvh] max-h-[100dvh] overflow-hidden'
+          : 'min-h-screen overflow-x-hidden'
+      } flex flex-col bg-white text-stone-900 ${
+        activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
+          ? 'pb-16'
+          : ''
       }`}
     >
       {/* Top Navigation Bar — Hidden on Login/Register Page & Admin Workspace */}
       {activePage !== 'auth' && activePage !== 'admin' && (
         <header className="sticky top-0 z-30 h-14 md:h-16 bg-[#1F281A] text-white border-b border-white/10 flex items-center">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4 md:gap-8 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2 sm:gap-4 md:gap-8 px-3 sm:px-6">
           {/* Zone 1: Single text element wordmark */}
           <button
             type="button"
@@ -881,131 +911,162 @@ function CustomerAndAdminPortal() {
             SisaPiring
           </button>
 
-          {/* Zone 2: 4 concise single-line navigation links (Desktop) */}
+          {/* Zone 2: Navigation Links (Desktop) */}
           <nav
             aria-label="Navigasi Utama"
-            className="hidden md:flex items-center gap-8 text-sm font-display font-medium text-stone-100"
+            className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-display font-medium text-stone-100"
           >
-            <button
-              type="button"
-              onClick={openLandingPage}
-              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'landing' ? 'text-[#8da249] underline' : ''
-              }`}
-            >
-              Beranda
-            </button>
-            <button
-              type="button"
-              onClick={openEtalasePage}
-              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'etalase' ? 'text-[#8da249] underline' : ''
-              }`}
-            >
-              Etalase Makanan
-            </button>
-            <button
-              type="button"
-              onClick={() => openChatPage()}
-              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'chat' ? 'text-[#8da249] underline' : ''
-              }`}
-            >
-              Chat Penjual
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateToSection('cara-kerja')}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Cara Kerja
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateToSection('dampak-umkm')}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Dampak UMKM
-            </button>
-            <button
-              type="button"
-              onClick={() => openSellerPage()}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Mitra UMKM
-            </button>
-            <button
-              type="button"
-              onClick={openAdminPage}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Panel Admin
-            </button>
+            {activePage === 'landing' ? (
+              /* ON LANDING PAGE: Only Beranda, Cara Kerja, Dampak UMKM */
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('beranda');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    else openLandingPage();
+                  }}
+                  className="text-[#8da249] font-bold underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Beranda
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigateToSection('cara-kerja')}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Cara Kerja
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigateToSection('dampak-umkm')}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Fakta Limbah Pangan
+                </button>
+              </>
+            ) : (
+              /* INSIDE APP: Etalase Makanan, Pesanan, Chat Penjual, History, Beranda, Mitra UMKM, Panel Admin */
+              <>
+                <button
+                  type="button"
+                  onClick={openEtalasePage}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'etalase' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  Etalase Makanan
+                </button>
+                <button
+                  type="button"
+                  onClick={openOrdersPage}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'pesanan' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  Pesanan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openChatPage()}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'chat' || activePage === 'chat-bot' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  Chat Penjual
+                </button>
+                <button
+                  type="button"
+                  onClick={openHistoryPage}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'history' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  History
+                </button>
+                <button
+                  type="button"
+                  onClick={openLandingPage}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Beranda
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openSellerPage()}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Mitra UMKM
+                </button>
+                <button
+                  type="button"
+                  onClick={openAdminPage}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Panel Admin
+                </button>
+              </>
+            )}
           </nav>
 
-          {/* Zone 3: Quick Portal Switchers + Cart Icon + Login/Register */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            <button
-              type="button"
-              onClick={() => openSellerPage()}
-              title="Buka Portal Mitra UMKM"
-              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-[#8da249]/40 bg-white/10 hover:bg-white/20 text-[#8da249] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              <Store className="w-4 h-4 text-[#8da249] shrink-0" />
-              <span className="hidden sm:inline">Mitra UMKM</span>
-            </button>
+          {/* Zone 3: Header Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {activePage === 'landing' ? (
+              /* ON LANDING PAGE: CTA button to enter app + Login/User + Hamburger */
+              <button
+                type="button"
+                onClick={openEtalasePage}
+                className="h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 bg-[#8DA249] hover:bg-[#7b8e3d] text-white shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span>Mulai Pakai</span>
+              </button>
+            ) : (
+              /* INSIDE APP: Chat + Cart + Login/User + Hamburger */
+              <>
+                <button
+                  type="button"
+                  onClick={() => openChatPage()}
+                  title="Pusat Pesan & Chat Penjual"
+                  aria-label="Pusat Pesan & Chat Penjual"
+                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
+                    activePage === 'chat'
+                      ? 'bg-white/30 border-[#8da249]'
+                      : 'bg-white/15 border-white/25 hover:bg-white/25'
+                  }`}
+                >
+                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#f89254] ring-2 ring-[#1F281A]" />
+                </button>
 
-            <button
-              type="button"
-              onClick={openAdminPage}
-              title="Akses Panel Admin & Tata Kelola Platform"
-              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-[#fbe1b5]/40 bg-white/10 hover:bg-white/20 text-[#fbe1b5] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              <ShieldCheck className="w-4 h-4 text-[#fbe1b5] shrink-0" />
-              <span className="hidden sm:inline">Panel Admin</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => openChatPage()}
-              title="Pusat Pesan & Chat Penjual"
-              aria-label="Pusat Pesan & Chat Penjual"
-              className={`relative w-10 h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                activePage === 'chat'
-                  ? 'bg-white/30 border-[#8da249]'
-                  : 'bg-white/15 border-white/25 hover:bg-white/25'
-              }`}
-            >
-              <MessageSquare className="w-5 h-5 text-[#8da249]" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#f89254] ring-2 ring-[#1F281A]" />
-            </button>
-
-            <button
-              type="button"
-              onClick={openCartPage}
-              aria-label={`Kantong Belanja (${totalCartItems} item)`}
-              className={`relative w-10 h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                activePage === 'kantong'
-                  ? 'bg-white/30 border-[#8da249]'
-                  : 'bg-white/15 border-white/25 hover:bg-white/25'
-              }`}
-            >
-              <ShoppingBag className="w-5 h-5 text-[#8da249]" />
-              {totalCartItems > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
-                  {totalCartItems}
-                </span>
-              )}
-            </button>
+                <button
+                  type="button"
+                  onClick={openCartPage}
+                  aria-label={`Kantong Belanja (${totalCartItems} item)`}
+                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
+                    activePage === 'kantong'
+                      ? 'bg-white/30 border-[#8da249]'
+                      : 'bg-white/15 border-white/25 hover:bg-white/25'
+                  }`}
+                >
+                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
+                  {totalCartItems > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
+                      {totalCartItems}
+                    </span>
+                  )}
+                </button>
+              </>
+            )}
 
             {!currentUser ? (
               <button
                 type="button"
                 onClick={openAuthPage}
-                className="h-10 px-3 sm:px-3.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border bg-white text-[#1F281A] border-white hover:bg-stone-100 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border bg-white text-[#1F281A] border-white hover:bg-stone-100 shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <User className="w-3.5 h-3.5 shrink-0" />
-                <span>Login / Register</span>
+                <span>Login</span>
               </button>
             ) : (
               <div className="relative">
@@ -1014,13 +1075,13 @@ function CustomerAndAdminPortal() {
                   onClick={() => setIsAccountMenuOpen((prev) => !prev)}
                   aria-label="Menu Akun Pengguna"
                   aria-expanded={isAccountMenuOpen}
-                  className={`w-10 h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
+                  className={`w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
                     isAccountMenuOpen
                       ? 'bg-white/30 border-[#8da249]'
                       : 'bg-white/15 border-white/25 hover:bg-white/25'
                   }`}
                 >
-                  <User className="w-5 h-5 text-[#8da249]" />
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
                 </button>
 
                 {isAccountMenuOpen && (
@@ -1135,9 +1196,234 @@ function CustomerAndAdminPortal() {
                 )}
               </div>
             )}
+
+            {/* Mobile Navigation Drawer Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(true)}
+              aria-label="Buka Menu Navigasi"
+              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border border-white/20 bg-white/10 hover:bg-white/20 rounded-xl transition-colors shrink-0 cursor-pointer"
+            >
+              <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            </button>
           </div>
         </div>
       </header>
+      )}
+
+      {/* Mobile Navigation Drawer for Customer & Portal Links */}
+      {isMobileNavOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMobileNavOpen(false)}
+          />
+          <div className="fixed inset-y-0 right-0 w-full max-w-xs bg-white text-stone-900 shadow-2xl p-6 flex flex-col justify-between z-10">
+            <div>
+              <div className="flex items-center justify-between pb-5 border-b border-stone-100">
+                <span className="font-display font-bold text-xl text-[#1F281A]">
+                  SisaPiring
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="py-4 space-y-1">
+                {activePage === 'landing' ? (
+                  /* ON LANDING PAGE: Beranda, Cara Kerja, Dampak UMKM + Mulai Pakai CTA */
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        const el = document.getElementById('beranda');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        else openLandingPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold bg-[#8da249]/15 text-[#8da249] transition-colors cursor-pointer"
+                    >
+                      Beranda
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        navigateToSection('cara-kerja');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                    >
+                      Cara Kerja
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        navigateToSection('dampak-umkm');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                    >
+                      Fakta Limbah Pangan
+                    </button>
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMobileNavOpen(false);
+                          openEtalasePage();
+                        }}
+                        className="w-full text-center px-4 py-2.5 rounded-xl text-sm font-bold bg-[#8DA249] hover:bg-[#7b8e3d] text-white flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        <span>Mulai Pakai (Buka Etalase)</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  /* INSIDE APP: Etalase Makanan, Pesanan, Chat Penjual, History, Beranda */
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openEtalasePage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'etalase'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      Etalase Makanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openOrdersPage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'pesanan'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      Pesanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openChatPage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'chat' || activePage === 'chat-bot'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      Chat Penjual
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openHistoryPage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'history'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      History Pesanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openLandingPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                    >
+                      Beranda (Landing)
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <div className="pt-3 border-t border-stone-100 space-y-2">
+                <p className="px-3 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                  Portal Khusus
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileNavOpen(false);
+                    openSellerPage();
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#8da249] bg-[#8da249]/10 hover:bg-[#8da249]/20 flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <Store className="w-4 h-4 shrink-0" />
+                  <span>Portal Mitra UMKM</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileNavOpen(false);
+                    openAdminPage();
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#2e434f] bg-stone-100 hover:bg-stone-200 flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <ShieldCheck className="w-4 h-4 shrink-0" />
+                  <span>Panel Admin</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-stone-100">
+              {!currentUser ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileNavOpen(false);
+                    openAuthPage();
+                  }}
+                  className="w-full h-11 bg-[#1F281A] hover:bg-[#2e434f] text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Login / Daftar Akun</span>
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  <div className="p-3 bg-stone-50 rounded-xl">
+                    <p className="text-xs font-bold text-stone-900 truncate">
+                      {currentUser.name}
+                    </p>
+                    <p className="text-[11px] text-stone-500 truncate">
+                      {currentUser.email}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileNavOpen(false);
+                      setCurrentUser(null);
+                    }}
+                    className="w-full h-9 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Keluar Akun</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Non-intrusive Feedback Toast */}
@@ -1229,8 +1515,8 @@ function CustomerAndAdminPortal() {
           />
         </main>
       ) : activePage === 'chat' ? (
-        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM - FULL SCREEN) */
-        <main className="flex-1 w-full h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-hidden bg-white">
+        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white mb-16">
           <ChatContainerPage
             initialMerchantName={chatTargetMerchant}
             catalog={publicVisibleCatalogItems}
@@ -1242,8 +1528,8 @@ function CustomerAndAdminPortal() {
           />
         </main>
       ) : activePage === 'chat-bot' ? (
-        /* PAGE 9: DEDICATED AI CHAT BOT VIEW (FULL SCREEN) */
-        <main className="flex-1 w-full h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-hidden bg-white">
+        /* PAGE 9: DEDICATED AI CHAT BOT VIEW */
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white mb-16">
           <BotChatView
             catalog={publicVisibleCatalogItems}
             onBack={openEtalasePage}
@@ -1302,9 +1588,6 @@ function CustomerAndAdminPortal() {
                     <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-100">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm sm:text-base font-bold text-stone-900 font-mono-tabular">
-                            #{order.orderCode}
-                          </span>
                           <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/10 text-[#1F281A] text-[11px] font-semibold">
                             Status: {currentStageInfo.label}
                           </span>
@@ -1644,6 +1927,17 @@ function CustomerAndAdminPortal() {
             onOpenDetail={(item) => setActiveProductModal(item)}
             onOpenCart={openCartPage}
           />
+          <Footer
+            extraPaddingBottom={true}
+            onNavigateHome={openLandingPage}
+            onNavigateSection={(sec) => {
+              openLandingPage();
+              window.setTimeout(() => navigateToSection(sec), 150);
+            }}
+            onNavigateEtalase={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onNavigateOrders={openOrdersPage}
+            onNavigateChat={openChatPage}
+          />
         </main>
       ) : (
         /* PAGE 1: DEDICATED LANDING PAGE */
@@ -1687,7 +1981,7 @@ function CustomerAndAdminPortal() {
                       onClick={openEtalasePage}
                       className="w-full sm:w-auto min-h-[48px] px-10 py-3.5 bg-[#8DA249] hover:bg-[#7b8e3d] active:scale-[0.99] text-white font-display font-semibold text-base rounded-full transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-[#8DA249]/30"
                     >
-                      Pesan Sekarang
+                      Mulai Pakai
                     </button>
                   </div>
                 </div>
@@ -1697,103 +1991,187 @@ function CustomerAndAdminPortal() {
 
           {/* Full-Width 4-Column Quantitative Proof Strip Below Hero */}
           <section
-            aria-label="Ringkasan Dampak SisaPiring"
+            aria-label="Fakta Krisis Sampah Pangan di Indonesia"
             className="bg-[#F4F6EC] border-b border-[#8DA249]/20 py-8 sm:py-10"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                  18.420 Porsi
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Hidangan UMKM terselamatkan sepanjang Oktober 2026
-                </p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-4 mb-6 border-b border-[#8DA249]/15">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#f89254]" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-600">
+                    Fakta Krisis Sampah Pangan di Indonesia
+                  </span>
+                </div>
+                <span className="text-[10px] text-stone-500 font-mono">
+                  Sumber: Kajian Food Loss & Waste Bappenas & Data SIPSN KLHK
+                </span>
               </div>
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                  Rp 412 Juta
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Pendapatan tambahan langsung ke kasir 340+ mitra UMKM
-                </p>
-              </div>
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8DA249] font-mono-tabular">
-                  55% – 61%
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Rata-rata potongan harga dibanding harga etalase siang hari
-                </p>
-              </div>
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                  14,7 Ton CO₂e
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Jejak emisi sampah pangan organik yang berhasil dicegah
-                </p>
+
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    23 – 48 Juta Ton
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Bahan pangan terbuang per tahun di Indonesia (115–184 kg/kapita/tahun · Bappenas)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8DA249] font-mono-tabular">
+                    Rp 551 Triliun
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Kerugian ekonomi per tahun akibat makanan terbuang, setara 4%–5% PDB nasional (Bappenas)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    41,5% Sampah RI
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Komposisi sisa makanan mendominasi timbulan sampah terbesar di TPA se-Indonesia (SIPSN KLHK 2023)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    125 Juta Jiwa
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Porsi pangan terbuang yang sebenarnya mampu mencukupi makan 29%–47% populasi warga (Bappenas)
+                  </p>
+                </div>
               </div>
             </div>
           </section>
 
-          {/* SECTION 2: MECHANISM & INTERACTIVE SAVINGS CALCULATOR ("CARA KERJA") */}
+          {/* SECTION 2: MECHANISM ("CARA KERJA") */}
           <section
             id="cara-kerja"
             className="py-12 sm:py-16 md:py-24 bg-white"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                {/* Left 5 Columns: Editorial 3-Step Mechanism */}
-                <div className="lg:col-span-5 space-y-6 sm:space-y-8">
-                  <div>
-                    <p className="text-xs text-stone-500 mb-1.5">
-                      Mekanisme Transparan · Menguntungkan Warga & UMKM
-                    </p>
-                    <h2
-                      className="text-2xl md:text-3xl font-semibold text-stone-900 tracking-tight"
-                      style={{ textWrap: 'balance' }}
-                    >
-                      Cara Menyelamatkan Makanan Tanpa Ribet
-                    </h2>
-                    <p className="text-xs sm:text-sm text-stone-600 mt-2.5 leading-relaxed">
-                      Makanan yang dijual di SisaPiring bukanlah makanan bekas, melainkan stok produksi baru hari ini yang melebihi kuota penjualan harian UMKM.
+              <div className="max-w-3xl mx-auto text-center space-y-3 mb-10 sm:mb-14">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#8DA249]">
+                  Mekanisme Transparan · Menguntungkan Warga & UMKM
+                </p>
+                <h2
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-stone-900 tracking-tight font-display"
+                  style={{ textWrap: 'balance' }}
+                >
+                  Cara Menyelamatkan Makanan Tanpa Ribet
+                </h2>
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-2xl mx-auto">
+                  Makanan yang dijual di SisaPiring bukanlah makanan bekas, melainkan stok produksi baru hari ini yang melebihi kuota penjualan harian UMKM dengan potongan harga hemat.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 items-stretch">
+                {/* Langkah 01 */}
+                <div className="p-4.5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-2.5 sm:space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-sm sm:text-base flex items-center justify-center shadow-xs shrink-0">
+                        01
+                      </span>
+                      <h3 className="text-base font-bold text-stone-900 leading-snug">
+                        Pilih Menu Spesifik di Sekitar Anda
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                      Setiap pukul 15.00–17.00 WIB, mitra toko roti, kafe, dan rumah makan memperbarui jumlah porsi berlebih mereka dengan potongan harga minimal 50%.
                     </p>
                   </div>
 
-                  <div className="divide-y divide-stone-200/90 border-t border-b border-stone-200/90">
-                    <div className="py-4 sm:py-5 space-y-1.5">
-                      <h3 className="text-sm sm:text-base font-semibold text-stone-900">
-                        01. Pilih Paket Kejutan atau Menu Spesifik di Sekitar Anda
-                      </h3>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        Setiap pukul 15.00–17.00 WIB, mitra toko roti, kafe, dan rumah makan memperbarui jumlah porsi berlebih mereka dengan potongan harga minimal 50%.
-                      </p>
+                  <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
+                    <div className="h-36 xs:h-40 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                      <ResilientImage
+                        src="/assets/steps/step1-pilih-menu.png"
+                        alt="Tangkapan layar katalog menu etalase di aplikasi SisaPiring"
+                        fallbackTitle="Katalog Menu Etalase"
+                        className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                      />
                     </div>
-
-                    <div className="py-4 sm:py-5 space-y-1.5">
-                      <h3 className="text-sm sm:text-base font-semibold text-stone-900">
-                        02. Kunci Pesanan & Dapatkan Kode Tiket Pengambilan
-                      </h3>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        Pesan langsung dari halaman etalase dan pilih pembayaran QRIS instan bebas biaya admin atau bayar tunai saat mengambil di kasir UMKM.
-                      </p>
-                    </div>
-
-                    <div className="py-4 sm:py-5 space-y-1.5">
-                      <h3 className="text-sm sm:text-base font-semibold text-stone-900">
-                        03. Jemput Hidangan pada Jendela Jam Penyelamatan
-                      </h3>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        Datang ke lokasi UMKM sesuai jam ambil (misal 18.30–20.30 WIB), tunjukkan kode tiket SisaPiring, dan bawa pulang hidangan hangat berkualitas.
-                      </p>
+                    <div className="px-3 py-2 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                      <span className="font-semibold text-stone-700">Tampilan Menu Aplikasi</span>
+                      <span className="text-[#8DA249] font-medium">Etalase Makanan</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Right 7 Columns: Interactive Savings & UMKM Calculator */}
-                <div className="lg:col-span-7">
-                  <ImpactCalculator onExploreClick={openEtalasePage} />
+                {/* Langkah 02 */}
+                <div className="p-4.5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-2.5 sm:space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-sm sm:text-base flex items-center justify-center shadow-xs shrink-0">
+                        02
+                      </span>
+                      <h3 className="text-base font-bold text-stone-900 leading-snug">
+                        Kunci Pesanan & Dapatkan Kode Tiket
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                      Pesan langsung dari halaman etalase dan bayar menggunakan QRIS instan bebas biaya admin atau bayar tunai saat mengambil di kasir mitra UMKM.
+                    </p>
+                  </div>
+
+                  <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
+                    <div className="h-36 xs:h-40 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                      <ResilientImage
+                        src="/assets/steps/step2-kunci-pesanan.png"
+                        alt="Tangkapan layar kode pesanan dan pembayaran QRIS di aplikasi SisaPiring"
+                        fallbackTitle="Kode Tiket Pesanan"
+                        className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="px-3 py-2 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                      <span className="font-semibold text-stone-700">Kode Tiket & QRIS</span>
+                      <span className="text-[#8DA249] font-medium">Lunas Instan</span>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Langkah 03 */}
+                <div className="p-4.5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-2.5 sm:space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-sm sm:text-base flex items-center justify-center shadow-xs shrink-0">
+                        03
+                      </span>
+                      <h3 className="text-base font-bold text-stone-900 leading-snug">
+                        Jemput Hidangan pada Jam Penyelamatan
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                      Datang ke lokasi UMKM sesuai jadwal ambil (misal 18.30–20.30 WIB), tunjukkan kode tiket pesanan SisaPiring, dan nikmati santapan berkualitas.
+                    </p>
+                  </div>
+
+                  <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
+                    <div className="h-36 xs:h-40 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                      <ResilientImage
+                        src="/assets/steps/step3-jemput-hidangan.png"
+                        alt="Tangkapan layar status pengiriman dan penjemputan pesanan di aplikasi SisaPiring"
+                        fallbackTitle="Pelacakan Pesanan"
+                        className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="px-3 py-2 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                      <span className="font-semibold text-stone-700">Pelacakan Real-Time</span>
+                      <span className="text-[#8DA249] font-medium">Status Ambil / Antar</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-10 sm:mt-12 text-center">
+                <button
+                  type="button"
+                  onClick={openEtalasePage}
+                  className="min-h-[46px] px-8 py-3 bg-[#1F281A] hover:bg-[#2e434f] text-white text-xs sm:text-sm font-semibold rounded-full shadow-md transition-colors cursor-pointer inline-flex items-center gap-2"
+                >
+                  <ShoppingBag className="w-4 h-4 text-[#8DA249]" />
+                  <span>Jelajahi Etalase Kuliner Sekarang</span>
+                </button>
               </div>
             </div>
           </section>
@@ -1804,70 +2182,14 @@ function CustomerAndAdminPortal() {
             className="border-t border-[#8DA249]/20 bg-[#F4F6EC] py-12 sm:py-16 md:py-24"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
-              {/* Top Sub-Block: Documentary Portrait + Attributable Testimonials */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-                <div className="lg:col-span-5">
-                  <div className="relative h-full min-h-[280px] sm:min-h-[320px] rounded-2xl overflow-hidden border border-[#8DA249]/30">
-                    <ResilientImage
-                      src={PARTNER_PORTRAIT_PATH}
-                      alt="Ibu Sari Rahmawati mengemas roti segar ke dalam kantong kertas di Sari Bakery Kotagede"
-                      fallbackTitle="Ibu Sari Rahmawati — Sari Bakery Kotagede"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-5 sm:p-6 text-white">
-                      <p className="text-xs text-stone-200">
-                        Potret Mitra · Sari Bakery Kotagede, Berdiri Sejak 1998
-                      </p>
-                      <p className="text-sm font-medium mt-1">
-                        Menyelamatkan rata-rata 450 potong roti dan donat kampung setiap bulan.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-7 flex flex-col justify-between space-y-5 sm:space-y-6">
-                  <div>
-                    <p className="text-xs text-stone-500 mb-1.5">
-                      Suara Pemilik Dapur Lokal · Bukti Dampak Terukur
-                    </p>
-                    <h2
-                      className="text-2xl md:text-3xl font-semibold text-stone-900 tracking-tight"
-                      style={{ textWrap: 'balance' }}
-                    >
-                      Menjaga Jerih Payah UMKM Agar Tidak Berakhir di Tempat Sampah
-                    </h2>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                    {MERCHANT_STORIES.map((story) => (
-                      <div
-                        key={story.id}
-                        className="p-5 sm:p-6 bg-white border border-[#8DA249]/20 rounded-2xl space-y-3 shadow-xs"
-                      >
-                        <div className="text-xs text-stone-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-                          <strong className="text-stone-900">{story.ownerName}</strong>
-                          <span aria-hidden="true">·</span>
-                          <span>
-                            {story.role}, {story.businessName} ({story.city})
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span className="text-[#8DA249] font-mono-tabular font-bold">
-                            +{story.monthlyRecoveredRupiah}
-                          </span>
-                        </div>
-
-                        <blockquote className="text-xs sm:text-sm text-stone-800 leading-relaxed">
-                          “{story.quote}”
-                        </blockquote>
-
-                        <p className="text-xs text-stone-500 pt-2 border-t border-stone-200/70">
-                          {story.beforeAfterSummary}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {/* MENU FUN FACT DARI DAMPAK PEMBUANGAN MAKANAN / LIMBAH PANGAN */}
+              <FoodWasteFunFacts
+                onOpenEtalase={openEtalasePage}
+                onOpenPartnerForm={() => {
+                  const el = document.getElementById('gabung-mitra');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              />
 
               {/* Bottom Sub-Block: Interactive Partner / Community Lead Capture Form */}
               <div
@@ -2109,72 +2431,17 @@ function CustomerAndAdminPortal() {
               </div>
             </div>
           </section>
+
+          {/* SECTION 4: DEDICATED CENTER-ALIGNED WEBSITE FOOTER */}
+          <Footer
+            extraPaddingBottom={false}
+            onNavigateHome={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onNavigateSection={(sec) => navigateToSection(sec)}
+            onNavigateEtalase={openEtalasePage}
+            onNavigateOrders={openOrdersPage}
+            onNavigateChat={openChatPage}
+          />
         </main>
-      )}
-
-      {/* QUIET FOOTER (Hidden on Login/Register Page, Admin Workspace, Chat Penjual, and Chat Bot) */}
-      {activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
-        <footer className="border-t border-stone-200 bg-white py-10 md:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-1">
-              <p className="text-base font-bold font-display text-stone-900">
-                SisaPiring
-              </p>
-              <p className="text-xs text-stone-500">
-                Pasar Penyelamatan Kuliner Berlebih UMKM Indonesia · Hemat Pangan, Dukung Warung Lokal.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-5 sm:gap-6 text-xs text-stone-600">
-              <button
-                type="button"
-                onClick={openLandingPage}
-                className="hover:text-stone-900 transition-colors cursor-pointer"
-              >
-                Beranda
-              </button>
-              <button
-                type="button"
-                onClick={openEtalasePage}
-                className="hover:text-stone-900 transition-colors cursor-pointer"
-              >
-                Etalase Makanan
-              </button>
-              <button
-                type="button"
-                onClick={() => navigateToSection('cara-kerja')}
-                className="hover:text-stone-900 transition-colors cursor-pointer"
-              >
-                Cara Kerja & Kalkulator
-              </button>
-              <button
-                type="button"
-                onClick={() => navigateToSection('dampak-umkm')}
-                className="hover:text-stone-900 transition-colors cursor-pointer"
-              >
-                Kisah Mitra UMKM
-              </button>
-              <button
-                type="button"
-                onClick={() => openSellerPage()}
-                className="hover:text-stone-900 font-semibold text-[#1F281A] transition-colors cursor-pointer"
-              >
-                Portal Mitra UMKM
-              </button>
-              <button
-                type="button"
-                onClick={openAdminPage}
-                className="hover:text-stone-900 font-semibold text-[#1F281A] transition-colors cursor-pointer"
-              >
-                Panel Admin
-              </button>
-            </div>
-
-            <p className="text-xs text-stone-400">
-              © 2026 SisaPiring Nusantara. Seluruh hak cipta dilindungi.
-            </p>
-          </div>
-        </footer>
       )}
 
       {/* CONTIGUOUS PURCHASE MODULE MODAL (PDP) */}
@@ -2630,8 +2897,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* POST-LOGIN BOTTOM NAVBAR: UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY (Hidden on Chat & Chat Bot) */}
-      {currentUser && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY (Hanya di dalam aplikasi pemesanan) */}
+      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2640,7 +2907,7 @@ function CustomerAndAdminPortal() {
             type="button"
             onClick={openEtalasePage}
             className={`flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
-              activePage === 'etalase' || activePage === 'landing'
+              activePage === 'etalase'
                 ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
@@ -2673,7 +2940,7 @@ function CustomerAndAdminPortal() {
             type="button"
             onClick={() => openChatPage()}
             className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
-              (activePage as string) === 'chat'
+              activePage === 'chat' || activePage === 'chat-bot'
                 ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
@@ -2700,8 +2967,8 @@ function CustomerAndAdminPortal() {
         </nav>
       )}
 
-      {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE) */}
-      {activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE - HANYA DI DALAM APLIKASI PEMESANAN) */}
+      {activePage !== 'landing' && activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <FloatingChatButton
           onOpenChatBot={openChatBotPage}
         />

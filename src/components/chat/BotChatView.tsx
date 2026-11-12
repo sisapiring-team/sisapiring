@@ -7,15 +7,11 @@ import {
   ShoppingBag,
   ExternalLink,
   ShieldCheck,
-  Flame,
-  Soup,
-  QrCode,
-  Leaf,
   CheckCircle2,
   ArrowLeft,
 } from 'lucide-react';
-import { ChatMessage, BotQuickPrompt } from './types';
-import { BOT_QUICK_PROMPTS, INITIAL_BOT_MESSAGES } from './chatData';
+import { ChatMessage } from './types';
+import { INITIAL_BOT_MESSAGES } from './chatData';
 import { generateBotResponse } from './botEngine';
 import { SisaPiringItem } from '../../data/sisaPiringCatalog';
 import { ResilientImage } from '../ResilientImage';
@@ -108,23 +104,6 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
     setMessages(INITIAL_BOT_MESSAGES);
   };
 
-  const getPromptIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Soup':
-        return <Soup className="w-4 h-4 text-amber-600" />;
-      case 'ShieldCheck':
-        return <ShieldCheck className="w-4 h-4 text-emerald-600" />;
-      case 'Flame':
-        return <Flame className="w-4 h-4 text-rose-500" />;
-      case 'QrCode':
-        return <QrCode className="w-4 h-4 text-indigo-600" />;
-      case 'Leaf':
-        return <Leaf className="w-4 h-4 text-emerald-500" />;
-      default:
-        return <Sparkles className="w-4 h-4 text-amber-500" />;
-    }
-  };
-
   return (
     <div className="flex flex-col h-full w-full bg-white overflow-hidden font-sans">
       {/* ======================================================== */}
@@ -178,35 +157,6 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
       {/* 2. CHAT STREAM VIEWPORT */}
       {/* ======================================================== */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-white">
-        {/* Suggested Quick Prompts Grid (When few messages) */}
-        {messages.length <= 2 && (
-          <div className="mb-4">
-            <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block mb-2 px-1">
-              Topik Populer Warga Bandung:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {BOT_QUICK_PROMPTS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => handleSendMessage(p.query)}
-                  className="p-3 bg-white hover:bg-emerald-50/50 border border-stone-200 hover:border-emerald-600/40 rounded-2xl text-left transition-all shadow-2xs hover:shadow-xs cursor-pointer group"
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-7 h-7 rounded-xl bg-stone-100 group-hover:bg-white flex items-center justify-center shrink-0">
-                      {getPromptIcon(p.icon)}
-                    </div>
-                    <span className="font-bold text-xs text-stone-900 group-hover:text-[#1F281A]">
-                      {p.title}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-stone-500 line-clamp-1">{p.subtitle}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Messages List */}
         {messages.map((msg) => {
           const isUser = msg.sender === 'user';
@@ -217,13 +167,13 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
             >
               <div
                 className={`max-w-[90%] sm:max-w-[75%] rounded-3xl p-4 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${isUser
-                    ? 'bg-[#1F281A] text-white rounded-br-xs'
-                    : 'bg-white text-stone-800 border border-stone-200/90 rounded-bl-xs'
+                    ? 'bg-[#1F281A] text-white border-2 border-[#1F281A] rounded-br-xs'
+                    : 'bg-white text-stone-900 border-2 border-[#8da249]/70 rounded-bl-xs shadow-xs'
                   }`}
               >
                 {!isUser && (
-                  <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-stone-100 text-[11px] font-bold text-[#1F281A]">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-[#8da249]/20 text-[11px] font-bold text-[#1F281A]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#8da249]" />
                     <span>SisaPiring AI</span>
                   </div>
                 )}
@@ -304,7 +254,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
         {/* Typing indicator bubble */}
         {isTyping && (
           <div className="flex items-start">
-            <div className="bg-white border border-stone-200/90 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-1.5">
+            <div className="bg-white border-2 border-[#8da249]/70 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce" />
               <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce [animation-delay:0.2s]" />
               <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce [animation-delay:0.4s]" />
@@ -326,7 +276,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
           e.preventDefault();
           handleSendMessage(inputQuery);
         }}
-        className="p-3.5 bg-white border-t border-stone-200/90 flex items-center gap-2 shrink-0"
+        className="p-3 sm:p-3.5 bg-white border-t border-stone-200/90 shadow-[0_-2px_10px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 flex items-center gap-2 shrink-0"
       >
         <div className="flex-1 relative">
           <input
@@ -334,15 +284,15 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
             disabled={isTyping}
-            placeholder="Tanyakan rekomendasi makanan, garansi refund, atau tips food safety..."
-            className="w-full px-4 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-2xl focus:outline-none focus:border-[#8da249] focus:bg-white transition-colors disabled:opacity-50"
+            placeholder="Tanya rekomendasi sisa piring, garansi refund, tips food safety..."
+            className="w-full px-4 py-2.5 sm:py-3 text-xs sm:text-sm bg-stone-50 hover:bg-white focus:bg-white border border-stone-300 focus:border-[#8da249] rounded-2xl focus:outline-none transition-colors disabled:opacity-50 text-stone-900 placeholder:text-stone-400 shadow-inner"
           />
         </div>
 
         <button
           type="submit"
           disabled={!inputQuery.trim() || isTyping}
-          className="w-10 h-10 rounded-2xl bg-[#8da249] hover:bg-[#7b8e3d] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer shrink-0"
+          className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#1F281A] hover:bg-emerald-900 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-sm cursor-pointer shrink-0"
           aria-label="Kirim Pertanyaan"
         >
           <Send className="w-4 h-4 ml-0.5" />

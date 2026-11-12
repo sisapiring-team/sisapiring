@@ -89,6 +89,7 @@ import {
 import { MarketplaceDisplayPage } from './components/MarketplaceDisplayPage';
 import { StoreCatalogPage } from './components/StoreCatalogPage';
 import { AuthPage, UserAccount } from './components/AuthPage';
+import { fetchCatalog } from './lib/api';
 import { AdminDashboardPage } from './components/AdminDashboardPage';
 import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
@@ -251,6 +252,24 @@ function CustomerAndAdminPortal() {
 
   // Dynamic Catalog State & Admin Governance States
   const [catalogItems, setCatalogItems] = useState<SisaPiringItem[]>(SISA_PIRING_CATALOG);
+
+  // Load the live marketplace catalog from the Laravel API, keeping the bundled
+  // sample catalog as a resilient fallback when the backend is unavailable.
+  useEffect(() => {
+    let active = true;
+
+    fetchCatalog()
+      .then((items) => {
+        if (active && items.length > 0) {
+          setCatalogItems(items);
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, []);
   const [productMonitoring, setProductMonitoring] = useState<
     Record<string, ProductMonitoringMeta>
   >(INITIAL_PRODUCT_MONITORING);

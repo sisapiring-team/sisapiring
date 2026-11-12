@@ -107,41 +107,37 @@ export const ProductManagementView: React.FC = () => {
           <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-xl overflow-x-auto">
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'all'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'all'
                   ? 'bg-white text-[#1F281A] shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Semua ({products.length})
             </button>
             <button
               onClick={() => setActiveTab('active')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'active'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'active'
                   ? 'bg-white text-[#1F281A] shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Aktif ({products.filter((p) => p.isActive && p.stock > 0).length})
             </button>
             <button
               onClick={() => setActiveTab('critical')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'critical'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'critical'
                   ? 'bg-white text-[#f89254] shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Rescue Prioritas ({products.filter((p) => p.stock > 0 && p.discountPercentage >= 70).length})
             </button>
             <button
               onClick={() => setActiveTab('inactive')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'inactive'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'inactive'
                   ? 'bg-white text-neutral-800 shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Habis / Nonaktif ({products.filter((p) => !p.isActive || p.stock === 0).length})
             </button>
@@ -249,13 +245,12 @@ export const ProductManagementView: React.FC = () => {
                       {/* Discount Percentage */}
                       <td className="py-3.5 px-4 text-center">
                         <span
-                          className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
-                            p.discountPercentage === 100
+                          className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${p.discountPercentage === 100
                               ? 'bg-[#1F281A] text-[#fbe1b5]'
                               : isCritical
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
                         >
                           {p.discountPercentage === 100 ? 'Donasi 100%' : `${p.discountPercentage}% OFF`}
                         </span>
@@ -319,14 +314,12 @@ export const ProductManagementView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => toggleProductStatus(p.id)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            p.isActive && p.stock > 0 ? 'bg-[#1F281A]' : 'bg-neutral-300'
-                          }`}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${p.isActive && p.stock > 0 ? 'bg-[#1F281A]' : 'bg-neutral-300'
+                            }`}
                         >
                           <span
-                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                              p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
-                            }`}
+                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
+                              }`}
                           />
                         </button>
                       </td>
@@ -379,11 +372,10 @@ export const ProductManagementView: React.FC = () => {
                         {p.category}
                       </span>
                       <span
-                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                          p.discountPercentage === 100
+                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${p.discountPercentage === 100
                             ? 'bg-[#1F281A] text-[#fbe1b5]'
                             : 'bg-[#f89254]/10 text-[#f89254]'
-                        }`}
+                          }`}
                       >
                         {p.discountPercentage === 100 ? 'Donasi 100%' : `${p.discountPercentage}% OFF`}
                       </span>
@@ -431,14 +423,12 @@ export const ProductManagementView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => toggleProductStatus(p.id)}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        p.isActive && p.stock > 0 ? 'bg-[#1F281A]' : 'bg-neutral-300'
-                      }`}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${p.isActive && p.stock > 0 ? 'bg-[#1F281A]' : 'bg-neutral-300'
+                        }`}
                     >
                       <span
-                        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                          p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
-                        }`}
+                        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
+                          }`}
                       />
                     </button>
                     <span className="text-[11px] text-neutral-500">

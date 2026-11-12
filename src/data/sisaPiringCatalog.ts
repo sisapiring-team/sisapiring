@@ -636,10 +636,10 @@ export interface ComplaintReport {
   itemName: string;
   reporterName: string;
   category:
-    | 'Makanan Tidak Sesuai Deskripsi'
-    | 'Kualitas / Kesegaran Kurang Baik'
-    | 'Porsi Tidak Sesuai Ketentuan'
-    | 'Kendala Saat Pengambilan di Toko';
+  | 'Makanan Tidak Sesuai Deskripsi'
+  | 'Kualitas / Kesegaran Kurang Baik'
+  | 'Porsi Tidak Sesuai Ketentuan'
+  | 'Kendala Saat Pengambilan di Toko';
   description: string;
   evidenceFileName?: string;
   createdAt: string;

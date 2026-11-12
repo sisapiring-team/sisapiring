@@ -162,6 +162,7 @@ const statusLabels: Record<DisputeStatus, string> = {
   'Sedang Ditinjau': 'Ditinjau',
   'Investigasi Mitra': 'Investigasi mitra',
   'Selesai (Refund Pembeli)': 'Refund selesai',
+  'Selesai (Sanksi UMKM)': 'Sanksi UMKM',
   'Ditolak (Bukti Tidak Valid)': 'Ditolak',
 };
 
@@ -173,9 +174,18 @@ const DisputeCard = ({
   const isInvestigation = dispute.status === 'Investigasi Mitra';
   const isPending = isReview || isInvestigation;
   const isRefund = dispute.status === 'Selesai (Refund Pembeli)';
+  const isSanksi = dispute.status === 'Selesai (Sanksi UMKM)';
   const isRejected = dispute.status === 'Ditolak (Bukti Tidak Valid)';
-  const statusClass = isReview ? 'dr-status-review' : isInvestigation ? 'dr-status-investigate' : isRefund ? 'dr-status-refund' : isRejected ? 'dr-status-rejected' : '';
-  const StatusIcon = isRefund ? CheckCircle2 : isRejected ? Ban : Clock;
+  const statusClass = isReview
+    ? 'dr-status-review'
+    : isInvestigation
+      ? 'dr-status-investigate'
+      : isRefund
+        ? 'dr-status-refund'
+        : isSanksi || isRejected
+          ? 'dr-status-rejected'
+          : '';
+  const StatusIcon = isRefund ? CheckCircle2 : isRejected || isSanksi ? Ban : Clock;
 
   return (
     <article className="dr-card" aria-labelledby={headingId}>

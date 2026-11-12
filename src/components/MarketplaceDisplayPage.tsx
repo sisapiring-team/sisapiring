@@ -126,7 +126,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
   };
 
   const visibleCulinaryCategories = useMemo(
-    () => (showAllCategories ? CULINARY_CATEGORIES : CULINARY_CATEGORIES.slice(0, 6)),
+    () => (showAllCategories ? CULINARY_CATEGORIES : CULINARY_CATEGORIES.slice(0, 3)),
     [showAllCategories]
   );
 
@@ -485,7 +485,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
             <button
               type="button"
               onClick={() => setShowAllCategories((prev) => !prev)}
-              className="w-full min-h-[40px] py-2.5 px-4 bg-[#E7F7EC] hover:bg-[#D5F0DD] text-[#00880C] text-xs sm:text-sm font-semibold rounded-full transition-colors cursor-pointer"
+              className="w-full min-h-[40px] py-2.5 px-4 bg-[#8da249]/15 hover:bg-[#8da249]/25 text-[#1F281A] border border-[#8da249]/30 text-xs sm:text-sm font-semibold rounded-full transition-colors cursor-pointer"
             >
               {showAllCategories
                 ? 'Sembunyikan sebagian kuliner'

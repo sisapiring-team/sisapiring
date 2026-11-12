@@ -7,15 +7,11 @@ import {
   ShoppingBag,
   ExternalLink,
   ShieldCheck,
-  Flame,
-  Soup,
-  QrCode,
-  Leaf,
   CheckCircle2,
   ArrowLeft,
 } from 'lucide-react';
-import { ChatMessage, BotQuickPrompt } from './types';
-import { BOT_QUICK_PROMPTS, INITIAL_BOT_MESSAGES } from './chatData';
+import { ChatMessage } from './types';
+import { INITIAL_BOT_MESSAGES } from './chatData';
 import { generateBotResponse } from './botEngine';
 import { SisaPiringItem } from '../../data/sisaPiringCatalog';
 import { ResilientImage } from '../ResilientImage';
@@ -108,23 +104,6 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
     setMessages(INITIAL_BOT_MESSAGES);
   };
 
-  const getPromptIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Soup':
-        return <Soup className="w-4 h-4 text-amber-600" />;
-      case 'ShieldCheck':
-        return <ShieldCheck className="w-4 h-4 text-emerald-600" />;
-      case 'Flame':
-        return <Flame className="w-4 h-4 text-rose-500" />;
-      case 'QrCode':
-        return <QrCode className="w-4 h-4 text-indigo-600" />;
-      case 'Leaf':
-        return <Leaf className="w-4 h-4 text-emerald-500" />;
-      default:
-        return <Sparkles className="w-4 h-4 text-amber-500" />;
-    }
-  };
-
   return (
     <div className="flex flex-col h-full w-full bg-white overflow-hidden font-sans">
       {/* ======================================================== */}
@@ -178,35 +157,6 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
       {/* 2. CHAT STREAM VIEWPORT */}
       {/* ======================================================== */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-white">
-        {/* Suggested Quick Prompts Grid (When few messages) */}
-        {messages.length <= 2 && (
-          <div className="mb-4">
-            <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block mb-2 px-1">
-              Topik Populer Warga Bandung:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {BOT_QUICK_PROMPTS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => handleSendMessage(p.query)}
-                  className="p-3 bg-white hover:bg-emerald-50/50 border border-stone-200 hover:border-emerald-600/40 rounded-2xl text-left transition-all shadow-2xs hover:shadow-xs cursor-pointer group"
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-7 h-7 rounded-xl bg-stone-100 group-hover:bg-white flex items-center justify-center shrink-0">
-                      {getPromptIcon(p.icon)}
-                    </div>
-                    <span className="font-bold text-xs text-stone-900 group-hover:text-[#1F281A]">
-                      {p.title}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-stone-500 line-clamp-1">{p.subtitle}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Messages List */}
         {messages.map((msg) => {
           const isUser = msg.sender === 'user';

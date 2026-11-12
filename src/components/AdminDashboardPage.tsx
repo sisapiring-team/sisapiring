@@ -333,8 +333,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         onSwitchToSellerPortal={onSwitchToSellerPortal}
       />
 
-      {/* 4. MAIN SCROLLABLE CONTENT AREA */}
-      <main className="pt-20 sm:pt-24 pl-4 sm:pl-20 xl:pl-24 pr-4 sm:pr-6 pb-12 w-full max-w-7xl mx-auto relative z-10 space-y-6">
+      {/* 4. MAIN SCROLLABLE CONTENT AREA (Full-width, flush with sidebar & right edge) */}
+      <main className="pt-20 sm:pt-24 px-4 lg:pl-[84px] xl:pl-[96px] lg:pr-4 pb-12 w-full relative z-10 space-y-6">
           {activeTab === 'overview' && (
             <OverviewTab
               macroStats={macroStats}

@@ -92,6 +92,8 @@ import { AuthPage, UserAccount } from './components/AuthPage';
 import { AdminDashboardPage } from './components/AdminDashboardPage';
 import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
+import { BotChatView } from './components/chat/BotChatView';
+import { parseRoute, pushRoute } from './utils/navigation';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -130,32 +132,98 @@ function CustomerAndAdminPortal() {
     updateProduct,
     setVerificationStatus,
   } = useApp();
-  // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat')
+  // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot')
   const [activePage, setActivePage] = useState<
-    'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat'
-  >(activeTab === 'admin' ? 'admin' : 'etalase');
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
+  >(() => {
+    if (typeof window !== 'undefined') {
+      const route = parseRoute(window.location.pathname);
+      if (route.page === 'admin') return 'admin';
+      if (
+        route.page === 'landing' ||
+        route.page === 'etalase' ||
+        route.page === 'kantong' ||
+        route.page === 'pesanan' ||
+        route.page === 'history' ||
+        route.page === 'store' ||
+        route.page === 'chat' ||
+        route.page === 'chat-bot' ||
+        route.page === 'auth'
+      ) {
+        return route.page;
+      }
+    }
+    return activeTab === 'admin' ? 'admin' : 'etalase';
+  });
 
   // Sync activeTab with activePage for direct routing between Seller, Customer, and Admin portals
   useEffect(() => {
     if (activeTab === 'admin') {
       setActivePage('admin');
-    } else if (activeTab === 'marketplace') {
+    } else if (activeTab === 'marketplace' && activePage === 'admin') {
       setActivePage('etalase');
     }
-  }, [activeTab]);
-  const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
-    'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store' | 'chat'
-  >('etalase');
-  const [chatTargetMerchant, setChatTargetMerchant] = useState<string | undefined>(undefined);
+  }, [activeTab, activePage]);
 
-  const openChatPage = (merchantName?: string) => {
-    setChatTargetMerchant(merchantName);
-    setActivePage('chat');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  const [selectedStoreName, setSelectedStoreName] = useState<string>(
-    SISA_PIRING_CATALOG[0].merchantName
-  );
+  // Synchronize state when browser Back or Forward is pressed
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseRoute(window.location.pathname);
+      if (route.page === 'admin') {
+        setActiveTab('admin');
+        setActivePage('admin');
+      } else if (route.page === 'penjual') {
+        // Handled in AppProvider
+      } else {
+        setActiveTab('marketplace');
+        if (route.page === 'store' && route.merchantName) {
+          setSelectedStoreName(route.merchantName);
+        }
+        if (route.page === 'chat') {
+          setChatTargetMerchant(route.merchantName);
+        }
+        if (
+          route.page === 'landing' ||
+          route.page === 'etalase' ||
+          route.page === 'kantong' ||
+          route.page === 'pesanan' ||
+          route.page === 'history' ||
+          route.page === 'store' ||
+          route.page === 'chat' ||
+          route.page === 'chat-bot' ||
+          route.page === 'auth'
+        ) {
+          setActivePage(route.page);
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [setActiveTab]);
+
+  const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
+  >('etalase');
+
+  const [chatTargetMerchant, setChatTargetMerchant] = useState<string | undefined>(() => {
+    if (typeof window !== 'undefined') {
+      const route = parseRoute(window.location.pathname);
+      if (route.page === 'chat' && route.merchantName) {
+        return route.merchantName;
+      }
+    }
+    return undefined;
+  });
+
+  const [selectedStoreName, setSelectedStoreName] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const route = parseRoute(window.location.pathname);
+      if (route.page === 'store' && route.merchantName) {
+        return route.merchantName;
+      }
+    }
+    return SISA_PIRING_CATALOG[0].merchantName;
+  });
   const [storeReviews, setStoreReviews] = useState<StoreReview[]>(
     INITIAL_STORE_REVIEWS
   );
@@ -398,23 +466,77 @@ function CustomerAndAdminPortal() {
     }
   };
 
+  const openLandingPage = () => {
+    pushRoute('/');
+    setActiveTab('marketplace');
+    setActivePage('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const openEtalasePage = () => {
+    pushRoute('/etalase');
     setActiveTab('marketplace');
     setActivePage('etalase');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const openLandingPage = () => {
-    setActivePage('landing');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const openCartPage = () => {
+    pushRoute('/kantong');
     setActivePage('kantong');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const openOrdersPage = () => {
+    pushRoute('/pesanan');
+    setActiveTab('marketplace');
+    setActivePage('pesanan');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openHistoryPage = () => {
+    pushRoute('/history');
+    setActiveTab('marketplace');
+    setActivePage('history');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openChatPage = (merchantName?: string) => {
+    pushRoute(merchantName ? `/chat/${encodeURIComponent(merchantName)}` : '/chat');
+    setChatTargetMerchant(merchantName);
+    setActiveTab('marketplace');
+    setActivePage('chat');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openChatBotPage = () => {
+    pushRoute('/chat/bot');
+    setActiveTab('marketplace');
+    setActivePage('chat-bot');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openStorePage = (merchantName: string) => {
+    pushRoute(`/toko/${encodeURIComponent(merchantName)}`);
+    setSelectedStoreName(merchantName);
+    setActivePage('store');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openAdminPage = () => {
+    pushRoute('/admin');
+    setActiveTab('admin');
+    setActivePage('admin');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openSellerPage = (subTab?: string) => {
+    pushRoute(subTab && subTab !== 'dashboard' ? `/penjual/${subTab}` : '/penjual');
+    setActiveTab((subTab as any) || 'dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const openAuthPage = () => {
+    pushRoute('/auth');
     if (activePage !== 'auth') {
       setReturnPageAfterAuth(activePage);
     }
@@ -431,9 +553,16 @@ function CustomerAndAdminPortal() {
         phone: user.phone,
       }))
     );
-    setActivePage(returnPageAfterAuth);
-    setRecentToast(`Selamat datang, ${user.name}!`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const target = returnPageAfterAuth || 'etalase';
+    if (target === 'landing') openLandingPage();
+    else if (target === 'etalase') openEtalasePage();
+    else if (target === 'kantong') openCartPage();
+    else if (target === 'pesanan') openOrdersPage();
+    else if (target === 'history') openHistoryPage();
+    else if (target === 'chat') openChatPage();
+    else if (target === 'chat-bot') openChatBotPage();
+    else if (target === 'admin') openAdminPage();
+    else openEtalasePage();
     window.setTimeout(() => {
       setRecentToast((prev) => (prev?.includes(user.name) ? null : prev));
     }, 3000);
@@ -506,17 +635,6 @@ function CustomerAndAdminPortal() {
     });
   };
 
-  const openStorePage = (merchantName: string) => {
-    setSelectedStoreName(merchantName);
-    setActivePage('store');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const openAdminPage = () => {
-    setActiveTab('admin');
-    setActivePage('admin');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const handleAddStoreReview = (newRev: Omit<StoreReview, 'id' | 'date'>) => {
     const created: StoreReview = {
@@ -747,7 +865,7 @@ function CustomerAndAdminPortal() {
   return (
     <div
       className={`min-h-screen flex flex-col bg-white text-stone-900 overflow-x-hidden ${
-        currentUser && activePage !== 'auth' && activePage !== 'admin' ? 'pb-16' : ''
+        currentUser && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' ? 'pb-16' : ''
       }`}
     >
       {/* Top Navigation Bar — Hidden on Login/Register Page & Admin Workspace */}
@@ -811,7 +929,7 @@ function CustomerAndAdminPortal() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => openSellerPage()}
               className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Mitra UMKM
@@ -829,7 +947,7 @@ function CustomerAndAdminPortal() {
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <button
               type="button"
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => openSellerPage()}
               title="Buka Portal Mitra UMKM"
               className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-[#8da249]/40 bg-white/10 hover:bg-white/20 text-[#8da249] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
@@ -1111,18 +1229,27 @@ function CustomerAndAdminPortal() {
           />
         </main>
       ) : activePage === 'chat' ? (
-        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
-        <main className="flex-1 bg-white pb-24">
+        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM - FULL SCREEN) */
+        <main className="flex-1 w-full h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-hidden bg-white">
           <ChatContainerPage
             initialMerchantName={chatTargetMerchant}
             catalog={publicVisibleCatalogItems}
             onBack={openEtalasePage}
             onOpenStore={(mName) => openStorePage(mName)}
-            onOpenOrder={(orderCode) => {
-              setActivePage('pesanan');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onOpenOrder={(orderCode) => openOrdersPage()}
             onOpenEtalase={openEtalasePage}
+            onSelectProduct={(item) => setActiveProductModal(item)}
+          />
+        </main>
+      ) : activePage === 'chat-bot' ? (
+        /* PAGE 9: DEDICATED AI CHAT BOT VIEW (FULL SCREEN) */
+        <main className="flex-1 w-full h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-hidden bg-white">
+          <BotChatView
+            catalog={publicVisibleCatalogItems}
+            onBack={openEtalasePage}
+            onOpenEtalase={openEtalasePage}
+            onOpenOrders={openOrdersPage}
+            onOpenSellerChat={(merchantName) => openChatPage(merchantName)}
             onSelectProduct={(item) => setActiveProductModal(item)}
           />
         </main>
@@ -1985,8 +2112,8 @@ function CustomerAndAdminPortal() {
         </main>
       )}
 
-      {/* QUIET FOOTER (Hidden on Login/Register Page & Admin Workspace) */}
-      {activePage !== 'auth' && activePage !== 'admin' && (
+      {/* QUIET FOOTER (Hidden on Login/Register Page, Admin Workspace, Chat Penjual, and Chat Bot) */}
+      {activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <footer className="border-t border-stone-200 bg-white py-10 md:py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-1">
@@ -2029,7 +2156,7 @@ function CustomerAndAdminPortal() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('dashboard')}
+                onClick={() => openSellerPage()}
                 className="hover:text-stone-900 font-semibold text-[#1F281A] transition-colors cursor-pointer"
               >
                 Portal Mitra UMKM
@@ -2503,8 +2630,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* POST-LOGIN BOTTOM NAVBAR: UTAMA, PESANAN, DAN HISTORY */}
-      {currentUser && activePage !== 'auth' && activePage !== 'admin' && (
+      {/* POST-LOGIN BOTTOM NAVBAR: UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY (Hidden on Chat & Chat Bot) */}
+      {currentUser && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2524,10 +2651,7 @@ function CustomerAndAdminPortal() {
 
           <button
             type="button"
-            onClick={() => {
-              setActivePage('pesanan');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onClick={openOrdersPage}
             className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'pesanan'
                 ? 'text-[#8da249] font-bold'
@@ -2549,7 +2673,7 @@ function CustomerAndAdminPortal() {
             type="button"
             onClick={() => openChatPage()}
             className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
-              activePage === 'chat'
+              (activePage as string) === 'chat'
                 ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
@@ -2563,10 +2687,7 @@ function CustomerAndAdminPortal() {
 
           <button
             type="button"
-            onClick={() => {
-              setActivePage('history');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onClick={openHistoryPage}
             className={`flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'history'
                 ? 'text-[#8da249] font-bold'
@@ -2580,16 +2701,9 @@ function CustomerAndAdminPortal() {
       )}
 
       {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE) */}
-      {activePage !== 'admin' && activePage !== 'auth' && (
+      {activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <FloatingChatButton
-          catalog={publicVisibleCatalogItems}
-          onOpenEtalase={openEtalasePage}
-          onOpenOrders={() => {
-            setActivePage('pesanan');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenSellerChat={(merchantName) => openChatPage(merchantName)}
-          onSelectProduct={(item) => setActiveProductModal(item)}
+          onOpenChatBot={openChatBotPage}
         />
       )}
     </div>

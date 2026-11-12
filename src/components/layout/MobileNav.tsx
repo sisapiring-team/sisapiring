@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { ActiveTab, useApp } from '../../context/AppContext';
+import { pushRoute } from '../../utils/navigation';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -43,6 +44,13 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
   ];
 
   const handleSelect = (tab: ActiveTab) => {
+    if (tab === 'marketplace') {
+      pushRoute('/etalase');
+    } else if (tab === 'admin') {
+      pushRoute('/admin');
+    } else {
+      pushRoute(tab !== 'dashboard' ? `/penjual/${tab}` : '/penjual');
+    }
     setActiveTab(tab);
     onClose();
   };
@@ -134,8 +142,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
       {/* Mobile Bottom Quick-Access Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 h-14 bg-white border-t border-neutral-200 flex items-center justify-around z-30 px-2 shadow-lg">
         <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 ${
+          onClick={() => handleSelect('dashboard')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 cursor-pointer ${
             activeTab === 'dashboard' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >
@@ -144,8 +152,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         </button>
 
         <button
-          onClick={() => setActiveTab('products')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 ${
+          onClick={() => handleSelect('products')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 cursor-pointer ${
             activeTab === 'products' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >
@@ -155,8 +163,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
 
         {/* Floating Rescue QR Verification Action Button */}
         <button
-          onClick={() => setActiveTab('qr_pickup')}
-          className="flex flex-col items-center justify-center -mt-5"
+          onClick={() => handleSelect('qr_pickup')}
+          className="flex flex-col items-center justify-center -mt-5 cursor-pointer"
         >
           <div className="w-12 h-12 rounded-full bg-[#f89254] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform">
             <QrCode className="w-6 h-6" />
@@ -165,8 +173,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         </button>
 
         <button
-          onClick={() => setActiveTab('orders')}
-          className={`relative flex flex-col items-center justify-center flex-1 py-1 ${
+          onClick={() => handleSelect('orders')}
+          className={`relative flex flex-col items-center justify-center flex-1 py-1 cursor-pointer ${
             activeTab === 'orders' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >
@@ -178,8 +186,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         </button>
 
         <button
-          onClick={() => setActiveTab('rescue_deals')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 ${
+          onClick={() => handleSelect('rescue_deals')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 cursor-pointer ${
             activeTab === 'rescue_deals' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >

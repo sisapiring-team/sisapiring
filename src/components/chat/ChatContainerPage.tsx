@@ -1,10 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Store,
-  ArrowLeft,
-  Users,
-  ShieldCheck,
-} from 'lucide-react';
 import { SellerChatView } from './SellerChatView';
 import { SellerConversation, ChatMessage } from './types';
 import { INITIAL_SELLER_CONVERSATIONS } from './chatData';
@@ -65,8 +59,7 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
     return INITIAL_SELLER_CONVERSATIONS;
   });
 
-  // If initialMerchantName is passed (e.g. from store detail/product modal), select it directly;
-  // otherwise null so user sees the seller contact list first!
+  // If initialMerchantName is passed, select it directly; otherwise null so user sees contact list first!
   const [activeConvId, setActiveConvId] = useState<string | null>(() => {
     if (initialMerchantName) {
       const found = INITIAL_SELLER_CONVERSATIONS.find(
@@ -74,7 +67,7 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
       );
       if (found) return found.id;
     }
-    return null; // Start with contact list!
+    return null;
   });
 
   // When initialMerchantName changes
@@ -123,7 +116,7 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
       })
     );
 
-    // Simulate realistic seller response after 1.5 seconds
+    // Simulate realistic seller response after 1.2 seconds
     setTimeout(() => {
       const targetConv = conversations.find((c) => c.id === conversationId);
       const merchantName = targetConv?.merchantName || 'Mitra UMKM';
@@ -162,40 +155,12 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
           return c;
         })
       );
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 animate-in fade-in duration-200">
-      {/* Top Banner Navigation (Dedicated to Seller Chat Only) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-3xl border border-stone-200/90 shadow-xs">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="p-2 -ml-1 text-stone-500 hover:text-stone-900 rounded-xl hover:bg-stone-100 transition-colors cursor-pointer"
-            title="Kembali ke Halaman Sebelumnya"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-stone-900 tracking-tight flex items-center gap-2">
-              <Store className="w-5 h-5 text-[#1F281A]" />
-              <span>Chat Penjual Mitra UMKM</span>
-            </h2>
-            <p className="text-xs text-stone-500 mt-0.5">
-              Hubungi gerai makanan langsung untuk memastikan porsi sisa piring dan waktu pengambilan
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-950 bg-emerald-50 px-3.5 py-1.5 rounded-2xl border border-emerald-200/80 self-start sm:self-auto">
-          <ShieldCheck className="w-4 h-4 text-emerald-700" />
-          <span>Mitra Kuliner Terverifikasi Kota Bandung</span>
-        </div>
-      </div>
-
-      {/* Main Seller Chat View: Contact list first, then thread when clicked */}
+    <div className="w-full h-full flex flex-col overflow-hidden bg-white animate-in fade-in duration-150">
+      {/* Main Seller Chat View: Contact list on left / thread on right, 100% full screen */}
       <SellerChatView
         conversations={conversations}
         activeConversationId={activeConvId}
@@ -203,6 +168,7 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
         onSendMessage={handleSendSellerMessage}
         onOpenStore={onOpenStore}
         onOpenOrder={onOpenOrder}
+        onBackToEtalase={onBack}
       />
     </div>
   );

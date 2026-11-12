@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { ActiveTab, useApp } from '../../context/AppContext';
 import { ConfirmationModal } from '../common/ConfirmationModal';
+import { pushRoute } from '../../utils/navigation';
 
 /**
  * Warna cadangan tab aktif (dipakai sebelum warna halaman berhasil dibaca).
@@ -188,7 +189,10 @@ export const SellerSidebar: React.FC = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  pushRoute(item.id !== 'dashboard' ? `/penjual/${item.id}` : '/penjual');
+                  setActiveTab(item.id);
+                }}
                 className={`relative flex w-full items-center justify-between rounded-l-full py-3 pl-4 pr-5 text-left text-[12px] font-semibold uppercase tracking-wider transition-colors ${isActive ? activeTabShape : 'text-white/70 hover:text-white'
                   }`}
               >
@@ -218,14 +222,20 @@ export const SellerSidebar: React.FC = () => {
           <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f89254]">Akses lain</p>
           <div className="space-y-0.5">
             <button
-              onClick={() => setActiveTab('marketplace')}
+              onClick={() => {
+                pushRoute('/etalase');
+                setActiveTab('marketplace');
+              }}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
             >
               <ExternalLink className="h-4 w-4 text-white/50" />
               <span>Etalase Pembeli</span>
             </button>
             <button
-              onClick={() => setActiveTab('admin')}
+              onClick={() => {
+                pushRoute('/admin');
+                setActiveTab('admin');
+              }}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
             >
               <ShieldCheck className="h-4 w-4 text-white/50" />

@@ -1470,9 +1470,6 @@ function CustomerAndAdminPortal() {
                     <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-100">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm sm:text-base font-bold text-stone-900 font-mono-tabular">
-                            #{order.orderCode}
-                          </span>
                           <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/10 text-[#1F281A] text-[11px] font-semibold">
                             Status: {currentStageInfo.label}
                           </span>

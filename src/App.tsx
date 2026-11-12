@@ -885,8 +885,14 @@ function CustomerAndAdminPortal() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-white text-stone-900 overflow-x-hidden ${
-        currentUser && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' ? 'pb-16' : ''
+      className={`${
+        activePage === 'chat' || activePage === 'chat-bot'
+          ? 'h-screen max-h-screen overflow-hidden'
+          : 'min-h-screen overflow-x-hidden'
+      } flex flex-col bg-white text-stone-900 ${
+        activePage !== 'auth' && activePage !== 'admin'
+          ? 'pb-16'
+          : ''
       }`}
     >
       {/* Top Navigation Bar — Hidden on Login/Register Page & Admin Workspace */}
@@ -1397,8 +1403,8 @@ function CustomerAndAdminPortal() {
           />
         </main>
       ) : activePage === 'chat' ? (
-        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM - FULL SCREEN) */
-        <main className="flex-1 w-full h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-hidden bg-white">
+        /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white">
           <ChatContainerPage
             initialMerchantName={chatTargetMerchant}
             catalog={publicVisibleCatalogItems}
@@ -1410,8 +1416,8 @@ function CustomerAndAdminPortal() {
           />
         </main>
       ) : activePage === 'chat-bot' ? (
-        /* PAGE 9: DEDICATED AI CHAT BOT VIEW (FULL SCREEN) */
-        <main className="flex-1 w-full h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] overflow-hidden bg-white">
+        /* PAGE 9: DEDICATED AI CHAT BOT VIEW */
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white">
           <BotChatView
             catalog={publicVisibleCatalogItems}
             onBack={openEtalasePage}
@@ -2730,8 +2736,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* POST-LOGIN BOTTOM NAVBAR: UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY (Hidden on Chat & Chat Bot) */}
-      {currentUser && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY */}
+      {activePage !== 'auth' && activePage !== 'admin' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2773,7 +2779,7 @@ function CustomerAndAdminPortal() {
             type="button"
             onClick={() => openChatPage()}
             className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
-              (activePage as string) === 'chat'
+              activePage === 'chat' || activePage === 'chat-bot'
                 ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}

@@ -12,6 +12,7 @@ import {
   QrCode,
   Leaf,
   CheckCircle2,
+  ArrowLeft,
 } from 'lucide-react';
 import { ChatMessage, BotQuickPrompt } from './types';
 import { BOT_QUICK_PROMPTS, INITIAL_BOT_MESSAGES } from './chatData';
@@ -21,6 +22,7 @@ import { ResilientImage } from '../ResilientImage';
 
 interface BotChatViewProps {
   catalog: SisaPiringItem[];
+  onBack?: () => void;
   onOpenEtalase?: () => void;
   onOpenOrders?: () => void;
   onOpenSellerChat?: (merchantName?: string) => void;
@@ -29,6 +31,7 @@ interface BotChatViewProps {
 
 export const BotChatView: React.FC<BotChatViewProps> = ({
   catalog,
+  onBack,
   onOpenEtalase,
   onOpenOrders,
   onOpenSellerChat,
@@ -123,13 +126,24 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] min-h-[580px] max-h-[820px] bg-white rounded-3xl border border-stone-200/90 shadow-xl overflow-hidden font-sans">
+    <div className="flex flex-col h-full w-full bg-white overflow-hidden font-sans">
       {/* ======================================================== */}
       {/* 1. BOT HEADER */}
       {/* ======================================================== */}
-      <div className="px-5 py-3.5 border-b border-stone-200/80 bg-white flex items-center justify-between gap-3 shadow-2xs shrink-0">
+      <div className="px-4 sm:px-6 py-3 border-b border-stone-200/80 bg-white flex items-center justify-between gap-3 shadow-2xs shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#1F281A] to-emerald-700 text-amber-300 flex items-center justify-center shadow-xs shrink-0">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="p-2 -ml-2 text-stone-600 hover:text-stone-900 rounded-xl hover:bg-stone-100 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer shrink-0"
+              title="Kembali ke Etalase"
+              aria-label="Kembali"
+            >
+              <ArrowLeft className="w-5 h-5 text-stone-700" />
+            </button>
+          )}
+          <div className="w-10 h-10 rounded-2xl bg-[#8da249] text-white flex items-center justify-center shadow-xs shrink-0">
             <Bot className="w-5 h-5" />
           </div>
           <div>
@@ -137,13 +151,13 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
               <h4 className="font-extrabold text-sm sm:text-base text-stone-900 tracking-tight">
                 SisaPiring AI Assistant
               </h4>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-200 shrink-0">
-                <Sparkles className="w-2.5 h-2.5 text-amber-600 animate-pulse" />
-                AI Penyelamat Pangan
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#8da249]/20 text-[#8da249] border border-[#8da249]/30 shrink-0">
+                <Sparkles className="w-2.5 h-2.5 text-[#8da249] animate-pulse" />
+                AI 24/7
               </span>
             </div>
             <p className="text-[11px] text-stone-500 mt-0.5">
-              Siap memandu rekomendasi sisa piring, jaminan garansi 100%, dan tips food safety
+              Konsultasi kuliner hemat, garansi escrow refund 100%, dan panduan food safety
             </p>
           </div>
         </div>

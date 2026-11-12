@@ -1,152 +1,36 @@
-import React, { useState } from 'react';
-import {
-  Bot,
-  Sparkles,
-  X,
-  Minimize2,
-  Maximize2,
-} from 'lucide-react';
-import { BotChatView } from './BotChatView';
-import { SisaPiringItem } from '../../data/sisaPiringCatalog';
+import React from 'react';
+import { Sparkles, Bot } from 'lucide-react';
 
 interface FloatingChatButtonProps {
-  catalog: SisaPiringItem[];
-  onOpenEtalase?: () => void;
-  onOpenOrders?: () => void;
-  onOpenSellerChat?: (merchantName?: string) => void;
-  onSelectProduct?: (item: SisaPiringItem) => void;
+  onOpenChatBot: () => void;
 }
 
 export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
-  catalog,
-  onOpenEtalase,
-  onOpenOrders,
-  onOpenSellerChat,
-  onSelectProduct,
+  onOpenChatBot,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-
   return (
-    <>
-      {/* ======================================================== */}
-      {/* 1. FLOATING AI BOT CHAT DIALOG / DRAWER WINDOW */}
-      {/* ======================================================== */}
-      {isOpen && (
-        <div
-          className={`fixed z-50 transition-all duration-200 animate-in fade-in slide-in-from-bottom-4 ${
-            isExpanded
-              ? 'inset-2 sm:inset-6 md:inset-10'
-              : 'bottom-20 md:bottom-6 right-2 sm:right-6 w-full sm:w-[440px] max-w-[calc(100vw-16px)] h-[620px] max-h-[85vh]'
-          }`}
-          role="dialog"
-          aria-modal="true"
-          aria-label="SisaPiring AI Assistant Chat Window"
-        >
-          <div className="w-full h-full bg-white rounded-3xl border border-stone-200/90 shadow-2xl flex flex-col overflow-hidden">
-            {/* Window Top Controls Bar */}
-            <div className="bg-[#1F281A] text-white px-4 py-3 flex items-center justify-between gap-3 shrink-0 shadow-xs">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-white/10 text-amber-300 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-extrabold text-xs sm:text-sm text-white truncate">
-                      SisaPiring AI Assistant
-                    </span>
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#8da249]/25 text-[#8da249] border border-[#8da249]/40 shrink-0">
-                      24/7
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-white/80 block truncate">
-                    Asisten Rekomendasi & Panduan Food Safety
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 shrink-0">
-                {/* Expand / Minimize Window */}
-                <button
-                  type="button"
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="p-1.5 text-stone-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer hidden sm:block"
-                  title={isExpanded ? 'Kecilkan Jendela' : 'Perbesar Jendela'}
-                  aria-label="Ukuran Jendela"
-                >
-                  {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                </button>
-
-                {/* Close Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsOpen(false);
-                    setIsExpanded(false);
-                  }}
-                  className="p-1.5 text-stone-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                  title="Tutup Chat Bot"
-                  aria-label="Tutup"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Embedded Bot Chat View (Height flex-1) */}
-            <div className="flex-1 overflow-hidden">
-              <BotChatView
-                catalog={catalog}
-                onOpenEtalase={() => {
-                  setIsOpen(false);
-                  if (onOpenEtalase) onOpenEtalase();
-                }}
-                onOpenOrders={() => {
-                  setIsOpen(false);
-                  if (onOpenOrders) onOpenOrders();
-                }}
-                onOpenSellerChat={(merchantName) => {
-                  setIsOpen(false);
-                  if (onOpenSellerChat) onOpenSellerChat(merchantName);
-                }}
-                onSelectProduct={(item) => {
-                  setIsOpen(false);
-                  if (onSelectProduct) onSelectProduct(item);
-                }}
-              />
-            </div>
-          </div>
+    <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 select-none">
+      <button
+        type="button"
+        onClick={onOpenChatBot}
+        className="h-12 px-4 rounded-full bg-[#8da249] hover:bg-[#7b8e3d] text-white shadow-xl hover:shadow-2xl shadow-[#8da249]/25 border border-white/25 flex items-center gap-2.5 transition-all transform hover:scale-105 cursor-pointer group"
+        title="Tanya SisaPiring AI Bot (Buka Halaman Chat Bot 24/7)"
+        aria-label="Buka Halaman Chat dengan Bot AI"
+      >
+        <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center relative">
+          <Sparkles className="w-4 h-4 text-[#fbe1b5] group-hover:rotate-12 transition-transform" />
+          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#f89254] ring-2 ring-[#1F281A] animate-pulse" />
         </div>
-      )}
 
-      {/* ======================================================== */}
-      {/* 2. FLOATING TRIGGER BUTTON (KHUSUS CHAT BOT AI) */}
-      {/* ======================================================== */}
-      {!isOpen && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 select-none">
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            className="h-12 px-4 rounded-full bg-[#8da249] hover:bg-[#7b8e3d] text-white shadow-xl hover:shadow-2xl shadow-[#8da249]/25 border border-white/25 flex items-center gap-2.5 transition-all transform hover:scale-105 cursor-pointer group"
-            title="Tanya SisaPiring AI Bot (Rekomendasi & Panduan 24/7)"
-            aria-label="Buka Chat dengan Bot AI"
-          >
-            <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center relative">
-              <Sparkles className="w-4 h-4 text-[#fbe1b5] group-hover:rotate-12 transition-transform" />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#f89254] ring-2 ring-[#1F281A] animate-pulse" />
-            </div>
-
-            <div className="text-left hidden sm:block">
-              <span className="text-xs font-bold font-sans tracking-wide block leading-tight text-white">
-                Tanya AI Bot
-              </span>
-              <span className="text-[9px] text-[#fbe1b5] font-mono block leading-none">
-                Bantuan 24/7
-              </span>
-            </div>
-          </button>
+        <div className="text-left hidden sm:block">
+          <span className="text-xs font-bold font-sans tracking-wide block leading-tight text-white">
+            Tanya AI Bot
+          </span>
+          <span className="text-[9px] text-[#fbe1b5] font-mono block leading-none">
+            Bantuan 24/7
+          </span>
         </div>
-      )}
-    </>
+      </button>
+    </div>
   );
 };

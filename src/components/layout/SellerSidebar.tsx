@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { ActiveTab, useApp } from '../../context/AppContext';
 import { ConfirmationModal } from '../common/ConfirmationModal';
+import { pushRoute } from '../../utils/navigation';
 
 interface NavItem {
   id: ActiveTab;
@@ -121,7 +122,10 @@ export const SellerSidebar: React.FC = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  pushRoute(item.id !== 'dashboard' ? `/penjual/${item.id}` : '/penjual');
+                  setActiveTab(item.id);
+                }}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-white/15 text-white font-semibold shadow-xs'
@@ -155,7 +159,10 @@ export const SellerSidebar: React.FC = () => {
 
           {/* Registration / Verification Wizard Link */}
           <button
-            onClick={() => setActiveTab('registration')}
+            onClick={() => {
+              pushRoute('/penjual/registration');
+              setActiveTab('registration');
+            }}
             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
               activeTab === 'registration'
                 ? 'bg-white/15 text-white font-semibold'
@@ -180,8 +187,11 @@ export const SellerSidebar: React.FC = () => {
         <div className="p-3 border-t border-white/10 space-y-2">
           {/* Marketplace test link */}
           <button
-            onClick={() => setActiveTab('marketplace')}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-white text-[#1F281A] hover:bg-white transition-all shadow-xs group"
+            onClick={() => {
+              pushRoute('/etalase');
+              setActiveTab('marketplace');
+            }}
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-white text-[#1F281A] hover:bg-white transition-all shadow-xs group cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <MarketplaceIcon className="w-4 h-4 text-[#f89254]" />
@@ -194,8 +204,11 @@ export const SellerSidebar: React.FC = () => {
 
           {/* Admin Governance link */}
           <button
-            onClick={() => setActiveTab('admin')}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold bg-white/10 text-white hover:bg-white/20 transition-all group"
+            onClick={() => {
+              pushRoute('/admin');
+              setActiveTab('admin');
+            }}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold bg-white/10 text-white hover:bg-white/20 transition-all group cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#fbe1b5]" />

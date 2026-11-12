@@ -1979,41 +1979,55 @@ function CustomerAndAdminPortal() {
 
           {/* Full-Width 4-Column Quantitative Proof Strip Below Hero */}
           <section
-            aria-label="Ringkasan Dampak SisaPiring"
+            aria-label="Fakta Krisis Sampah Pangan di Indonesia"
             className="bg-[#F4F6EC] border-b border-[#8DA249]/20 py-8 sm:py-10"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                  18.420 Porsi
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Hidangan UMKM terselamatkan sepanjang Oktober 2026
-                </p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-4 mb-6 border-b border-[#8DA249]/15">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#f89254]" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-600">
+                    Fakta Krisis Sampah Pangan di Indonesia
+                  </span>
+                </div>
+                <span className="text-[10px] text-stone-500 font-mono">
+                  Sumber: Kajian Food Loss & Waste Bappenas & Data SIPSN KLHK
+                </span>
               </div>
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                  Rp 412 Juta
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Pendapatan tambahan langsung ke kasir 340+ mitra UMKM
-                </p>
-              </div>
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8DA249] font-mono-tabular">
-                  55% – 61%
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Rata-rata potongan harga dibanding harga etalase siang hari
-                </p>
-              </div>
-              <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                  14,7 Ton CO₂e
-                </p>
-                <p className="text-xs text-stone-600 mt-1">
-                  Jejak emisi sampah pangan organik yang berhasil dicegah
-                </p>
+
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    23 – 48 Juta Ton
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Bahan pangan terbuang per tahun di Indonesia (115–184 kg/kapita/tahun · Bappenas)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8DA249] font-mono-tabular">
+                    Rp 551 Triliun
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Kerugian ekonomi per tahun akibat makanan terbuang, setara 4%–5% PDB nasional (Bappenas)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    41,5% Sampah RI
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Komposisi sisa makanan mendominasi timbulan sampah terbesar di TPA se-Indonesia (SIPSN KLHK 2023)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    125 Juta Jiwa
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Porsi pangan terbuang yang sebenarnya mampu mencukupi makan 29%–47% populasi warga (Bappenas)
+                  </p>
+                </div>
               </div>
             </div>
           </section>

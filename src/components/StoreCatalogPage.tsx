@@ -7,6 +7,7 @@ import {
   Star,
   ShieldAlert,
   CheckCircle2,
+  MessageSquare,
   MessageSquarePlus,
   Plus,
   Minus,
@@ -39,6 +40,7 @@ interface StoreCatalogPageProps {
   onAddComplaint: (
     complaint: Omit<ComplaintReport, 'id' | 'ticketCode' | 'createdAt' | 'status'>
   ) => void;
+  onChatStore?: (merchantName: string) => void;
 }
 
 const REVIEW_TAG_OPTIONS = [
@@ -77,6 +79,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
   onOpenDetail,
   onAddReview,
   onAddComplaint,
+  onChatStore,
 }) => {
   const [activeTab, setActiveTab] = useState<'katalog' | 'ulasan'>(initialTab);
   const [showReviewForm, setShowReviewForm] = useState<boolean>(false);
@@ -245,23 +248,40 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
               </div>
             </div>
 
-            {/* Store Rating & Rescued Stats Box */}
-            <div className="flex items-center gap-3 sm:gap-4 bg-[#FAF9F6] border border-stone-200/90 rounded-2xl p-3.5 sm:px-5 shrink-0 self-start">
-              <div className="text-center pr-3 sm:pr-4 border-r border-stone-200">
-                <div className="flex items-center justify-center gap-1 text-base sm:text-lg font-bold text-stone-900 font-mono-tabular">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  <span>{averageRating}</span>
+            {/* Store Rating, Rescued Stats & Chat Action */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 self-start">
+              <div className="flex items-center gap-3 sm:gap-4 bg-[#FAF9F6] border border-stone-200/90 rounded-2xl p-3.5 sm:px-5 shrink-0">
+                <div className="text-center pr-3 sm:pr-4 border-r border-stone-200">
+                  <div className="flex items-center justify-center gap-1 text-base sm:text-lg font-bold text-stone-900 font-mono-tabular">
+                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    <span>{averageRating}</span>
+                  </div>
+                  <p className="text-[11px] text-stone-500">
+                    {storeReviews.length} Ulasan
+                  </p>
                 </div>
-                <p className="text-[11px] text-stone-500">
-                  {storeReviews.length} Ulasan
-                </p>
+                <div className="text-center">
+                  <p className="text-base sm:text-lg font-bold text-[#16382C] font-mono-tabular">
+                    {primaryStoreItem.rescuedTotalCount}+
+                  </p>
+                  <p className="text-[11px] text-stone-500">Paket Terselamatkan</p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-base sm:text-lg font-bold text-[#16382C] font-mono-tabular">
-                  {primaryStoreItem.rescuedTotalCount}+
-                </p>
-                <p className="text-[11px] text-stone-500">Paket Terselamatkan</p>
-              </div>
+
+              {onChatStore && (
+                <button
+                  type="button"
+                  onClick={() => onChatStore(merchantName)}
+                  className="h-14 px-4 sm:px-5 rounded-2xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-bold inline-flex items-center gap-2.5 transition-all shadow-xs hover:shadow-md cursor-pointer shrink-0"
+                  title={`Chat langsung dengan ${merchantName}`}
+                >
+                  <MessageSquare className="w-4 h-4 text-amber-300" />
+                  <div className="text-left">
+                    <span className="block leading-tight">Chat Penjual</span>
+                    <span className="block text-[10px] text-emerald-200 font-normal">Tanya ketersediaan</span>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 

@@ -12,6 +12,7 @@ import {
   Lock,
   Store,
   Star,
+  MessageSquare,
 } from 'lucide-react';
 import { SisaPiringItem, formatRupiah } from '../data/sisaPiringCatalog';
 import { ResilientImage } from './ResilientImage';
@@ -42,6 +43,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   onAddToCart: (item: SisaPiringItem, qty: number) => void;
   onOpenStore?: (merchantName: string) => void;
+  onChatStore?: (merchantName: string) => void;
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -49,6 +51,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
   onAddToCart,
   onOpenStore,
+  onChatStore,
 }) => {
   const [quantity, setQuantity] = useState<number>(1);
 
@@ -244,6 +247,21 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <Plus className="w-4 h-4" />
             </button>
           </div>
+
+          {onChatStore && (
+            <button
+              type="button"
+              onClick={() => {
+                onChatStore(item.merchantName);
+                onClose();
+              }}
+              className="h-12 px-3.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+              title={`Chat penjual ${item.merchantName}`}
+            >
+              <MessageSquare className="w-4 h-4 text-emerald-800" />
+              <span className="hidden sm:inline">Tanya Penjual</span>
+            </button>
+          )}
 
           <button
             type="button"

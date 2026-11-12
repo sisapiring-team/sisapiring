@@ -1,5 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { INITIAL_ORDERS, INITIAL_PRODUCTS, INITIAL_SELLER_PROFILE } from '../data/initialData';
+import {
+  applyProductDiscountRemote,
+  cancelOrderRemote,
+  createOrderRemote,
+  createProductRemote,
+  deleteProductRemote,
+  fetchCurrentMerchant,
+  fetchOrders,
+  fetchProducts,
+  updateMerchantRemote,
+  updateOrderStatusRemote,
+  updateProductRemote,
+  updateProductStockRemote,
+  verifyOrderRemote,
+} from '../lib/api';
 import { Order, OrderStatus, SellerProfile, SisaPiringProduct, VerificationStatus } from '../types/seller';
 
 export type ActiveTab =
@@ -129,6 +144,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [orders]);
 
+  // Hydrate from the Laravel API when it is reachable. Falling back to the
+  // localStorage snapshot keeps the SPA usable while the backend is offline.
+  useEffect(() => {
+    let active = true;
+
+    Promise.allSettled([fetchCurrentMerchant(), fetchProducts(), fetchOrders()]).then(
+      ([merchantResult, productsResult, ordersResult]) => {
+        if (!active) {
+          return;
+        }
+
+        if (merchantResult.status === 'fulfilled' && merchantResult.value) {
+          setSellerProfile((prev) => ({ ...prev, ...merchantResult.value }));
+        }
+
+        if (productsResult.status === 'fulfilled' && productsResult.value.length > 0) {
+          setProducts(productsResult.value);
+        }
+
+        if (ordersResult.status === 'fulfilled' && ordersResult.value.length > 0) {
+          setOrders(ordersResult.value);
+        }
+      }
+    );
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const showToast = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
     const id = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const newToast: ToastMessage = { id, title, message, type };
@@ -145,6 +190,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateSellerProfile = (updates: Partial<SellerProfile>) => {
     setSellerProfile((prev) => ({ ...prev, ...updates }));
+    void updateMerchantRemote(sellerProfile.id, updates).catch(() => undefined);
     showToast('Profil Berhasil Diperbarui', 'Data profil usaha UMKM Anda telah disimpan.', 'success');
   };
 
@@ -154,6 +200,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       verificationStatus: status,
       verificationNotes: notes || prev.verificationNotes,
     }));
+    void updateMerchantRemote(sellerProfile.id, {
+      verificationStatus: status,
+      verificationNotes: notes,
+    }).catch(() => undefined);
     const statusLabel =
       status === 'verified' ? 'Terverifikasi' : status === 'pending_review' ? 'Menunggu Peninjauan' : 'Ditolak';
     showToast('Status Verifikasi Berubah', `Status akun UMKM saat ini: ${statusLabel}`, 'info');
@@ -169,6 +219,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       portionsRescuedCount: 0,
     };
     setProducts((prev) => [newProduct, ...prev]);
+    void createProductRemote(productData).catch(() => undefined);
     showToast(
       'Produk Sisa Piring Berhasil Diterbitkan',
       `"${newProduct.name}" kini tayang di etalase SisaPiring Bandung.`,
@@ -193,29 +244,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return p;
       })
     );
+    void updateProductRemote(id, updates).catch(() => undefined);
     showToast('Produk Diperbarui', 'Perubahan produk sisa piring berhasil disimpan.', 'success');
   };
 
   const deleteProduct = (id: string) => {
     const p = products.find((prod) => prod.id === id);
     setProducts((prev) => prev.filter((prod) => prod.id !== id));
+    void deleteProductRemote(id).catch(() => undefined);
     showToast('Produk Dihapus', `Produk "${p?.name || id}" telah dihapus dari etalase.`, 'info');
   };
 
   const toggleProductStatus = (id: string) => {
-    setProducts((prev) =>
-      prev.map((p) => {
-        if (p.id === id) {
-          const nextState = !p.isActive;
-          showToast(
-            nextState ? 'Produk Diaktifkan' : 'Produk Dinonaktifkan',
-            `Status "${p.name}" sekarang ${nextState ? 'Aktif' : 'Nonaktif'}.`,
-            'info'
-          );
-          return { ...p, isActive: nextState };
-        }
-        return p;
-      })
+    const target = products.find((p) => p.id === id);
+    if (!target) {
+      return;
+    }
+
+    const nextState = !target.isActive;
+    setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, isActive: nextState } : p)));
+    void updateProductRemote(id, { isActive: nextState }).catch(() => undefined);
+    showToast(
+      nextState ? 'Produk Diaktifkan' : 'Produk Dinonaktifkan',
+      `Status "${target.name}" sekarang ${nextState ? 'Aktif' : 'Nonaktif'}.`,
+      'info'
     );
   };
 
@@ -229,6 +281,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return p;
       })
     );
+    void updateProductStockRemote(id, delta).catch(() => undefined);
   };
 
   const applyDiscount = (id: string, discount: 50 | 70 | 90 | 100) => {
@@ -245,6 +298,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return p;
       })
     );
+    void applyProductDiscountRemote(id, discount).catch(() => undefined);
     showToast('Diskon Penyelamatan Diterapkan', `Diskon ${discount}% berhasil diatur untuk produk.`, 'success');
   };
 
@@ -269,6 +323,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return o;
       })
     );
+
+    void updateOrderStatusRemote(orderId, status, note).catch(() => undefined);
 
     const labels: Record<OrderStatus, string> = {
       waiting_confirmation: 'Menunggu Konfirmasi',
@@ -305,6 +361,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return o;
       })
     );
+    void cancelOrderRemote(orderId, reason).catch(() => undefined);
     showToast('Pesanan Dibatalkan', `Pesanan ${orderId} telah dibatalkan.`, 'warning');
   };
 
@@ -377,6 +434,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return o;
       })
     );
+
+    void verifyOrderRemote(order.id).catch(() => undefined);
 
     // Update portionsRescuedCount for the products
     setProducts((prev) =>
@@ -466,6 +525,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setOrders((prev) => [newOrder, ...prev]);
+    void createOrderRemote(cartItems, customerName, customerPhone).catch(() => undefined);
     showToast('Pesanan Baru Diterima!', `Pesanan ${newOrder.id} dari ${customerName} telah masuk.`, 'info');
     return newOrder;
   };
@@ -477,6 +537,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return [newOrder, ...prev];
     });
+    void createOrderRemote(
+      newOrder.items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+      newOrder.customerName,
+      newOrder.customerPhone
+    ).catch(() => undefined);
     showToast(
       'Pesanan Masuk dari Etalase!',
       `Pesanan #${newOrder.pickupCode} (${newOrder.customerName}) siap dikonfirmasi di antrean.`,

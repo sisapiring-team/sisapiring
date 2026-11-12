@@ -890,7 +890,7 @@ function CustomerAndAdminPortal() {
     <div
       className={`${
         activePage === 'chat' || activePage === 'chat-bot'
-          ? 'h-screen max-h-screen overflow-hidden'
+          ? 'h-[100dvh] max-h-[100dvh] overflow-hidden'
           : 'min-h-screen overflow-x-hidden'
       } flex flex-col bg-white text-stone-900 ${
         activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
@@ -1516,7 +1516,7 @@ function CustomerAndAdminPortal() {
         </main>
       ) : activePage === 'chat' ? (
         /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
-        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white">
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white mb-16">
           <ChatContainerPage
             initialMerchantName={chatTargetMerchant}
             catalog={publicVisibleCatalogItems}
@@ -1529,7 +1529,7 @@ function CustomerAndAdminPortal() {
         </main>
       ) : activePage === 'chat-bot' ? (
         /* PAGE 9: DEDICATED AI CHAT BOT VIEW */
-        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white">
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white mb-16">
           <BotChatView
             catalog={publicVisibleCatalogItems}
             onBack={openEtalasePage}

@@ -59,13 +59,16 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
     return INITIAL_SELLER_CONVERSATIONS;
   });
 
-  // If initialMerchantName is passed, select it directly; otherwise null so user sees contact list first!
+  // If initialMerchantName is passed, select it directly; on desktop auto-select first conversation so thread and chat bar are immediately ready!
   const [activeConvId, setActiveConvId] = useState<string | null>(() => {
     if (initialMerchantName) {
       const found = INITIAL_SELLER_CONVERSATIONS.find(
         (c) => c.merchantName.toLowerCase() === initialMerchantName.toLowerCase()
       );
       if (found) return found.id;
+    }
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      return INITIAL_SELLER_CONVERSATIONS[0]?.id || null;
     }
     return null;
   });
@@ -78,9 +81,16 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
       );
       if (found) {
         setActiveConvId(found.id);
+        return;
       }
     }
-  }, [initialMerchantName]);
+    // On desktop, auto-select first conversation so chat thread & input bar are immediately visible!
+    if (!activeConvId && typeof window !== 'undefined' && window.innerWidth >= 768) {
+      if (conversations.length > 0) {
+        setActiveConvId(conversations[0].id);
+      }
+    }
+  }, [initialMerchantName, activeConvId, conversations]);
 
   // Send message to seller with realistic auto-reply simulation
   const handleSendSellerMessage = (

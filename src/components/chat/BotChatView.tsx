@@ -276,7 +276,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
           e.preventDefault();
           handleSendMessage(inputQuery);
         }}
-        className="p-3.5 bg-white border-t border-stone-200/90 flex items-center gap-2 shrink-0"
+        className="p-3 sm:p-3.5 bg-white border-t border-stone-200/90 shadow-[0_-2px_10px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 flex items-center gap-2 shrink-0"
       >
         <div className="flex-1 relative">
           <input
@@ -284,15 +284,15 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
             disabled={isTyping}
-            placeholder="Tanyakan rekomendasi makanan, garansi refund, atau tips food safety..."
-            className="w-full px-4 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-2xl focus:outline-none focus:border-[#8da249] focus:bg-white transition-colors disabled:opacity-50"
+            placeholder="Tanya rekomendasi sisa piring, garansi refund, tips food safety..."
+            className="w-full px-4 py-2.5 sm:py-3 text-xs sm:text-sm bg-stone-50 hover:bg-white focus:bg-white border border-stone-300 focus:border-[#8da249] rounded-2xl focus:outline-none transition-colors disabled:opacity-50 text-stone-900 placeholder:text-stone-400 shadow-inner"
           />
         </div>
 
         <button
           type="submit"
           disabled={!inputQuery.trim() || isTyping}
-          className="w-10 h-10 rounded-2xl bg-[#8da249] hover:bg-[#7b8e3d] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer shrink-0"
+          className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#1F281A] hover:bg-emerald-900 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-sm cursor-pointer shrink-0"
           aria-label="Kirim Pertanyaan"
         >
           <Send className="w-4 h-4 ml-0.5" />

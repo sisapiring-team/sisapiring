@@ -25,7 +25,7 @@ import { useApp } from '../context/AppContext';
 import { AdminTab, AdminMacroStats } from './admin/types';
 import { AdminSidebar } from './admin/AdminSidebar';
 import { AdminMobileDrawer } from './admin/AdminMobileDrawer';
-import { AdminTopInfoBar } from './admin/AdminTopInfoBar';
+import { AdminFloatingNavbar } from './admin/AdminFloatingNavbar';
 
 // Modular Admin Tab Views
 import { OverviewTab } from './admin/tabs/OverviewTab';
@@ -283,7 +283,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   };
 
   return (
-    <div className="flex h-screen w-full bg-[#FAF9F6] text-neutral-900 overflow-hidden font-sans">
+    <div className="min-h-screen w-full bg-[#FAF9F6] text-neutral-900 font-sans relative overflow-x-hidden selection:bg-amber-400/30 selection:text-neutral-900">
       {/* Toast Feedback */}
       {adminToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#16382C] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-500/30 animate-in fade-in slide-in-from-bottom-4">
@@ -302,8 +302,17 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
       )}
 
-      {/* 1. Desktop Left Sidebar (Navigation Moved Here!) */}
-      <div className="hidden lg:flex shrink-0 h-full">
+      {/* 1. TOP FLOATING NAVBAR (RESTORED MATCHING REFERENCE DESIGN) */}
+      <AdminFloatingNavbar
+        macroStats={macroStats}
+        onMobileMenuToggle={() => setMobileSidebarOpen(true)}
+        onSwitchToPublicEtalase={onSwitchToPublicEtalase}
+        onSwitchToSellerPortal={onSwitchToSellerPortal}
+        onSelectTab={setActiveTab}
+      />
+
+      {/* 2. DESKTOP FLOATING LEFT SIDEBAR (TWO SEPARATE CAPSULES) */}
+      <div className="hidden lg:block">
         <AdminSidebar
           activeTab={activeTab}
           onTabChange={handleTabChange}
@@ -313,7 +322,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         />
       </div>
 
-      {/* 2. Mobile Drawer Navigation */}
+      {/* 3. MOBILE DRAWER NAVIGATION */}
       <AdminMobileDrawer
         isOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
@@ -324,17 +333,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         onSwitchToSellerPortal={onSwitchToSellerPortal}
       />
 
-      {/* 3. Main Workspace Viewport */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        {/* Top Header (Full of Information Only!) */}
-        <AdminTopInfoBar
-          activeTab={activeTab}
-          macroStats={macroStats}
-          onMobileMenuToggle={() => setMobileSidebarOpen(true)}
-        />
-
-        {/* Scrollable Tab Workspace */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* 4. MAIN SCROLLABLE CONTENT AREA */}
+      <main className="pt-20 sm:pt-24 pl-4 sm:pl-20 xl:pl-24 pr-4 sm:pr-6 pb-12 w-full max-w-7xl mx-auto relative z-10 space-y-6">
           {activeTab === 'overview' && (
             <OverviewTab
               macroStats={macroStats}
@@ -437,7 +437,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
             />
           )}
         </main>
-      </div>
 
       {/* 4. Interactive Dialog Modals */}
       <UmkmVerificationModal

@@ -63,11 +63,10 @@ export const FoodWasteFunFacts: React.FC<FoodWasteFunFactsProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('all')}
-          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'all'
+          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'all'
               ? 'bg-[#1F281A] text-white shadow-xs'
               : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
-          }`}
+            }`}
         >
           <Layers className="w-4 h-4 text-[#8DA249]" />
           <span>Semua Fakta (Overview)</span>
@@ -76,11 +75,10 @@ export const FoodWasteFunFacts: React.FC<FoodWasteFunFactsProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('volume')}
-          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'volume'
+          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'volume'
               ? 'bg-[#1F281A] text-white shadow-xs'
               : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
-          }`}
+            }`}
         >
           <Scale className="w-4 h-4 text-[#8DA249]" />
           <span>1. Volume Timbulan</span>
@@ -89,11 +87,10 @@ export const FoodWasteFunFacts: React.FC<FoodWasteFunFactsProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('komposisi')}
-          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'komposisi'
+          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'komposisi'
               ? 'bg-[#1F281A] text-white shadow-xs'
               : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
-          }`}
+            }`}
         >
           <PieChart className="w-4 h-4 text-[#8DA249]" />
           <span>2. Komposisi Sampah</span>
@@ -102,11 +99,10 @@ export const FoodWasteFunFacts: React.FC<FoodWasteFunFactsProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('ekonomi')}
-          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'ekonomi'
+          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'ekonomi'
               ? 'bg-[#1F281A] text-white shadow-xs'
               : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
-          }`}
+            }`}
         >
           <DollarSign className="w-4 h-4 text-[#8DA249]" />
           <span>3. Ekonomi & Lingkungan</span>
@@ -115,11 +111,10 @@ export const FoodWasteFunFacts: React.FC<FoodWasteFunFactsProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('sosial')}
-          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'sosial'
+          className={`min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'sosial'
               ? 'bg-[#1F281A] text-white shadow-xs'
               : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50 hover:text-stone-900'
-          }`}
+            }`}
         >
           <Users className="w-4 h-4 text-[#8DA249]" />
           <span>4. Dampak Sosial & Gizi</span>
@@ -525,3 +520,4 @@ export const FoodWasteFunFacts: React.FC<FoodWasteFunFactsProps> = ({
     </div>
   );
 };
+

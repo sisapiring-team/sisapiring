@@ -225,9 +225,8 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
             </div>
 
             <ChevronDown
-              className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${
-                profileDropdownOpen ? 'rotate-180' : ''
-              }`}
+              className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''
+                }`}
             />
           </button>
         </div>
@@ -296,3 +295,4 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
     </header>
   );
 };
+

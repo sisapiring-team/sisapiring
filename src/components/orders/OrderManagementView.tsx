@@ -106,7 +106,7 @@ export const OrderManagementView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
+          <h1 className="text-xl md:text-2xl font-bold text-[#1F281A] tracking-tight">
             Pesanan Masuk (Incoming Orders)
           </h1>
           <p className="text-xs text-neutral-500 mt-1">
@@ -117,9 +117,9 @@ export const OrderManagementView: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('qr_pickup')}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0"
         >
-          <QrCode className="w-4 h-4 text-[#FFD230]" />
+          <QrCode className="w-4 h-4 text-[#fbe1b5]" />
           <span>Buka Verifikasi QR Kasir</span>
         </button>
       </div>
@@ -157,7 +157,7 @@ export const OrderManagementView: React.FC = () => {
                 onClick={() => setStatusFilter(tab.id as any)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                   statusFilter === tab.id
-                    ? 'bg-white text-[#16382C] shadow-xs'
+                    ? 'bg-white text-[#1F281A] shadow-xs'
                     : 'text-neutral-600 hover:text-neutral-900'
                 }`}
               >
@@ -174,7 +174,7 @@ export const OrderManagementView: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari ID pesanan, nama, atau kode..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
             />
           </div>
         </div>
@@ -205,7 +205,7 @@ export const OrderManagementView: React.FC = () => {
                 {/* Top Row: Order ID, Timestamp, Status Badge */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-neutral-100">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-sm text-[#16382C]">{order.id}</span>
+                    <span className="font-mono font-bold text-sm text-[#1F281A]">{order.id}</span>
                     <span className="text-xs text-neutral-400">·</span>
                     <span className="text-xs text-neutral-500">{order.orderDate}</span>
                   </div>
@@ -233,7 +233,7 @@ export const OrderManagementView: React.FC = () => {
                       <span>{order.customerPhone}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-neutral-600 mt-1">
-                      <Clock className="w-3 h-3 text-[#EE4D2D]" />
+                      <Clock className="w-3 h-3 text-[#f89254]" />
                       <span>Batas Ambil: <strong className="text-neutral-800">{order.pickupDeadline}</strong></span>
                     </div>
                   </div>
@@ -263,14 +263,14 @@ export const OrderManagementView: React.FC = () => {
                       <span className="text-neutral-400 uppercase font-semibold text-[10px] block">
                         Kode Pickup PIN
                       </span>
-                      <span className="font-mono font-bold text-base text-[#EE4D2D] tracking-wider">
+                      <span className="font-mono font-bold text-base text-[#f89254] tracking-wider">
                         {order.pickupCode}
                       </span>
                     </div>
 
                     <div>
                       <span className="text-neutral-400 text-[11px] block">Total Pembayaran</span>
-                      <span className="font-mono font-bold text-base text-[#16382C]">
+                      <span className="font-mono font-bold text-base text-[#1F281A]">
                         {order.totalPayment === 0 ? 'Rp 0 (Donasi)' : formatRupiah(order.totalPayment)}
                       </span>
                     </div>
@@ -302,7 +302,7 @@ export const OrderManagementView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleConfirmOrder(order.id)}
-                          className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#16382C] hover:bg-[#214F3F] rounded-lg transition-colors shadow-xs"
+                          className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#1F281A] hover:bg-[#2D3A26] rounded-lg transition-colors shadow-xs"
                         >
                           Konfirmasi Ketersediaan
                         </button>
@@ -313,7 +313,7 @@ export const OrderManagementView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleReadyForPickup(order.id)}
-                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#EE4D2D] hover:bg-[#D73C1C] rounded-lg transition-colors shadow-xs"
+                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#f89254] hover:bg-[#e57d3d] rounded-lg transition-colors shadow-xs"
                       >
                         Tandai Siap Diambil
                       </button>
@@ -325,7 +325,7 @@ export const OrderManagementView: React.FC = () => {
                         onClick={() => setActiveTab('qr_pickup')}
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors shadow-xs"
                       >
-                        <QrCode className="w-3.5 h-3.5 text-[#FFD230]" />
+                        <QrCode className="w-3.5 h-3.5 text-[#fbe1b5]" />
                         <span>Verifikasi QR Pengambilan</span>
                       </button>
                     )}
@@ -361,9 +361,9 @@ export const OrderManagementView: React.FC = () => {
             </button>
 
             <div className="flex items-center gap-2 pb-3 border-b border-neutral-100">
-              <span className="font-mono font-bold text-base text-[#16382C]">{selectedOrder.id}</span>
+              <span className="font-mono font-bold text-base text-[#1F281A]">{selectedOrder.id}</span>
               <span className="text-xs text-neutral-400">·</span>
-              <span className="text-xs font-mono font-semibold text-[#EE4D2D]">
+              <span className="text-xs font-mono font-semibold text-[#f89254]">
                 PIN: {selectedOrder.pickupCode}
               </span>
             </div>
@@ -404,7 +404,7 @@ export const OrderManagementView: React.FC = () => {
                   ))}
                   <div className="pt-2 border-t border-neutral-200 flex justify-between font-bold text-neutral-900">
                     <span>Total Transaksi</span>
-                    <span className="font-mono text-[#16382C]">
+                    <span className="font-mono text-[#1F281A]">
                       {selectedOrder.totalPayment === 0 ? 'Rp 0 (Donasi)' : formatRupiah(selectedOrder.totalPayment)}
                     </span>
                   </div>

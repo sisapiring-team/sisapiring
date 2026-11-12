@@ -59,10 +59,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
           />
 
           {/* Drawer content */}
-          <div className="relative w-72 max-w-[80vw] bg-[#16382C] text-white flex flex-col h-full shadow-2xl z-10">
+          <div className="relative w-72 max-w-[80vw] bg-[#1F281A] text-white flex flex-col h-full shadow-2xl z-10">
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#EE4D2D] flex items-center justify-center font-bold text-white text-base">
+                <div className="w-8 h-8 rounded-lg bg-[#f89254] flex items-center justify-center font-bold text-white text-base">
                   S
                 </div>
                 <div>
@@ -98,11 +98,11 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#FFD230]' : 'text-white/60'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#fbe1b5]' : 'text-white/60'}`} />
                       <span>{item.label}</span>
                     </div>
                     {item.badge !== undefined && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EE4D2D] text-white font-bold">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#f89254] text-white font-bold">
                         {item.badge}
                       </span>
                     )}
@@ -114,9 +114,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
             <div className="p-3 border-t border-white/10 space-y-2">
               <button
                 onClick={() => handleSelect('marketplace')}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold bg-[#FAF9F6] text-[#16382C] cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold bg-white text-[#1F281A] cursor-pointer"
               >
-                <MarketplaceIcon className="w-4 h-4 text-[#EE4D2D]" />
+                <MarketplaceIcon className="w-4 h-4 text-[#f89254]" />
                 <span>Lihat Etalase Pembeli</span>
               </button>
               <button
@@ -136,7 +136,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         <button
           onClick={() => setActiveTab('dashboard')}
           className={`flex flex-col items-center justify-center flex-1 py-1 ${
-            activeTab === 'dashboard' ? 'text-[#16382C]' : 'text-neutral-500'
+            activeTab === 'dashboard' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >
           <LayoutDashboard className="w-5 h-5" />
@@ -146,7 +146,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         <button
           onClick={() => setActiveTab('products')}
           className={`flex flex-col items-center justify-center flex-1 py-1 ${
-            activeTab === 'products' ? 'text-[#16382C]' : 'text-neutral-500'
+            activeTab === 'products' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >
           <UtensilsCrossed className="w-5 h-5" />
@@ -158,21 +158,21 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
           onClick={() => setActiveTab('qr_pickup')}
           className="flex flex-col items-center justify-center -mt-5"
         >
-          <div className="w-12 h-12 rounded-full bg-[#EE4D2D] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+          <div className="w-12 h-12 rounded-full bg-[#f89254] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform">
             <QrCode className="w-6 h-6" />
           </div>
-          <span className="text-[10px] mt-0.5 font-semibold text-[#EE4D2D]">Scan QR</span>
+          <span className="text-[10px] mt-0.5 font-semibold text-[#f89254]">Scan QR</span>
         </button>
 
         <button
           onClick={() => setActiveTab('orders')}
           className={`relative flex flex-col items-center justify-center flex-1 py-1 ${
-            activeTab === 'orders' ? 'text-[#16382C]' : 'text-neutral-500'
+            activeTab === 'orders' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >
           <ShoppingBag className="w-5 h-5" />
           {pendingOrders > 0 && (
-            <span className="absolute top-1 right-5 w-2 h-2 rounded-full bg-[#EE4D2D]" />
+            <span className="absolute top-1 right-5 w-2 h-2 rounded-full bg-[#f89254]" />
           )}
           <span className="text-[10px] mt-0.5 font-medium">Pesanan</span>
         </button>
@@ -180,7 +180,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         <button
           onClick={() => setActiveTab('rescue_deals')}
           className={`flex flex-col items-center justify-center flex-1 py-1 ${
-            activeTab === 'rescue_deals' ? 'text-[#16382C]' : 'text-neutral-500'
+            activeTab === 'rescue_deals' ? 'text-[#1F281A]' : 'text-neutral-500'
           }`}
         >
           <Sparkles className="w-5 h-5" />

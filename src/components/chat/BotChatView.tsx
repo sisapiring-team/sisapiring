@@ -129,7 +129,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
       {/* ======================================================== */}
       <div className="px-5 py-3.5 border-b border-stone-200/80 bg-white flex items-center justify-between gap-3 shadow-2xs shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#16382C] to-emerald-700 text-amber-300 flex items-center justify-center shadow-xs shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#1F281A] to-emerald-700 text-amber-300 flex items-center justify-center shadow-xs shrink-0">
             <Bot className="w-5 h-5" />
           </div>
           <div>
@@ -163,7 +163,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
       {/* ======================================================== */}
       {/* 2. CHAT STREAM VIEWPORT */}
       {/* ======================================================== */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-[#FAF9F6]">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-white">
         {/* Suggested Quick Prompts Grid (When few messages) */}
         {messages.length <= 2 && (
           <div className="mb-4">
@@ -182,7 +182,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
                     <div className="w-7 h-7 rounded-xl bg-stone-100 group-hover:bg-white flex items-center justify-center shrink-0">
                       {getPromptIcon(p.icon)}
                     </div>
-                    <span className="font-bold text-xs text-stone-900 group-hover:text-[#16382C]">
+                    <span className="font-bold text-xs text-stone-900 group-hover:text-[#1F281A]">
                       {p.title}
                     </span>
                   </div>
@@ -203,12 +203,12 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
             >
               <div
                 className={`max-w-[90%] sm:max-w-[75%] rounded-3xl p-4 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${isUser
-                    ? 'bg-[#16382C] text-white rounded-br-xs'
+                    ? 'bg-[#1F281A] text-white rounded-br-xs'
                     : 'bg-white text-stone-800 border border-stone-200/90 rounded-bl-xs'
                   }`}
               >
                 {!isUser && (
-                  <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-stone-100 text-[11px] font-bold text-[#16382C]">
+                  <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-stone-100 text-[11px] font-bold text-[#1F281A]">
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>SisaPiring AI</span>
                   </div>
@@ -237,7 +237,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
                         {msg.productCard.merchantName}
                       </span>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="font-bold text-xs text-[#16382C]">
+                        <span className="font-bold text-xs text-[#1F281A]">
                           Rp {msg.productCard.price.toLocaleString('id-ID')}
                         </span>
                         <span className="text-[10px] line-through text-stone-400">
@@ -252,7 +252,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
                           const item = catalog.find((c) => c.id === msg.productCard?.id);
                           if (item) onSelectProduct(item);
                         }}
-                        className="px-3 py-1.5 bg-[#16382C] text-white rounded-xl text-[11px] font-bold hover:bg-emerald-900 transition-colors shrink-0 cursor-pointer shadow-xs"
+                        className="px-3 py-1.5 bg-[#1F281A] text-white rounded-xl text-[11px] font-bold hover:bg-emerald-900 transition-colors shrink-0 cursor-pointer shadow-xs"
                       >
                         Pesan
                       </button>
@@ -276,7 +276,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
                       key={idx}
                       type="button"
                       onClick={() => handleActionChipClick(chip.action, chip.payload)}
-                      className="px-3 py-1 text-[11px] font-semibold bg-white border border-stone-200/90 rounded-full hover:border-[#16382C] hover:bg-emerald-50/70 text-stone-700 hover:text-[#16382C] transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
+                      className="px-3 py-1 text-[11px] font-semibold bg-white border border-stone-200/90 rounded-full hover:border-[#1F281A] hover:bg-emerald-50/70 text-stone-700 hover:text-[#1F281A] transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
                     >
                       <span>{chip.label}</span>
                     </button>
@@ -291,9 +291,9 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
         {isTyping && (
           <div className="flex items-start">
             <div className="bg-white border border-stone-200/90 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-bounce" />
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.2s]" />
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.4s]" />
+              <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce" />
+              <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce [animation-delay:0.2s]" />
+              <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce [animation-delay:0.4s]" />
               <span className="text-[11px] text-stone-400 font-medium ml-1">
                 SisaPiring AI sedang mencari jawaban...
               </span>
@@ -321,14 +321,14 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
             onChange={(e) => setInputQuery(e.target.value)}
             disabled={isTyping}
             placeholder="Tanyakan rekomendasi makanan, garansi refund, atau tips food safety..."
-            className="w-full px-4 py-2.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-2xl focus:outline-none focus:border-[#16382C] focus:bg-white transition-colors disabled:opacity-50"
+            className="w-full px-4 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-2xl focus:outline-none focus:border-[#8da249] focus:bg-white transition-colors disabled:opacity-50"
           />
         </div>
 
         <button
           type="submit"
           disabled={!inputQuery.trim() || isTyping}
-          className="w-10 h-10 rounded-2xl bg-[#16382C] hover:bg-emerald-900 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer shrink-0"
+          className="w-10 h-10 rounded-2xl bg-[#8da249] hover:bg-[#7b8e3d] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer shrink-0"
           aria-label="Kirim Pertanyaan"
         >
           <Send className="w-4 h-4 ml-0.5" />

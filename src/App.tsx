@@ -746,13 +746,13 @@ function CustomerAndAdminPortal() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-[#FAF9F6] text-stone-900 overflow-x-hidden ${
+      className={`min-h-screen flex flex-col bg-white text-stone-900 overflow-x-hidden ${
         currentUser && activePage !== 'auth' && activePage !== 'admin' ? 'pb-16' : ''
       }`}
     >
       {/* Top Navigation Bar — Hidden on Login/Register Page & Admin Workspace */}
       {activePage !== 'auth' && activePage !== 'admin' && (
-        <header className="sticky top-0 z-30 h-14 md:h-16 bg-[#16382C] text-white border-b border-white/10 flex items-center">
+        <header className="sticky top-0 z-30 h-14 md:h-16 bg-[#1F281A] text-white border-b border-white/10 flex items-center">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4 md:gap-8 px-4 sm:px-6">
           {/* Zone 1: Single text element wordmark */}
           <button
@@ -771,8 +771,8 @@ function CustomerAndAdminPortal() {
             <button
               type="button"
               onClick={openLandingPage}
-              className={`hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'landing' ? 'text-amber-300 underline' : ''
+              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activePage === 'landing' ? 'text-[#8da249] underline' : ''
               }`}
             >
               Beranda
@@ -780,8 +780,8 @@ function CustomerAndAdminPortal() {
             <button
               type="button"
               onClick={openEtalasePage}
-              className={`hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'etalase' ? 'text-amber-300 underline' : ''
+              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activePage === 'etalase' ? 'text-[#8da249] underline' : ''
               }`}
             >
               Etalase Makanan
@@ -789,8 +789,8 @@ function CustomerAndAdminPortal() {
             <button
               type="button"
               onClick={() => openChatPage()}
-              className={`hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'chat' ? 'text-amber-300 underline' : ''
+              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activePage === 'chat' ? 'text-[#8da249] underline' : ''
               }`}
             >
               Chat Penjual
@@ -798,28 +798,28 @@ function CustomerAndAdminPortal() {
             <button
               type="button"
               onClick={() => navigateToSection('cara-kerja')}
-              className="hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Cara Kerja
             </button>
             <button
               type="button"
               onClick={() => navigateToSection('dampak-umkm')}
-              className="hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Dampak UMKM
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('dashboard')}
-              className="hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Mitra UMKM
             </button>
             <button
               type="button"
               onClick={openAdminPage}
-              className="hover:text-amber-300 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Panel Admin
             </button>
@@ -831,9 +831,9 @@ function CustomerAndAdminPortal() {
               type="button"
               onClick={() => setActiveTab('dashboard')}
               title="Buka Portal Mitra UMKM"
-              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-emerald-400/30 bg-white/10 hover:bg-white/20 text-emerald-200 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-[#8da249]/40 bg-white/10 hover:bg-white/20 text-[#8da249] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
-              <Store className="w-4 h-4 text-emerald-300 shrink-0" />
+              <Store className="w-4 h-4 text-[#8da249] shrink-0" />
               <span className="hidden sm:inline">Mitra UMKM</span>
             </button>
 
@@ -841,9 +841,9 @@ function CustomerAndAdminPortal() {
               type="button"
               onClick={openAdminPage}
               title="Akses Panel Admin & Tata Kelola Platform"
-              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-amber-300/30 bg-white/10 hover:bg-white/20 text-amber-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="h-10 px-2 sm:px-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border border-[#fbe1b5]/40 bg-white/10 hover:bg-white/20 text-[#fbe1b5] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
-              <ShieldCheck className="w-4 h-4 text-amber-300 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-[#fbe1b5] shrink-0" />
               <span className="hidden sm:inline">Panel Admin</span>
             </button>
 
@@ -854,12 +854,12 @@ function CustomerAndAdminPortal() {
               aria-label="Pusat Pesan & Chat Penjual"
               className={`relative w-10 h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
                 activePage === 'chat'
-                  ? 'bg-white/30 border-amber-300'
+                  ? 'bg-white/30 border-[#8da249]'
                   : 'bg-white/15 border-white/25 hover:bg-white/25'
               }`}
             >
-              <MessageSquare className="w-5 h-5 text-amber-300" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#EE4D2D] ring-2 ring-[#16382C]" />
+              <MessageSquare className="w-5 h-5 text-[#8da249]" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#f89254] ring-2 ring-[#1F281A]" />
             </button>
 
             <button
@@ -868,13 +868,13 @@ function CustomerAndAdminPortal() {
               aria-label={`Kantong Belanja (${totalCartItems} item)`}
               className={`relative w-10 h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
                 activePage === 'kantong'
-                  ? 'bg-white/30 border-amber-300'
+                  ? 'bg-white/30 border-[#8da249]'
                   : 'bg-white/15 border-white/25 hover:bg-white/25'
               }`}
             >
-              <ShoppingBag className="w-5 h-5 text-amber-300" />
+              <ShoppingBag className="w-5 h-5 text-[#8da249]" />
               {totalCartItems > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EE4D2D] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
                   {totalCartItems}
                 </span>
               )}
@@ -884,7 +884,7 @@ function CustomerAndAdminPortal() {
               <button
                 type="button"
                 onClick={openAuthPage}
-                className="h-10 px-3 sm:px-3.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border bg-white text-[#16382C] border-white hover:bg-stone-100 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="h-10 px-3 sm:px-3.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border bg-white text-[#1F281A] border-white hover:bg-stone-100 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <User className="w-3.5 h-3.5 shrink-0" />
                 <span>Login / Register</span>
@@ -898,17 +898,17 @@ function CustomerAndAdminPortal() {
                   aria-expanded={isAccountMenuOpen}
                   className={`w-10 h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
                     isAccountMenuOpen
-                      ? 'bg-white/30 border-amber-300'
+                      ? 'bg-white/30 border-[#8da249]'
                       : 'bg-white/15 border-white/25 hover:bg-white/25'
                   }`}
                 >
-                  <User className="w-5 h-5 text-amber-300" />
+                  <User className="w-5 h-5 text-[#8da249]" />
                 </button>
 
                 {isAccountMenuOpen && (
                   <div className="absolute right-0 mt-2 w-64 bg-white text-stone-900 border border-stone-200 rounded-2xl shadow-xl py-2 z-50 overflow-hidden">
                     {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-stone-100 bg-[#FAF9F6]">
+                    <div className="px-4 py-3 border-b border-stone-100 bg-white">
                       <p className="text-xs font-bold text-stone-900 truncate">
                         {currentUser.name}
                       </p>
@@ -932,7 +932,7 @@ function CustomerAndAdminPortal() {
                         }}
                         className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-start gap-2.5 transition-colors cursor-pointer"
                       >
-                        <MapPin className="w-4 h-4 text-[#16382C] shrink-0 mt-0.5" />
+                        <MapPin className="w-4 h-4 text-[#1F281A] shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1">
                           <span className="block font-semibold text-stone-900">
                             Alamat Default
@@ -953,7 +953,7 @@ function CustomerAndAdminPortal() {
                         }}
                         className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
                       >
-                        <Settings className="w-4 h-4 text-[#16382C] shrink-0" />
+                        <Settings className="w-4 h-4 text-[#1F281A] shrink-0" />
                         <span>Pengaturan Profil & Nomor</span>
                       </button>
 
@@ -965,7 +965,7 @@ function CustomerAndAdminPortal() {
                         }}
                         className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
                       >
-                        <ShoppingBag className="w-4 h-4 text-[#16382C] shrink-0" />
+                        <ShoppingBag className="w-4 h-4 text-[#1F281A] shrink-0" />
                         <span>Kantong Penyelamatan ({totalCartItems})</span>
                       </button>
 
@@ -977,7 +977,7 @@ function CustomerAndAdminPortal() {
                         }}
                         className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
                       >
-                        <Store className="w-4 h-4 text-[#16382C] shrink-0" />
+                        <Store className="w-4 h-4 text-[#1F281A] shrink-0" />
                         <span>Portal Mitra UMKM</span>
                       </button>
 
@@ -989,7 +989,7 @@ function CustomerAndAdminPortal() {
                         }}
                         className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
                       >
-                        <ShieldCheck className="w-4 h-4 text-[#16382C] shrink-0" />
+                        <ShieldCheck className="w-4 h-4 text-[#1F281A] shrink-0" />
                         <span>Panel Admin (Pengelola)</span>
                       </button>
                     </div>
@@ -1112,7 +1112,7 @@ function CustomerAndAdminPortal() {
         </main>
       ) : activePage === 'chat' ? (
         /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
-        <main className="flex-1 bg-[#FAF9F6] pb-24">
+        <main className="flex-1 bg-white pb-24">
           <ChatContainerPage
             initialMerchantName={chatTargetMerchant}
             catalog={publicVisibleCatalogItems}
@@ -1128,7 +1128,7 @@ function CustomerAndAdminPortal() {
         </main>
       ) : activePage === 'pesanan' ? (
         /* PAGE 5: DEDICATED PESANAN AKTIF & TRACKING PENGIRIMAN PAGE */
-        <main className="flex-1 bg-[#F5F5F5] pb-24">
+        <main className="flex-1 bg-white pb-24">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-5 sm:pt-7 space-y-4">
             {activeOrders.length === 0 ? (
               <div className="bg-white border border-stone-200 rounded-2xl p-10 text-center space-y-3">
@@ -1144,7 +1144,7 @@ function CustomerAndAdminPortal() {
                 <button
                   type="button"
                   onClick={openEtalasePage}
-                  className="min-h-[42px] px-5 py-2 bg-[#16382C] text-white text-xs font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
+                  className="min-h-[42px] px-5 py-2 bg-[#1F281A] text-white text-xs font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
                 >
                   Cari Makanan di Menu Utama
                 </button>
@@ -1178,7 +1178,7 @@ function CustomerAndAdminPortal() {
                           <span className="text-sm sm:text-base font-bold text-stone-900 font-mono-tabular">
                             #{order.orderCode}
                           </span>
-                          <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/10 text-[#16382C] text-[11px] font-semibold">
+                          <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/10 text-[#1F281A] text-[11px] font-semibold">
                             Status: {currentStageInfo.label}
                           </span>
                         </div>
@@ -1194,17 +1194,17 @@ function CustomerAndAdminPortal() {
                         <span className="block text-[11px] text-stone-400">
                           Kode Pesanan
                         </span>
-                        <span className="text-base sm:text-lg font-bold font-mono-tabular text-[#16382C]">
+                        <span className="text-base sm:text-lg font-bold font-mono-tabular text-[#1F281A]">
                           {order.orderCode}
                         </span>
                       </div>
                     </div>
 
                     {/* READ-ONLY LEFT-TO-RIGHT SLIDER TRACK WITH MOVING PACKAGE ICON (CONTROLLED BY STORE OWNER) */}
-                    <div className="bg-[#FAF9F6] border border-stone-200/80 rounded-2xl p-4 sm:p-5 space-y-4">
+                    <div className="bg-white border border-stone-200/80 rounded-2xl p-4 sm:p-5 space-y-4">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
-                          <Package className="w-4 h-4 text-[#16382C]" />
+                          <Package className="w-4 h-4 text-[#1F281A]" />
                           <span>Status Pengiriman Pesanan</span>
                         </span>
                         <span className="text-[11px] text-stone-500">
@@ -1217,7 +1217,7 @@ function CustomerAndAdminPortal() {
                         <div className="relative h-2.5 bg-stone-200 rounded-full">
                           {/* Filled Active Track from Left to Right */}
                           <div
-                            className="absolute left-0 top-0 bottom-0 bg-[#16382C] rounded-full transition-all duration-700 ease-out"
+                            className="absolute left-0 top-0 bottom-0 bg-[#1F281A] rounded-full transition-all duration-700 ease-out"
                             style={{ width: `${progressPercent}%` }}
                           />
 
@@ -1232,7 +1232,7 @@ function CustomerAndAdminPortal() {
                                 style={{ left: `${dotPercent}%` }}
                                 className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 transition-colors duration-500 ${
                                   isPassed
-                                    ? 'bg-[#16382C] border-white'
+                                    ? 'bg-[#1F281A] border-white'
                                     : 'bg-stone-300 border-white'
                                 }`}
                               />
@@ -1242,7 +1242,7 @@ function CustomerAndAdminPortal() {
                           {/* Moving Package Icon Indicator on the Slider */}
                           <div
                             style={{ left: `${progressPercent}%` }}
-                            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#16382C] text-white border-2 border-white shadow-md ring-4 ring-[#16382C]/15 flex items-center justify-center transition-all duration-700 ease-out z-10 pointer-events-none select-none"
+                            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1F281A] text-white border-2 border-white shadow-md ring-4 ring-[#1F281A]/15 flex items-center justify-center transition-all duration-700 ease-out z-10 pointer-events-none select-none"
                             aria-label={`Posisi paket: ${currentStageInfo.label}`}
                           >
                             <Package className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" />
@@ -1259,7 +1259,7 @@ function CustomerAndAdminPortal() {
                                 <span
                                   className={`block text-[11px] sm:text-xs leading-tight ${
                                     isCurrent
-                                      ? 'font-bold text-[#16382C]'
+                                      ? 'font-bold text-[#1F281A]'
                                       : isPassed
                                       ? 'font-semibold text-stone-800'
                                       : 'font-medium text-stone-400'
@@ -1279,7 +1279,7 @@ function CustomerAndAdminPortal() {
                         </p>
                         {currentUser?.defaultAddress && (
                           <span className="text-[11px] text-stone-500 shrink-0 flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-[#16382C]" />
+                            <MapPin className="w-3 h-3 text-[#1F281A]" />
                             <span className="truncate max-w-[220px]">
                               Tujuan: {currentUser.defaultAddress}
                             </span>
@@ -1293,7 +1293,7 @@ function CustomerAndAdminPortal() {
                       {order.items.map(({ item, quantity }) => (
                         <div
                           key={item.id}
-                          className="flex items-start sm:items-center justify-between gap-3 p-3 rounded-xl bg-[#FAF9F6] border border-stone-200/70"
+                          className="flex items-start sm:items-center justify-between gap-3 p-3 rounded-xl bg-white border border-stone-200/70"
                         >
                           <div className="w-16 h-16 rounded-lg overflow-hidden bg-stone-200 shrink-0">
                             <ResilientImage
@@ -1311,7 +1311,7 @@ function CustomerAndAdminPortal() {
                               <button
                                 type="button"
                                 onClick={() => openStorePage(item.merchantName)}
-                                className="max-w-full text-xs text-[#16382C] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer overflow-hidden"
+                                className="max-w-full text-xs text-[#1F281A] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer overflow-hidden"
                               >
                                 <Store className="w-3 h-3 shrink-0" />
                                 <span className="truncate">{item.merchantName}</span>
@@ -1322,7 +1322,7 @@ function CustomerAndAdminPortal() {
                             </p>
                           </div>
                           <div className="text-right shrink-0 pl-2 self-center">
-                            <span className="inline-block text-xs sm:text-sm font-bold text-[#16382C] font-mono-tabular whitespace-nowrap">
+                            <span className="inline-block text-xs sm:text-sm font-bold text-[#1F281A] font-mono-tabular whitespace-nowrap">
                               {formatRupiah(item.rescuePrice * quantity)}
                             </span>
                           </div>
@@ -1334,7 +1334,7 @@ function CustomerAndAdminPortal() {
                     <div className="pt-3 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="text-xs text-stone-600">
                         <span>Total Bayar: </span>
-                        <strong className="text-sm text-[#16382C] font-mono-tabular">
+                        <strong className="text-sm text-[#1F281A] font-mono-tabular">
                           {formatRupiah(order.totalPaid)}
                         </strong>
                         <span className="text-emerald-900 font-medium ml-2">
@@ -1354,10 +1354,10 @@ function CustomerAndAdminPortal() {
         </main>
       ) : activePage === 'history' ? (
         /* PAGE 6: DEDICATED HISTORY PESANAN, RATING UMKM & LAPORAN KOMPLAIN PAGE */
-        <main className="flex-1 bg-[#F5F5F5] pb-24">
+        <main className="flex-1 bg-white pb-24">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-5 sm:pt-7 space-y-4">
             {/* Summary Savings Banner */}
-            <div className="bg-[#16382C] text-white rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4">
+            <div className="bg-[#1F281A] text-white rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4">
               <div>
                 <p className="text-[11px] sm:text-xs text-emerald-200">
                   Total Penghematan Anda di SisaPiring
@@ -1407,7 +1407,7 @@ function CustomerAndAdminPortal() {
                         <span className="text-xs sm:text-sm font-bold text-stone-900 font-mono-tabular">
                           #{order.orderCode}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-950/10 text-[#16382C] text-[11px] font-semibold">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-950/10 text-[#1F281A] text-[11px] font-semibold">
                           Sampai & Selesai
                         </span>
                         {order.userRating && (
@@ -1426,7 +1426,7 @@ function CustomerAndAdminPortal() {
                         {order.createdAt}
                       </p>
                     </div>
-                    <span className="text-xs sm:text-sm font-bold text-[#16382C] font-mono-tabular">
+                    <span className="text-xs sm:text-sm font-bold text-[#1F281A] font-mono-tabular">
                       {formatRupiah(order.totalPaid)}
                     </span>
                   </div>
@@ -1449,7 +1449,7 @@ function CustomerAndAdminPortal() {
                           <button
                             type="button"
                             onClick={() => openStorePage(item.merchantName)}
-                            className="max-w-full text-[11px] text-[#16382C] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer overflow-hidden"
+                            className="max-w-full text-[11px] text-[#1F281A] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer overflow-hidden"
                           >
                             <Store className="w-3 h-3 shrink-0" />
                             <span className="truncate">Lihat Toko: {item.merchantName}</span>
@@ -1461,7 +1461,7 @@ function CustomerAndAdminPortal() {
                             handleAddToCart(item, 1);
                             openCartPage();
                           }}
-                          className="h-8 px-3 rounded-lg border border-stone-300 hover:border-[#16382C] text-xs font-semibold text-[#16382C] inline-flex items-center gap-1 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                          className="h-8 px-3 rounded-lg border border-stone-300 hover:border-[#1F281A] text-xs font-semibold text-[#1F281A] inline-flex items-center gap-1 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                         >
                           <RotateCcw className="w-3 h-3 shrink-0" />
                           <span>Pesan Lagi</span>
@@ -1493,7 +1493,7 @@ function CustomerAndAdminPortal() {
                         setModalReviewText('');
                         setOrderReviewModal(order);
                       }}
-                      className="h-9 px-3.5 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="h-9 px-3.5 rounded-xl bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
                       <span>
@@ -1571,7 +1571,7 @@ function CustomerAndAdminPortal() {
           {/* Full-Width 4-Column Quantitative Proof Strip Below Hero */}
           <section
             aria-label="Ringkasan Dampak SisaPiring"
-            className="bg-[#FAF9F6] border-b border-stone-200/80 py-8 sm:py-10"
+            className="bg-white border-b border-stone-200/80 py-8 sm:py-10"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
               <div>
@@ -1612,7 +1612,7 @@ function CustomerAndAdminPortal() {
           {/* SECTION 2: MECHANISM & INTERACTIVE SAVINGS CALCULATOR ("CARA KERJA") */}
           <section
             id="cara-kerja"
-            className="py-12 sm:py-16 md:py-24 bg-[#FAF9F6]"
+            className="py-12 sm:py-16 md:py-24 bg-white"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -1715,7 +1715,7 @@ function CustomerAndAdminPortal() {
                     {MERCHANT_STORIES.map((story) => (
                       <div
                         key={story.id}
-                        className="p-5 sm:p-6 bg-[#FAF9F6] border border-stone-200/90 rounded-2xl space-y-3"
+                        className="p-5 sm:p-6 bg-white border border-stone-200/90 rounded-2xl space-y-3"
                       >
                         <div className="text-xs text-stone-500 flex flex-wrap items-center gap-x-2 gap-y-1">
                           <strong className="text-stone-900">{story.ownerName}</strong>
@@ -1773,7 +1773,7 @@ function CustomerAndAdminPortal() {
                 </div>
 
                 <div className="lg:col-span-7">
-                  <div className="bg-[#FAF9F6] border border-stone-200 rounded-2xl p-5 sm:p-6 md:p-8">
+                  <div className="bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 md:p-8">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-5 border-b border-stone-200">
                       <div>
                         <h3 className="text-base font-semibold text-stone-900">
@@ -1987,7 +1987,7 @@ function CustomerAndAdminPortal() {
 
       {/* QUIET FOOTER (Hidden on Login/Register Page & Admin Workspace) */}
       {activePage !== 'auth' && activePage !== 'admin' && (
-        <footer className="border-t border-stone-200 bg-[#FAF9F6] py-10 md:py-12">
+        <footer className="border-t border-stone-200 bg-white py-10 md:py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-1">
               <p className="text-base font-bold font-display text-stone-900">
@@ -2030,14 +2030,14 @@ function CustomerAndAdminPortal() {
               <button
                 type="button"
                 onClick={() => setActiveTab('dashboard')}
-                className="hover:text-stone-900 font-semibold text-[#16382C] transition-colors cursor-pointer"
+                className="hover:text-stone-900 font-semibold text-[#1F281A] transition-colors cursor-pointer"
               >
                 Portal Mitra UMKM
               </button>
               <button
                 type="button"
                 onClick={openAdminPage}
-                className="hover:text-stone-900 font-semibold text-[#16382C] transition-colors cursor-pointer"
+                className="hover:text-stone-900 font-semibold text-[#1F281A] transition-colors cursor-pointer"
               >
                 Panel Admin
               </button>
@@ -2169,8 +2169,8 @@ function CustomerAndAdminPortal() {
                         }
                         className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border cursor-pointer ${
                           active
-                            ? 'bg-[#16382C] text-white border-[#16382C]'
-                            : 'bg-[#FAF9F6] text-stone-700 border-stone-300'
+                            ? 'bg-[#1F281A] text-white border-[#1F281A]'
+                            : 'bg-white text-stone-700 border-stone-300'
                         }`}
                       >
                         {tag}
@@ -2189,7 +2189,7 @@ function CustomerAndAdminPortal() {
                   value={modalReviewText}
                   onChange={(e) => setModalReviewText(e.target.value)}
                   placeholder="Bagikan pengalaman Anda mengenai rasa dan kesesuaian deskripsi makanan..."
-                  className="w-full p-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
+                  className="w-full p-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
                 />
               </div>
 
@@ -2203,7 +2203,7 @@ function CustomerAndAdminPortal() {
                 </button>
                 <button
                   type="submit"
-                  className="h-10 px-5 text-xs font-semibold text-white bg-[#16382C] hover:bg-emerald-900 rounded-xl cursor-pointer"
+                  className="h-10 px-5 text-xs font-semibold text-white bg-[#1F281A] hover:bg-emerald-900 rounded-xl cursor-pointer"
                 >
                   Simpan Rating & Ulasan
                 </button>
@@ -2282,7 +2282,7 @@ function CustomerAndAdminPortal() {
                       e.target.value as ComplaintReport['category']
                     )
                   }
-                  className="w-full h-11 px-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-red-600 cursor-pointer"
+                  className="w-full h-11 px-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-red-600 cursor-pointer"
                 >
                   <option value="Makanan Tidak Sesuai Deskripsi">
                     Makanan Tidak Sesuai Deskripsi
@@ -2309,12 +2309,12 @@ function CustomerAndAdminPortal() {
                   value={modalComplaintDesc}
                   onChange={(e) => setModalComplaintDesc(e.target.value)}
                   placeholder="Contoh: Isi paket berbeda dengan deskripsi menu atau kemasan terbuka saat diterima..."
-                  className="w-full p-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-red-600"
+                  className="w-full p-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-red-600"
                 />
               </div>
 
               <div>
-                <label className="flex items-center justify-between gap-2 border border-dashed border-stone-300 hover:border-red-500 bg-[#FAF9F6] rounded-xl px-3.5 py-2.5 cursor-pointer">
+                <label className="flex items-center justify-between gap-2 border border-dashed border-stone-300 hover:border-red-500 bg-white rounded-xl px-3.5 py-2.5 cursor-pointer">
                   <span className="text-xs text-stone-600 truncate">
                     {modalComplaintFile
                       ? `Bukti foto: ${modalComplaintFile}`
@@ -2402,7 +2402,7 @@ function CustomerAndAdminPortal() {
                   <select
                     value={editDistrictText}
                     onChange={(e) => setEditDistrictText(e.target.value)}
-                    className="w-full h-11 px-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
+                    className="w-full h-11 px-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
                   >
                     <option value="Coblong (Dago / Dipatiukur)">Coblong (Dago / Dipatiukur)</option>
                     <option value="Sumur Bandung (Braga)">Sumur Bandung (Braga)</option>
@@ -2423,7 +2423,7 @@ function CustomerAndAdminPortal() {
                     value={editAddressText}
                     onChange={(e) => setEditAddressText(e.target.value)}
                     placeholder="Contoh: Jl. Dipatiukur No. 42, Coblong, Bandung"
-                    className="w-full p-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
+                    className="w-full p-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
                   />
                 </div>
 
@@ -2437,7 +2437,7 @@ function CustomerAndAdminPortal() {
                   </button>
                   <button
                     type="submit"
-                    className="h-10 px-5 text-xs font-semibold text-white bg-[#16382C] hover:bg-emerald-900 rounded-xl cursor-pointer"
+                    className="h-10 px-5 text-xs font-semibold text-white bg-[#1F281A] hover:bg-emerald-900 rounded-xl cursor-pointer"
                   >
                     Simpan Alamat
                   </button>
@@ -2466,7 +2466,7 @@ function CustomerAndAdminPortal() {
                     type="text"
                     value={editNameText}
                     onChange={(e) => setEditNameText(e.target.value)}
-                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
+                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900"
                   />
                 </div>
 
@@ -2478,7 +2478,7 @@ function CustomerAndAdminPortal() {
                     type="tel"
                     value={editPhoneText}
                     onChange={(e) => setEditPhoneText(e.target.value)}
-                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 font-mono-tabular"
+                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 font-mono-tabular"
                   />
                 </div>
 
@@ -2492,7 +2492,7 @@ function CustomerAndAdminPortal() {
                   </button>
                   <button
                     type="submit"
-                    className="h-10 px-5 text-xs font-semibold text-white bg-[#16382C] hover:bg-emerald-900 rounded-xl cursor-pointer"
+                    className="h-10 px-5 text-xs font-semibold text-white bg-[#1F281A] hover:bg-emerald-900 rounded-xl cursor-pointer"
                   >
                     Simpan Profil
                   </button>
@@ -2514,7 +2514,7 @@ function CustomerAndAdminPortal() {
             onClick={openEtalasePage}
             className={`flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'etalase' || activePage === 'landing'
-                ? 'text-[#16382C] font-bold'
+                ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
           >
@@ -2530,14 +2530,14 @@ function CustomerAndAdminPortal() {
             }}
             className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'pesanan'
-                ? 'text-[#16382C] font-bold'
+                ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
           >
             <div className="relative">
               <ClipboardList className="w-5 h-5" />
               {activeOrders.length > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#EE4D2D] text-white text-[9px] font-bold font-mono-tabular flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#f89254] text-white text-[9px] font-bold font-mono-tabular flex items-center justify-center">
                   {activeOrders.length}
                 </span>
               )}
@@ -2550,13 +2550,13 @@ function CustomerAndAdminPortal() {
             onClick={() => openChatPage()}
             className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'chat'
-                ? 'text-[#16382C] font-bold'
+                ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
           >
             <div className="relative">
               <MessageSquare className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-[#EE4D2D]" />
+              <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-[#f89254]" />
             </div>
             <span className="text-[11px]">Chat Penjual</span>
           </button>
@@ -2569,7 +2569,7 @@ function CustomerAndAdminPortal() {
             }}
             className={`flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'history'
-                ? 'text-[#16382C] font-bold'
+                ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
           >
@@ -2611,7 +2611,7 @@ const SellerPortalContent: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full bg-[#FAF9F6] text-[#292929] overflow-hidden">
+    <div className="flex h-screen w-full bg-white text-[#2e434f] overflow-hidden">
       {/* Desktop Sidebar (lg:flex) */}
       <div className="hidden lg:flex shrink-0">
         <SellerSidebar />

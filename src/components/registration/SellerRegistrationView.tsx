@@ -143,7 +143,7 @@ export const SellerRegistrationView: React.FC = () => {
                   : 'Verifikasi Ditolak'}
               </span>
             </div>
-            <p className="text-sm font-semibold text-[#292929] mt-0.5">
+            <p className="text-sm font-semibold text-[#2e434f] mt-0.5">
               {sellerProfile.businessName} · Kec. {sellerProfile.district}, Bandung
             </p>
             {sellerProfile.verificationNotes && (
@@ -212,7 +212,7 @@ export const SellerRegistrationView: React.FC = () => {
       <div className="bg-white rounded-2xl border border-neutral-200 shadow-xs overflow-hidden">
         {/* Step Progress Header */}
         <div className="p-6 border-b border-neutral-200 bg-neutral-50/50">
-          <h2 className="text-lg font-bold text-[#16382C]">Formulir Pendaftaran & Verifikasi Mitra UMKM</h2>
+          <h2 className="text-lg font-bold text-[#1F281A]">Formulir Pendaftaran & Verifikasi Mitra UMKM</h2>
           <p className="text-xs text-neutral-600 mt-0.5">
             Khusus usaha kuliner lokal berdomisili di Kota Bandung untuk bergabung dalam gerakan penyelamatan pangan.
           </p>
@@ -229,7 +229,7 @@ export const SellerRegistrationView: React.FC = () => {
                 onClick={() => setStep(s.num as 1 | 2 | 3 | 4)}
                 className={`cursor-pointer transition-all ${
                   step === s.num
-                    ? 'border-b-2 border-[#16382C] pb-2'
+                    ? 'border-b-2 border-[#1F281A] pb-2'
                     : step > s.num
                     ? 'border-b-2 border-emerald-600 pb-2 text-emerald-800'
                     : 'border-b-2 border-neutral-200 pb-2 text-neutral-400'
@@ -239,7 +239,7 @@ export const SellerRegistrationView: React.FC = () => {
                   <span
                     className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
                       step === s.num
-                        ? 'bg-[#16382C] text-white'
+                        ? 'bg-[#1F281A] text-white'
                         : step > s.num
                         ? 'bg-emerald-600 text-white'
                         : 'bg-neutral-200 text-neutral-600'
@@ -258,8 +258,8 @@ export const SellerRegistrationView: React.FC = () => {
         {step === 1 && (
           <div className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-3 border-b border-neutral-100">
-              <Building2 className="w-5 h-5 text-[#16382C]" />
-              <h3 className="text-sm font-bold text-[#292929]">Langkah 1: Identitas Pemilik / Penanggung Jawab</h3>
+              <Building2 className="w-5 h-5 text-[#1F281A]" />
+              <h3 className="text-sm font-bold text-[#2e434f]">Langkah 1: Identitas Pemilik / Penanggung Jawab</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -272,7 +272,7 @@ export const SellerRegistrationView: React.FC = () => {
                   value={formData.ownerName}
                   onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
                   placeholder="Contoh: Kang Ridwan Sasmita"
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                 />
                 {errors.ownerName && <p className="text-xs text-red-500 mt-1">{errors.ownerName}</p>}
               </div>
@@ -286,7 +286,7 @@ export const SellerRegistrationView: React.FC = () => {
                   value={formData.ownerPhone}
                   onChange={(e) => setFormData({ ...formData, ownerPhone: e.target.value })}
                   placeholder="+62 812-XXXX-XXXX"
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                 />
                 <span className="text-[11px] text-neutral-500 mt-1 block">
                   Digunakan untuk notifikasi pesanan masuk instan
@@ -303,7 +303,7 @@ export const SellerRegistrationView: React.FC = () => {
                   value={formData.ownerEmail}
                   onChange={(e) => setFormData({ ...formData, ownerEmail: e.target.value })}
                   placeholder="kontak@usahakuliner.id"
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                 />
                 {errors.ownerEmail && <p className="text-xs text-red-500 mt-1">{errors.ownerEmail}</p>}
               </div>
@@ -313,7 +313,7 @@ export const SellerRegistrationView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f89254] hover:bg-[#e57d3d] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
               >
                 <span>Lanjut ke Info Usaha</span>
                 <ArrowRight className="w-4 h-4" />
@@ -326,8 +326,8 @@ export const SellerRegistrationView: React.FC = () => {
         {step === 2 && (
           <div className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-3 border-b border-neutral-100">
-              <Building2 className="w-5 h-5 text-[#16382C]" />
-              <h3 className="text-sm font-bold text-[#292929]">Langkah 2: Informasi Bisnis & Lokasi Kota Bandung</h3>
+              <Building2 className="w-5 h-5 text-[#1F281A]" />
+              <h3 className="text-sm font-bold text-[#2e434f]">Langkah 2: Informasi Bisnis & Lokasi Kota Bandung</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -340,7 +340,7 @@ export const SellerRegistrationView: React.FC = () => {
                   value={formData.businessName}
                   onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                   placeholder="Contoh: Kala Bakehouse & Coffee"
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                 />
                 {errors.businessName && <p className="text-xs text-red-500 mt-1">{errors.businessName}</p>}
               </div>
@@ -352,7 +352,7 @@ export const SellerRegistrationView: React.FC = () => {
                 <select
                   value={formData.businessCategory}
                   onChange={(e) => setFormData({ ...formData, businessCategory: e.target.value as ProductCategory })}
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                 >
                   <option value="Bakery & Roti">Bakery & Roti</option>
                   <option value="Katering & Nasi Kotak">Katering & Nasi Kotak</option>
@@ -370,7 +370,7 @@ export const SellerRegistrationView: React.FC = () => {
                 <select
                   value={formData.district}
                   onChange={(e) => setFormData({ ...formData, district: e.target.value as BandungDistrict })}
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                 >
                   {BANDUNG_DISTRICTS.map((dist) => (
                     <option key={dist.name} value={dist.name}>
@@ -415,7 +415,7 @@ export const SellerRegistrationView: React.FC = () => {
                   value={formData.businessAddress}
                   onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
                   placeholder="Contoh: Jl. Progo No. 14, Kel. Citarum, Kec. Bandung Wetan, Kota Bandung, 40115"
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                 />
                 {errors.businessAddress && <p className="text-xs text-red-500 mt-1">{errors.businessAddress}</p>}
               </div>
@@ -433,7 +433,7 @@ export const SellerRegistrationView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f89254] hover:bg-[#e57d3d] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
               >
                 <span>Lanjut ke Legalitas & Foto</span>
                 <ArrowRight className="w-4 h-4" />
@@ -446,8 +446,8 @@ export const SellerRegistrationView: React.FC = () => {
         {step === 3 && (
           <div className="p-6 space-y-5">
             <div className="flex items-center gap-2 pb-3 border-b border-neutral-100">
-              <FileText className="w-5 h-5 text-[#16382C]" />
-              <h3 className="text-sm font-bold text-[#292929]">Langkah 3: Dokumen Legalitas & Foto Usaha</h3>
+              <FileText className="w-5 h-5 text-[#1F281A]" />
+              <h3 className="text-sm font-bold text-[#2e434f]">Langkah 3: Dokumen Legalitas & Foto Usaha</h3>
             </div>
 
             <div className="space-y-4">
@@ -458,7 +458,7 @@ export const SellerRegistrationView: React.FC = () => {
                 <div className="border-2 border-dashed border-neutral-300 rounded-xl p-5 text-center bg-neutral-50/50 hover:bg-neutral-50 transition-colors">
                   <Upload className="w-7 h-7 mx-auto text-neutral-400 mb-2" />
                   <p className="text-xs font-semibold text-neutral-700">
-                    File Terlampir: <span className="font-mono text-[#16382C]">{formData.businessDocumentName}</span>
+                    File Terlampir: <span className="font-mono text-[#1F281A]">{formData.businessDocumentName}</span>
                   </p>
                   <p className="text-[11px] text-neutral-500 mt-1">
                     Format didukung: PDF, JPG, PNG (Maksimal 5MB)
@@ -567,7 +567,7 @@ export const SellerRegistrationView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f89254] hover:bg-[#e57d3d] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
               >
                 <span>Tinjau Ringkasan</span>
                 <ArrowRight className="w-4 h-4" />
@@ -580,8 +580,8 @@ export const SellerRegistrationView: React.FC = () => {
         {step === 4 && (
           <div className="p-6 space-y-6">
             <div className="flex items-center gap-2 pb-3 border-b border-neutral-100">
-              <ShieldCheck className="w-5 h-5 text-[#16382C]" />
-              <h3 className="text-sm font-bold text-[#292929]">Langkah 4: Konfirmasi Berkas Pendaftaran Mitra</h3>
+              <ShieldCheck className="w-5 h-5 text-[#1F281A]" />
+              <h3 className="text-sm font-bold text-[#2e434f]">Langkah 4: Konfirmasi Berkas Pendaftaran Mitra</h3>
             </div>
 
             <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-200 space-y-3 text-xs">
@@ -596,7 +596,7 @@ export const SellerRegistrationView: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-neutral-400 block">Nama Usaha UMKM</span>
-                  <span className="font-semibold text-[#16382C] text-sm">{formData.businessName}</span>
+                  <span className="font-semibold text-[#1F281A] text-sm">{formData.businessName}</span>
                 </div>
                 <div>
                   <span className="text-neutral-400 block">Kategori</span>
@@ -619,9 +619,9 @@ export const SellerRegistrationView: React.FC = () => {
 
             {/* Terms confirmation */}
             <div className="p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 flex items-start gap-3">
-              <CheckCircle2 className="w-5 h-5 text-[#16382C] shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-[#1F281A] shrink-0 mt-0.5" />
               <div className="text-xs text-neutral-700 leading-relaxed">
-                <p className="font-semibold text-[#16382C]">Pernyataan Komitmen Kualitas & Higienitas</p>
+                <p className="font-semibold text-[#1F281A]">Pernyataan Komitmen Kualitas & Higienitas</p>
                 <p className="mt-1">
                   Dengan mengirimkan formulir ini, pemilik UMKM menyatakan seluruh data benar dan berkomitmen memenuhi
                   standar keamanan pangan SisaPiring, menjaga rantai dingin/kebersihan kemasan, serta menghormati jadwal
@@ -651,9 +651,9 @@ export const SellerRegistrationView: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#16382C] hover:bg-[#214F3F] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-sm font-semibold rounded-xl transition-colors shadow-xs"
                 >
-                  <Check className="w-4 h-4 text-[#FFD230]" />
+                  <Check className="w-4 h-4 text-[#fbe1b5]" />
                   <span>Kirim Berkas Verifikasi</span>
                 </button>
               </div>

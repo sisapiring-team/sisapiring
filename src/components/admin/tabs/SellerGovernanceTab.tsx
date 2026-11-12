@@ -78,7 +78,7 @@ export const SellerGovernanceTab: React.FC<SellerGovernanceTabProps> = ({
       </div>
 
       {/* Active Store Focus Banner (Kala Bakehouse) */}
-      <div className="bg-[#16382C] text-white p-5 rounded-3xl border border-emerald-900 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-[#1F281A] text-white p-5 rounded-3xl border border-emerald-900 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-amber-300 font-bold shrink-0">
             <Store className="w-6 h-6" />

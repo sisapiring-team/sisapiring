@@ -87,7 +87,7 @@ export const OrderEscrowTab: React.FC<OrderEscrowTabProps> = ({
 
         <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-xs space-y-1">
           <span className="text-xs font-semibold text-neutral-500">Pencairan Dana (Settled)</span>
-          <div className="text-xl font-black font-mono text-[#16382C]">
+          <div className="text-xl font-black font-mono text-[#1F281A]">
             {formatRupiah(settledTotal)}
           </div>
           <span className="text-[11px] text-emerald-600 font-semibold block">
@@ -134,7 +134,7 @@ export const OrderEscrowTab: React.FC<OrderEscrowTabProps> = ({
                     </span>
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="font-bold font-mono text-[#16382C] block text-xs">
+                    <span className="font-bold font-mono text-[#1F281A] block text-xs">
                       {formatRupiah(trx.totalPaid)}
                     </span>
                     <span className="text-[10px] text-neutral-500 block">{trx.paymentMethod}</span>

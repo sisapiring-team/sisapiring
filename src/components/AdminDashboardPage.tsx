@@ -283,14 +283,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF9F6] text-neutral-900 font-sans relative overflow-x-hidden selection:bg-amber-400/30 selection:text-neutral-900">
+    <div className="min-h-screen w-full bg-white text-neutral-900 font-sans relative overflow-x-hidden selection:bg-[#8da249]/30 selection:text-neutral-900">
       {/* Toast Feedback */}
       {adminToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#16382C] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-500/30 animate-in fade-in slide-in-from-bottom-4">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[#1F281A] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-[#8da249]/30 animate-in fade-in slide-in-from-bottom-4">
+          <CheckCircle2 className="w-5 h-5 text-[#8da249] shrink-0" />
           <div>
             <h5 className="font-bold text-xs">{adminToast.title}</h5>
-            <p className="text-[11px] text-emerald-200">{adminToast.message}</p>
+            <p className="text-[11px] text-white/80">{adminToast.message}</p>
           </div>
           <button
             type="button"

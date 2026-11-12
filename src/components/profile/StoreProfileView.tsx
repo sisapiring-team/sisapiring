@@ -47,7 +47,7 @@ export const StoreProfileView: React.FC = () => {
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
+        <h1 className="text-xl md:text-2xl font-bold text-[#1F281A] tracking-tight">
           Profil Usaha UMKM
         </h1>
         <p className="text-xs text-neutral-500 mt-1">
@@ -67,12 +67,12 @@ export const StoreProfileView: React.FC = () => {
             />
             <div className="absolute inset-0 bg-black/50" />
             <div className="absolute bottom-4 left-4 right-4 text-white">
-              <span className="text-xs font-semibold text-[#FFD230] uppercase tracking-wider block">
+              <span className="text-xs font-semibold text-[#fbe1b5] uppercase tracking-wider block">
                 {sellerProfile.businessCategory}
               </span>
               <h2 className="text-xl sm:text-2xl font-bold leading-tight">{businessName}</h2>
               <p className="text-xs text-white/80 flex items-center gap-1.5 mt-0.5">
-                <MapPin className="w-3.5 h-3.5 text-[#EE4D2D]" />
+                <MapPin className="w-3.5 h-3.5 text-[#f89254]" />
                 <span>Kec. {district}, Kota Bandung</span>
               </p>
             </div>
@@ -88,7 +88,7 @@ export const StoreProfileView: React.FC = () => {
                   type="text"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
                 />
               </div>
 
@@ -99,7 +99,7 @@ export const StoreProfileView: React.FC = () => {
                 <select
                   value={businessCategory}
                   onChange={(e) => setBusinessCategory(e.target.value as ProductCategory)}
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
                 >
                   <option value="Bakery & Roti">Bakery & Roti</option>
                   <option value="Katering & Nasi Kotak">Katering & Nasi Kotak</option>
@@ -117,7 +117,7 @@ export const StoreProfileView: React.FC = () => {
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value as BandungDistrict)}
-                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+                  className="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
                 >
                   {BANDUNG_DISTRICTS.map((d) => (
                     <option key={d.name} value={d.name}>
@@ -169,7 +169,7 @@ export const StoreProfileView: React.FC = () => {
 
         {/* Owner Details Card */}
         <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-4">
-          <h3 className="text-sm font-bold text-[#16382C]">Kontak Penanggung Jawab Usaha</h3>
+          <h3 className="text-sm font-bold text-[#1F281A]">Kontak Penanggung Jawab Usaha</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
@@ -214,9 +214,9 @@ export const StoreProfileView: React.FC = () => {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
           >
-            <Save className="w-4 h-4 text-[#FFD230]" />
+            <Save className="w-4 h-4 text-[#fbe1b5]" />
             <span>Simpan Perubahan Profil</span>
           </button>
         </div>

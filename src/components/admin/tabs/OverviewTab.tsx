@@ -40,7 +40,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
       <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#8da249]/15 text-[#1F281A] border border-[#8da249]/30">
               Kota Bandung • Real-Time
             </span>
             <span className="text-xs text-neutral-400">
@@ -59,9 +59,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           <button
             type="button"
             onClick={onExportCSV}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold rounded-xl transition-colors shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-xs cursor-pointer"
           >
-            <Download className="w-4 h-4 text-emerald-400" />
+            <Download className="w-4 h-4 text-[#8da249]" />
             <span>Ekspor Laporan CSV</span>
           </button>
         </div>
@@ -72,18 +72,18 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
         <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-neutral-400">
             <span className="text-[11px] font-semibold">Porsi Diselamatkan</span>
-            <ShoppingBag className="w-4 h-4 text-emerald-700" />
+            <ShoppingBag className="w-4 h-4 text-[#8da249]" />
           </div>
-          <div className="text-xl font-black font-mono text-[#16382C]">
+          <div className="text-xl font-black font-mono text-[#1F281A]">
             {macroStats.totalRescuedPortions.toLocaleString('id-ID')}
           </div>
-          <span className="text-[10px] text-emerald-600 font-semibold block">+12.4% minggu ini</span>
+          <span className="text-[10px] text-[#8da249] font-semibold block">+12.4% minggu ini</span>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-neutral-400">
             <span className="text-[11px] font-semibold">Sampah Pangan Dicegah</span>
-            <Leaf className="w-4 h-4 text-emerald-700" />
+            <Leaf className="w-4 h-4 text-[#8da249]" />
           </div>
           <div className="text-xl font-black font-mono text-neutral-900">
             {macroStats.period.foodWastePreventedKg.toLocaleString('id-ID')} <span className="text-xs">kg</span>
@@ -94,9 +94,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
         <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-neutral-400">
             <span className="text-[11px] font-semibold">Reduksi Gas CO2e</span>
-            <TrendingUp className="w-4 h-4 text-emerald-700" />
+            <TrendingUp className="w-4 h-4 text-[#8da249]" />
           </div>
-          <div className="text-xl font-black font-mono text-emerald-800">
+          <div className="text-xl font-black font-mono text-[#1F281A]">
             {macroStats.period.co2EmissionsSavedKg.toLocaleString('id-ID')} <span className="text-xs">kg</span>
           </div>
           <span className="text-[10px] text-neutral-500 block">Gas Metana Tercegah</span>
@@ -118,7 +118,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             <span className="text-[11px] font-semibold">Omzet UMKM Pulih</span>
             <Coins className="w-4 h-4 text-amber-600" />
           </div>
-          <div className="text-xl font-black font-mono text-[#16382C]">
+          <div className="text-xl font-black font-mono text-[#1F281A]">
             {formatRupiah(macroStats.period.umkmRevenueRecovered)}
           </div>
           <span className="text-[10px] text-emerald-600 font-semibold block">Dipulihkan ke Pedagang</span>
@@ -401,7 +401,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                     <MapPin className="w-3.5 h-3.5 text-emerald-700" />
                     <span>{d.district}</span>
                   </td>
-                  <td className="py-3 px-3 font-mono font-bold text-[#16382C]">
+                  <td className="py-3 px-3 font-mono font-bold text-[#1F281A]">
                     {d.portionsRescued.toLocaleString('id-ID')} porsi
                   </td>
                   <td className="py-3 px-3 font-mono">{d.wasteReducedKg.toLocaleString('id-ID')} kg</td>

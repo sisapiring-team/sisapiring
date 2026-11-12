@@ -48,7 +48,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
         </button>
 
         <div className="flex items-center gap-1.5 text-xs text-neutral-500 truncate">
-          <span className="font-medium text-[#16382C]">SisaPiring</span>
+          <span className="font-medium text-[#1F281A]">SisaPiring</span>
           <ChevronRight className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
           <span className="font-semibold text-neutral-800 truncate">{current.title}</span>
         </div>
@@ -58,7 +58,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
       <div className="flex items-center gap-3 md:gap-4 shrink-0">
         {/* Bandung District Badge */}
         <div className="hidden sm:flex items-center gap-1.5 text-xs text-neutral-600 bg-neutral-100 px-2.5 py-1.5 rounded-lg border border-neutral-200">
-          <MapPin className="w-3.5 h-3.5 text-[#EE4D2D]" />
+          <MapPin className="w-3.5 h-3.5 text-[#f89254]" />
           <span className="font-medium">Kec. {sellerProfile.district}, Bandung</span>
         </div>
 
@@ -85,7 +85,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
         <button
           type="button"
           onClick={() => setActiveTab('marketplace')}
-          className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/20 px-3 py-1.5 rounded-lg transition-colors border border-[#EE4D2D]/20"
+          className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-[#f89254] bg-[#f89254]/10 hover:bg-[#f89254]/20 px-3 py-1.5 rounded-lg transition-colors border border-[#f89254]/20"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           <span>Lihat Etalase Pembeli</span>
@@ -111,7 +111,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
           >
             <Bell className="w-5 h-5" />
             {pendingOrders.length > 0 && (
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#EE4D2D] rounded-full ring-2 ring-white" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#f89254] rounded-full ring-2 ring-white" />
             )}
           </button>
 
@@ -142,7 +142,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
                       className="px-4 py-3 hover:bg-neutral-50 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-[#EE4D2D] font-mono">{ord.id}</span>
+                        <span className="font-bold text-[#f89254] font-mono">{ord.id}</span>
                         <span className="text-[11px] text-neutral-400">{ord.orderDate}</span>
                       </div>
                       <p className="text-xs font-medium text-neutral-800 mt-1 truncate">
@@ -162,7 +162,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
                     setActiveTab('orders');
                     setShowNotifications(false);
                   }}
-                  className="text-xs font-semibold text-[#16382C] hover:underline"
+                  className="text-xs font-semibold text-[#1F281A] hover:underline"
                 >
                   Buka Semua Pesanan Masuk
                 </button>
@@ -179,7 +179,7 @@ export const SellerHeader: React.FC<SellerHeaderProps> = ({ onMobileMenuToggle }
           <img
             src={sellerProfile.businessPhoto}
             alt={sellerProfile.businessName}
-            className="w-8 h-8 rounded-full object-cover border border-neutral-300 group-hover:ring-2 group-hover:ring-[#16382C]/20 transition-all"
+            className="w-8 h-8 rounded-full object-cover border border-neutral-300 group-hover:ring-2 group-hover:ring-[#1F281A]/20 transition-all"
             referrerPolicy="no-referrer"
           />
           <div className="hidden xl:block text-left">

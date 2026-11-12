@@ -176,10 +176,10 @@ export const SellerDashboardView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsVerificationModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#16382C] text-[#FFD230] hover:bg-[#214F3F] transition-colors cursor-pointer group shadow-xs shrink-0"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#1F281A] text-[#fbe1b5] hover:bg-[#2D3A26] transition-colors cursor-pointer group shadow-xs shrink-0"
                 title="Klik untuk melihat sertifikat & legalitas usaha"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-[#FFD230]" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#fbe1b5]" />
                 <span>Mitra Resmi Bandung</span>
                 <span className="text-[10px] bg-white/20 px-1 rounded text-white group-hover:bg-white/30">
                   Lihat Info
@@ -187,13 +187,13 @@ export const SellerDashboardView: React.FC = () => {
               </button>
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-bold text-[#16382C] tracking-tight truncate">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1F281A] tracking-tight truncate">
               {sellerProfile.businessName}
             </h1>
 
             <div className="flex flex-wrap items-center gap-y-1 gap-x-2 text-xs text-neutral-500">
               <span className="flex items-center gap-1 text-neutral-700">
-                <MapPin className="w-3.5 h-3.5 text-[#EE4D2D] shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-[#f89254] shrink-0" />
                 <span>{sellerProfile.businessAddress}</span>
               </span>
               <span>·</span>
@@ -237,9 +237,9 @@ export const SellerDashboardView: React.FC = () => {
             <button
               type="button"
               onClick={() => setActiveTab('qr_pickup')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
             >
-              <QrCode className="w-4 h-4 text-[#FFD230]" />
+              <QrCode className="w-4 h-4 text-[#fbe1b5]" />
               <span>Verifikasi QR</span>
             </button>
 
@@ -247,7 +247,7 @@ export const SellerDashboardView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsAddProductModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Sisa Piring</span>
@@ -270,9 +270,9 @@ export const SellerDashboardView: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsAddProductModalOpen(true)}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
+            className="p-3 bg-white hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#EE4D2D] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-[#f89254] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
               <Plus className="w-4 h-4" />
             </div>
             <div>
@@ -285,9 +285,9 @@ export const SellerDashboardView: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('products')}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
+            className="p-3 bg-white hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#16382C] text-[#FFD230] flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-[#1F281A] text-[#fbe1b5] flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
               <UtensilsCrossed className="w-4 h-4" />
             </div>
             <div>
@@ -300,13 +300,13 @@ export const SellerDashboardView: React.FC = () => {
           <button
             type="button"
             onClick={() => navigateToOrdersWithFilter('waiting_confirmation')}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group relative"
+            className="p-3 bg-white hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group relative"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#EE4D2D] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-[#f89254] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
               <ShoppingBag className="w-4 h-4" />
             </div>
             {waitingOrders.length > 0 && (
-              <span className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-[#EE4D2D] text-white px-1.5 py-0.2 rounded-full">
+              <span className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-[#f89254] text-white px-1.5 py-0.2 rounded-full">
                 {waitingOrders.length}
               </span>
             )}
@@ -322,10 +322,10 @@ export const SellerDashboardView: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('qr_pickup')}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
+            className="p-3 bg-white hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#16382C] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
-              <QrCode className="w-4 h-4 text-[#FFD230]" />
+            <div className="w-8 h-8 rounded-lg bg-[#1F281A] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
+              <QrCode className="w-4 h-4 text-[#fbe1b5]" />
             </div>
             <div>
               <p className="font-bold text-xs text-neutral-900 leading-tight">Verifikasi Ambil</p>
@@ -337,10 +337,10 @@ export const SellerDashboardView: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsFoodSafetyModalOpen(true)}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group col-span-2 sm:col-span-1"
+            className="p-3 bg-white hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group col-span-2 sm:col-span-1"
           >
             <div className="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
-              <FileCheck className="w-4 h-4 text-[#FFD230]" />
+              <FileCheck className="w-4 h-4 text-[#fbe1b5]" />
             </div>
             <div>
               <p className="font-bold text-xs text-neutral-900 leading-tight">Keamanan Pangan</p>
@@ -363,11 +363,11 @@ export const SellerDashboardView: React.FC = () => {
           {/* Card 1: Total Orders */}
           <div
             onClick={() => navigateToOrdersWithFilter('all')}
-            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-[#16382C] transition-all cursor-pointer shadow-xs group"
+            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-[#1F281A] transition-all cursor-pointer shadow-xs group"
           >
             <div className="flex items-center justify-between text-neutral-500 mb-1">
               <span className="text-xs font-semibold">Semua Pesanan</span>
-              <ShoppingBag className="w-4 h-4 text-neutral-400 group-hover:text-[#16382C]" />
+              <ShoppingBag className="w-4 h-4 text-neutral-400 group-hover:text-[#1F281A]" />
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl sm:text-3xl font-mono font-bold text-neutral-900">
@@ -375,7 +375,7 @@ export const SellerDashboardView: React.FC = () => {
               </span>
               <span className="text-[11px] text-neutral-400">transaksi</span>
             </div>
-            <p className="text-[10px] text-neutral-500 mt-1 flex items-center gap-1 group-hover:text-[#16382C]">
+            <p className="text-[10px] text-neutral-500 mt-1 flex items-center gap-1 group-hover:text-[#1F281A]">
               <span>Buka daftar lengkap</span>
               <ChevronRight className="w-3 h-3" />
             </p>
@@ -384,19 +384,19 @@ export const SellerDashboardView: React.FC = () => {
           {/* Card 2: Waiting for Confirmation */}
           <div
             onClick={() => navigateToOrdersWithFilter('waiting_confirmation')}
-            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-[#EE4D2D] transition-all cursor-pointer shadow-xs group"
+            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-[#f89254] transition-all cursor-pointer shadow-xs group"
           >
             <div className="flex items-center justify-between text-neutral-500 mb-1">
               <span className="text-xs font-semibold">Menunggu Konfirmasi</span>
-              <Clock className="w-4 h-4 text-[#EE4D2D]" />
+              <Clock className="w-4 h-4 text-[#f89254]" />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-mono font-bold text-[#EE4D2D]">
+              <span className="text-2xl sm:text-3xl font-mono font-bold text-[#f89254]">
                 {waitingOrders.length}
               </span>
               <span className="text-[11px] text-neutral-500 font-semibold">antrean</span>
             </div>
-            <p className="text-[10px] text-[#EE4D2D] mt-1 flex items-center gap-1 font-semibold">
+            <p className="text-[10px] text-[#f89254] mt-1 flex items-center gap-1 font-semibold">
               <span>{waitingOrders.length > 0 ? 'Perlu tindakan staf' : 'Tidak ada antrean'}</span>
               <ChevronRight className="w-3 h-3" />
             </p>
@@ -433,7 +433,7 @@ export const SellerDashboardView: React.FC = () => {
               <CheckCircle2 className="w-4 h-4 text-emerald-700" />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-mono font-bold text-[#16382C]">
+              <span className="text-2xl sm:text-3xl font-mono font-bold text-[#1F281A]">
                 {completedOrders.length}
               </span>
               <span className="text-[11px] text-neutral-500">sukses</span>
@@ -453,13 +453,13 @@ export const SellerDashboardView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-[#16382C]" />
+                <TrendingUp className="w-4 h-4 text-[#1F281A]" />
                 <h3 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
                   Analisis Pendapatan Penjualan Sisa Piring
                 </h3>
               </div>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-[#16382C]">
+                <span className="text-xl sm:text-2xl font-bold font-mono text-[#1F281A]">
                   {formatRupiah(totalRevenue > 0 ? totalRevenue : 340000)}
                 </span>
                 <span className="inline-flex items-center gap-0.5 text-xs text-emerald-700 font-semibold">
@@ -481,7 +481,7 @@ export const SellerDashboardView: React.FC = () => {
                   }}
                   className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
                     revenuePeriod === p
-                      ? 'bg-[#16382C] text-white shadow-xs'
+                      ? 'bg-[#1F281A] text-white shadow-xs'
                       : 'text-neutral-600 hover:text-neutral-900'
                   }`}
                 >
@@ -492,12 +492,12 @@ export const SellerDashboardView: React.FC = () => {
           </div>
 
           {/* Interactive Tooltip Card */}
-          <div className="h-10 flex items-center justify-between px-3 bg-[#FAF9F6] rounded-xl border border-neutral-200 text-xs">
+          <div className="h-10 flex items-center justify-between px-3 bg-white rounded-xl border border-neutral-200 text-xs">
             {activeChartPoint ? (
               <>
                 <span className="font-semibold text-neutral-700">{activeChartPoint.date}</span>
                 <div className="flex items-center gap-3">
-                  <span className="font-mono font-bold text-[#16382C]">
+                  <span className="font-mono font-bold text-[#1F281A]">
                     {formatRupiah(activeChartPoint.revenue)}
                   </span>
                   <span className="text-neutral-400">·</span>
@@ -544,14 +544,14 @@ export const SellerDashboardView: React.FC = () => {
                         style={{ height: `${heightPct}%` }}
                         className={`w-full transition-all rounded-t-md ${
                           isSelected
-                            ? 'bg-[#EE4D2D]'
-                            : 'bg-[#16382C] group-hover:bg-[#214F3F]'
+                            ? 'bg-[#f89254]'
+                            : 'bg-[#1F281A] group-hover:bg-[#2D3A26]'
                         }`}
                       />
                     </div>
                     <span
                       className={`text-[11px] font-mono font-semibold truncate ${
-                        isSelected ? 'text-[#EE4D2D] font-bold' : 'text-neutral-600'
+                        isSelected ? 'text-[#f89254] font-bold' : 'text-neutral-600'
                       }`}
                     >
                       {item.shortDate}
@@ -580,10 +580,10 @@ export const SellerDashboardView: React.FC = () => {
 
             <div className="mt-4 space-y-3">
               {/* Total Portions Rescued */}
-              <div className="p-3 bg-[#FAF9F6] rounded-xl border border-neutral-200 flex items-center justify-between">
+              <div className="p-3 bg-white rounded-xl border border-neutral-200 flex items-center justify-between">
                 <div>
                   <span className="text-[11px] text-neutral-500 block">Total Porsi Diselamatkan</span>
-                  <span className="text-2xl font-bold font-mono text-[#16382C]">
+                  <span className="text-2xl font-bold font-mono text-[#1F281A]">
                     {totalPortionsRescued} <span className="text-xs text-neutral-600 font-sans">porsi</span>
                   </span>
                 </div>
@@ -604,10 +604,10 @@ export const SellerDashboardView: React.FC = () => {
 
                 <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
                   <span className="text-[11px] text-neutral-500 block">Produk Didonasikan</span>
-                  <span className="text-lg font-bold font-mono text-[#16382C]">
+                  <span className="text-lg font-bold font-mono text-[#1F281A]">
                     {donatedCount} <span className="text-[10px]">porsi</span>
                   </span>
-                  <span className="text-[10px] text-[#16382C] font-semibold block mt-0.5">
+                  <span className="text-[10px] text-[#1F281A] font-semibold block mt-0.5">
                     100% Bebas Bayar
                   </span>
                 </div>
@@ -632,7 +632,7 @@ export const SellerDashboardView: React.FC = () => {
 
           <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
             <span className="text-neutral-500">Target Bulanan UMKM:</span>
-            <span className="font-mono font-bold text-[#16382C]">250 Porsi (92% Tercapai)</span>
+            <span className="font-mono font-bold text-[#1F281A]">250 Porsi (92% Tercapai)</span>
           </div>
         </div>
       </div>
@@ -658,7 +658,7 @@ export const SellerDashboardView: React.FC = () => {
                 onClick={() => setPerformanceTab('best_selling')}
                 className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                   performanceTab === 'best_selling'
-                    ? 'bg-white text-[#16382C] shadow-xs'
+                    ? 'bg-white text-[#1F281A] shadow-xs'
                     : 'text-neutral-600 hover:text-neutral-900'
                 }`}
               >
@@ -680,7 +680,7 @@ export const SellerDashboardView: React.FC = () => {
                 onClick={() => setPerformanceTab('expiring_soon')}
                 className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                   performanceTab === 'expiring_soon'
-                    ? 'bg-white text-[#EE4D2D] shadow-xs'
+                    ? 'bg-white text-[#f89254] shadow-xs'
                     : 'text-neutral-600 hover:text-neutral-900'
                 }`}
               >
@@ -718,7 +718,7 @@ export const SellerDashboardView: React.FC = () => {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="font-mono font-bold text-[#16382C] block">
+                    <span className="font-mono font-bold text-[#1F281A] block">
                       {p.portionsRescuedCount} porsi
                     </span>
                     <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.2 rounded">
@@ -758,7 +758,7 @@ export const SellerDashboardView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => updateStock(p.id, 2)}
-                        className="px-2.5 py-1 bg-[#16382C] text-white text-[11px] font-semibold rounded-lg hover:bg-[#214F3F]"
+                        className="px-2.5 py-1 bg-[#1F281A] text-white text-[11px] font-semibold rounded-lg hover:bg-[#2D3A26]"
                       >
                         + Tambah 2
                       </button>
@@ -787,7 +787,7 @@ export const SellerDashboardView: React.FC = () => {
                       />
                       <div className="min-w-0">
                         <p className="font-bold text-neutral-900 truncate">{p.name}</p>
-                        <p className="text-[11px] text-[#EE4D2D] font-medium flex items-center gap-1">
+                        <p className="text-[11px] text-[#f89254] font-medium flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           <span>Aman s/d {p.safeConsumptionDeadline}</span>
                         </p>
@@ -795,7 +795,7 @@ export const SellerDashboardView: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="font-mono font-bold text-xs bg-[#EE4D2D]/10 text-[#EE4D2D] px-2 py-0.5 rounded">
+                      <span className="font-mono font-bold text-xs bg-[#f89254]/10 text-[#f89254] px-2 py-0.5 rounded">
                         {p.discountPercentage}% OFF
                       </span>
                       <button
@@ -815,7 +815,7 @@ export const SellerDashboardView: React.FC = () => {
             <button
               type="button"
               onClick={() => setActiveTab('products')}
-              className="text-xs font-semibold text-[#16382C] hover:underline flex items-center gap-1"
+              className="text-xs font-semibold text-[#1F281A] hover:underline flex items-center gap-1"
             >
               <span>Buka Seluruh Etalase Produk ({products.length})</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -839,7 +839,7 @@ export const SellerDashboardView: React.FC = () => {
             {recentActivities.map((act) => (
               <div
                 key={act.id}
-                className="p-3 bg-[#FAF9F6] rounded-xl border border-neutral-200 hover:border-neutral-300 transition-colors space-y-2"
+                className="p-3 bg-white rounded-xl border border-neutral-200 hover:border-neutral-300 transition-colors space-y-2"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -853,7 +853,7 @@ export const SellerDashboardView: React.FC = () => {
                   <button
                     type="button"
                     onClick={act.onClick}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#16382C] hover:text-[#EE4D2D] transition-colors"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1F281A] hover:text-[#f89254] transition-colors"
                   >
                     <span>{act.actionLabel}</span>
                     <ArrowRight className="w-3 h-3" />

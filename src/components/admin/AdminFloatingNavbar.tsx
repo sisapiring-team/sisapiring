@@ -47,7 +47,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
         <button
           type="button"
           onClick={onMobileMenuToggle}
-          className="lg:hidden p-2 rounded-2xl bg-[#131c26]/90 border border-white/10 text-white backdrop-blur-md shadow-lg hover:bg-white/10 transition-colors cursor-pointer"
+          className="lg:hidden p-2 rounded-2xl bg-[#1F281A]/90 border border-white/10 text-white backdrop-blur-md shadow-lg hover:bg-white/10 transition-colors cursor-pointer"
           aria-label="Buka Menu Navigasi"
           title="Buka Navigasi"
         >
@@ -57,14 +57,14 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
         {/* Brand & Admin Capsule */}
         <div
           onClick={() => onSelectTab && onSelectTab('overview')}
-          className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#131c26]/90 border border-white/10 backdrop-blur-md shadow-2xl cursor-pointer hover:bg-[#182330] transition-colors"
+          className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#1F281A]/90 border border-white/10 backdrop-blur-md shadow-2xl cursor-pointer hover:bg-[#2e434f] transition-colors"
           title="Ke Dashboard Ringkasan"
         >
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-[#8da249] animate-pulse" />
           <span className="font-extrabold text-sm sm:text-base text-white tracking-tight font-sans">
             SisaPiring
           </span>
-          <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-black tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase">
+          <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-black tracking-wider bg-[#8da249]/20 text-[#8da249] border border-[#8da249]/30 uppercase">
             ADMIN
           </span>
         </div>
@@ -72,16 +72,16 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
 
       {/* 2. TOP-RIGHT FLOATING PILL (Controls & Operator Profile - Matching Screenshot) */}
       <div className="relative pointer-events-auto flex items-center gap-2">
-        <div className="flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-[#131c26]/90 border border-white/10 backdrop-blur-md shadow-2xl text-white">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-[#1F281A]/90 border border-white/10 backdrop-blur-md shadow-2xl text-white">
           {/* Light / Dark Mode Toggle */}
           <button
             type="button"
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-1.5 rounded-full text-amber-300 hover:bg-white/10 transition-colors cursor-pointer"
+            className="p-1.5 rounded-full text-[#fbe1b5] hover:bg-white/10 transition-colors cursor-pointer"
             title={isDarkMode ? 'Mode Gelap Aktif' : 'Mode Terang Aktif'}
             aria-label="Toggle Theme"
           >
-            {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-cyan-300" />}
+            {isDarkMode ? <Sun className="w-4 h-4 text-[#fbe1b5]" /> : <Moon className="w-4 h-4 text-[#8da249]" />}
           </button>
 
           {/* Notification Bell with Badge */}
@@ -98,13 +98,13 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
             >
               <Bell className="w-4 h-4" />
               {pendingAlertsCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#131c26] animate-pulse" />
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#f89254] ring-2 ring-[#1F281A] animate-pulse" />
               )}
             </button>
 
             {/* Notifications Dropdown Popover */}
             {notificationsOpen && (
-              <div className="absolute right-0 mt-3 w-80 bg-[#111923]/98 border border-white/15 rounded-2xl shadow-2xl p-3 text-xs text-white backdrop-blur-xl animate-in fade-in slide-in-from-top-2 z-50">
+              <div className="absolute right-0 mt-3 w-80 bg-[#1F281A]/98 border border-white/15 rounded-2xl shadow-2xl p-3 text-xs text-white backdrop-blur-xl animate-in fade-in slide-in-from-top-2 z-50">
                 <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
                   <div className="flex items-center gap-1.5">
                     <Bell className="w-3.5 h-3.5 text-cyan-400" />
@@ -204,9 +204,9 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
             className="flex items-center gap-2 sm:gap-2.5 hover:opacity-90 transition-opacity cursor-pointer text-left pl-1"
             aria-label="Menu Profil Administrator"
           >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-cyan-600/80 border border-cyan-400/50 text-cyan-100 font-extrabold text-xs flex items-center justify-center shadow-xs relative shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#8da249] border border-white/20 text-white font-extrabold text-xs flex items-center justify-center shadow-xs relative shrink-0">
               SA
-              <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-[#131c26]" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#8da249] ring-2 ring-[#1F281A]" />
             </div>
 
             <div className="hidden md:block text-left">
@@ -214,8 +214,8 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                 <span className="text-xs font-bold text-white leading-tight">
                   Super Administrator
                 </span>
-                <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.2 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#8da249] bg-[#8da249]/15 border border-[#8da249]/30 px-1.5 py-0.2 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#8da249] animate-pulse" />
                   Online
                 </span>
               </div>
@@ -233,15 +233,15 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
 
         {/* Profile Dropdown Menu */}
         {profileDropdownOpen && (
-          <div className="absolute right-0 top-full mt-2 w-64 bg-[#111923]/98 border border-white/15 rounded-2xl shadow-2xl p-2.5 text-xs text-white backdrop-blur-xl animate-in fade-in slide-in-from-top-2 z-50">
+          <div className="absolute right-0 top-full mt-2 w-64 bg-[#1F281A]/98 border border-white/15 rounded-2xl shadow-2xl p-2.5 text-xs text-white backdrop-blur-xl animate-in fade-in slide-in-from-top-2 z-50">
             <div className="p-2 border-b border-white/10 mb-1.5">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-cyan-600/80 border border-cyan-400/50 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#8da249] border border-white/20 text-white font-bold flex items-center justify-center text-xs shrink-0">
                   SA
                 </div>
                 <div className="min-w-0">
                   <span className="font-bold text-white block truncate">Super Administrator</span>
-                  <span className="text-[10px] text-cyan-300 font-mono block truncate">
+                  <span className="text-[10px] text-[#8da249] font-mono block truncate">
                     Kota Bandung (Diskominfokot)
                   </span>
                 </div>

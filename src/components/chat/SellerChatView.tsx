@@ -108,7 +108,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#16382C]/10 text-[#16382C] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-[#1F281A]/10 text-[#1F281A] flex items-center justify-center font-bold">
                   <Users className="w-4 h-4" />
                 </div>
                 <h3 className="font-extrabold text-base sm:text-lg text-stone-900 tracking-tight">
@@ -120,7 +120,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
               </p>
             </div>
 
-            <span className="self-start sm:self-auto text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-[#16382C] border border-emerald-200 shrink-0">
+            <span className="self-start sm:self-auto text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-[#1F281A] border border-emerald-200 shrink-0">
               {conversations.length} Kontak Toko Tersedia
             </span>
           </div>
@@ -134,7 +134,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari nama toko, jalan, atau kecamatan di Bandung..."
-                className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-2xl focus:outline-none focus:border-[#16382C] focus:bg-white transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-2xl focus:outline-none focus:border-[#1F281A] focus:bg-white transition-colors"
               />
             </div>
 
@@ -145,7 +145,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                 onClick={() => setSelectedFilter('all')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                   selectedFilter === 'all'
-                    ? 'bg-[#16382C] text-white'
+                    ? 'bg-[#1F281A] text-white'
                     : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                 }`}
               >
@@ -156,7 +156,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                 onClick={() => setSelectedFilter('active_order')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                   selectedFilter === 'active_order'
-                    ? 'bg-[#16382C] text-white'
+                    ? 'bg-[#1F281A] text-white'
                     : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                 }`}
               >
@@ -167,7 +167,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                 onClick={() => setSelectedFilter('coblong')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                   selectedFilter === 'coblong'
-                    ? 'bg-[#16382C] text-white'
+                    ? 'bg-[#1F281A] text-white'
                     : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                 }`}
               >
@@ -178,7 +178,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                 onClick={() => setSelectedFilter('bandung_wetan')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                   selectedFilter === 'bandung_wetan'
-                    ? 'bg-[#16382C] text-white'
+                    ? 'bg-[#1F281A] text-white'
                     : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                 }`}
               >
@@ -189,7 +189,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
         </div>
 
         {/* Contact List Cards Grid */}
-        <div className="p-4 sm:p-6 bg-[#FAF9F6]">
+        <div className="p-4 sm:p-6 bg-white">
           {filteredConversations.length === 0 ? (
             <div className="py-16 text-center text-stone-400 space-y-2">
               <Store className="w-10 h-10 text-stone-300 mx-auto" />
@@ -202,7 +202,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                 <div
                   key={conv.id}
                   onClick={() => onSelectConversation(conv.id)}
-                  className="bg-white border border-stone-200/90 hover:border-[#16382C] rounded-2xl p-4 transition-all shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between gap-3 group"
+                  className="bg-white border border-stone-200/90 hover:border-[#1F281A] rounded-2xl p-4 transition-all shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between gap-3 group"
                 >
                   <div className="flex items-start gap-3.5">
                     {/* Store Avatar with Status */}
@@ -216,7 +216,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center font-bold text-[#16382C] text-base">
+                          <div className="w-full h-full flex items-center justify-center font-bold text-[#1F281A] text-base">
                             {conv.merchantName.slice(0, 2).toUpperCase()}
                           </div>
                         )}
@@ -230,7 +230,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-1">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <h4 className="font-bold text-sm text-stone-900 group-hover:text-[#16382C] transition-colors truncate">
+                          <h4 className="font-bold text-sm text-stone-900 group-hover:text-[#1F281A] transition-colors truncate">
                             {conv.merchantName}
                           </h4>
                           {conv.isVerified && (
@@ -265,11 +265,11 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
 
                     <div className="flex items-center gap-2 shrink-0">
                       {conv.unreadCount > 0 && (
-                        <span className="w-5 h-5 rounded-full bg-[#EE4D2D] text-white text-[10px] font-mono font-bold flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-full bg-[#f89254] text-white text-[10px] font-mono font-bold flex items-center justify-center">
                           {conv.unreadCount}
                         </span>
                       )}
-                      <span className="px-3 py-1 rounded-xl bg-emerald-50 text-[#16382C] group-hover:bg-[#16382C] group-hover:text-white text-xs font-bold transition-colors">
+                      <span className="px-3 py-1 rounded-xl bg-emerald-50 text-[#1F281A] group-hover:bg-[#1F281A] group-hover:text-white text-xs font-bold transition-colors">
                         Buka Chat →
                       </span>
                     </div>
@@ -315,7 +315,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center font-bold text-[#16382C]">
+              <div className="w-full h-full flex items-center justify-center font-bold text-[#1F281A]">
                 {activeConv.merchantName.slice(0, 2).toUpperCase()}
               </div>
             )}
@@ -381,7 +381,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
       )}
 
       {/* 2. Messages Stream */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-[#FAF9F6]">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-white">
         <div className="text-center my-2">
           <span className="px-3.5 py-1 bg-stone-200/80 text-stone-600 text-[10px] font-medium rounded-full">
             Obrolan Terenkripsi • Terhubung Langsung ke Dapur Mitra UMKM
@@ -398,7 +398,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
               <div
                 className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${
                   isUser
-                    ? 'bg-[#16382C] text-white rounded-br-xs'
+                    ? 'bg-[#1F281A] text-white rounded-br-xs'
                     : 'bg-white text-stone-800 border border-stone-200/80 rounded-bl-xs'
                 }`}
               >
@@ -466,7 +466,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
             key={idx}
             type="button"
             onClick={() => handleQuickQuestionClick(q)}
-            className="px-3 py-1 rounded-full bg-white border border-stone-200 hover:border-[#16382C] text-stone-700 hover:text-[#16382C] text-[11px] whitespace-nowrap transition-colors shadow-2xs shrink-0 cursor-pointer"
+            className="px-3 py-1 rounded-full bg-white border border-stone-200 hover:border-[#1F281A] text-stone-700 hover:text-[#1F281A] text-[11px] whitespace-nowrap transition-colors shadow-2xs shrink-0 cursor-pointer"
           >
             {q}
           </button>
@@ -499,7 +499,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
         {/* Message Input */}
         <div className="flex-1 relative">
           {selectedAttachment && (
-            <div className="absolute -top-9 left-0 right-0 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1 text-[11px] text-emerald-800 flex items-center justify-between">
+            <div className="absolute -top-9 left-0 right-0 bg-[#8da249]/10 border border-[#8da249]/30 rounded-lg px-2.5 py-1 text-[11px] text-[#1F281A] flex items-center justify-between">
               <span className="truncate">Lampiran: {selectedAttachment}</span>
               <button
                 type="button"
@@ -515,7 +515,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={`Kirim pesan ke ${activeConv.merchantName}...`}
-            className="w-full px-4 py-2.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-2xl focus:outline-none focus:border-[#16382C] focus:bg-white transition-colors"
+            className="w-full px-4 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-2xl focus:outline-none focus:border-[#8da249] focus:bg-white transition-colors"
           />
         </div>
 
@@ -523,7 +523,7 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
         <button
           type="submit"
           disabled={!inputText.trim() && !selectedAttachment}
-          className="w-10 h-10 rounded-2xl bg-[#16382C] hover:bg-emerald-900 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer shrink-0"
+          className="w-10 h-10 rounded-2xl bg-[#8da249] hover:bg-[#7b8e3d] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer shrink-0"
           aria-label="Kirim Pesan"
         >
           <Send className="w-4 h-4 ml-0.5" />

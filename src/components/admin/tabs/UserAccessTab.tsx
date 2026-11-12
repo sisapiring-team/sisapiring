@@ -38,7 +38,7 @@ export const UserAccessTab: React.FC<UserAccessTabProps> = ({
           <button
             type="button"
             onClick={onOpenAddUserModal}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-xs cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Tambah Akun Demo</span>

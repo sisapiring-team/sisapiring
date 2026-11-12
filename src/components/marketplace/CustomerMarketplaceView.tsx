@@ -93,11 +93,11 @@ export const CustomerMarketplaceView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#292929]">
+    <div className="min-h-screen bg-white text-[#2e434f]">
       {/* Top Banner informing user this is the Customer View */}
-      <div className="bg-[#16382C] text-white px-4 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-white/10 sticky top-0 z-30 shadow-xs">
+      <div className="bg-[#1F281A] text-white px-4 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-white/10 sticky top-0 z-30 shadow-xs">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#FFD230]" />
+          <span className="w-2 h-2 rounded-full bg-[#fbe1b5]" />
           <span className="font-medium">
             Pratinjau Etalase Pembeli SisaPiring Bandung — Hubungkan pesanan langsung ke Portal Mitra UMKM
           </span>
@@ -105,7 +105,7 @@ export const CustomerMarketplaceView: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('dashboard')}
-          className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-[11px] font-bold rounded-lg transition-colors shadow-xs"
+          className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#f89254] hover:bg-[#e57d3d] text-white text-[11px] font-bold rounded-lg transition-colors shadow-xs"
         >
           <span>Kembali ke Portal Mitra</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -116,15 +116,15 @@ export const CustomerMarketplaceView: React.FC = () => {
       <header className="bg-white border-b border-neutral-200 px-4 md:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#EE4D2D] flex items-center justify-center font-bold text-white text-lg">
+            <div className="w-9 h-9 rounded-xl bg-[#f89254] flex items-center justify-center font-bold text-white text-lg">
               S
             </div>
             <div>
-              <span className="font-bold text-lg text-[#16382C] tracking-tight block leading-tight">
+              <span className="font-bold text-lg text-[#1F281A] tracking-tight block leading-tight">
                 SisaPiring
               </span>
               <span className="text-[11px] text-neutral-500 flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-[#EE4D2D]" />
+                <MapPin className="w-3 h-3 text-[#f89254]" />
                 <span>Penyelamatan Makanan Kota Bandung</span>
               </span>
             </div>
@@ -135,12 +135,12 @@ export const CustomerMarketplaceView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsCheckoutModalOpen(true)}
-              className="relative inline-flex items-center gap-2 px-4 py-2 bg-[#16382C] text-white text-xs font-bold rounded-xl hover:bg-[#214F3F] transition-colors shadow-xs"
+              className="relative inline-flex items-center gap-2 px-4 py-2 bg-[#1F281A] text-white text-xs font-bold rounded-xl hover:bg-[#2D3A26] transition-colors shadow-xs"
             >
-              <ShoppingBag className="w-4 h-4 text-[#FFD230]" />
+              <ShoppingBag className="w-4 h-4 text-[#fbe1b5]" />
               <span>Keranjang</span>
               {cartCount > 0 && (
-                <span className="font-mono bg-[#EE4D2D] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">
+                <span className="font-mono bg-[#f89254] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">
                   {cartCount}
                 </span>
               )}
@@ -152,9 +152,9 @@ export const CustomerMarketplaceView: React.FC = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
         {/* Hero Banner */}
-        <div className="relative rounded-3xl overflow-hidden bg-[#16382C] text-white p-6 md:p-10 shadow-lg">
+        <div className="relative rounded-3xl overflow-hidden bg-[#1F281A] text-white p-6 md:p-10 shadow-lg">
           <div className="relative z-10 max-w-xl space-y-3">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FFD230] bg-white/10 px-3 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#fbe1b5] bg-white/10 px-3 py-1 rounded-full">
               <Sparkles className="w-3.5 h-3.5" />
               Sisa Piring Food Rescue — Hemat Hingga 90% & Donasi 100%
             </span>
@@ -181,7 +181,7 @@ export const CustomerMarketplaceView: React.FC = () => {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-colors whitespace-nowrap ${
                     selectedCategory === cat
-                      ? 'bg-[#16382C] text-white shadow-xs'
+                      ? 'bg-[#1F281A] text-white shadow-xs'
                       : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                   }`}
                 >
@@ -198,7 +198,7 @@ export const CustomerMarketplaceView: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari makanan lezat..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
             />
           </div>
         </div>
@@ -206,7 +206,7 @@ export const CustomerMarketplaceView: React.FC = () => {
         {/* Product Grid */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-[#16382C]">
+            <h2 className="text-base font-bold text-[#1F281A]">
               Menu Sisa Piring Tersedia Hari Ini ({filteredProducts.length} Pilihan)
             </h2>
             <span className="text-xs text-neutral-500">
@@ -241,8 +241,8 @@ export const CustomerMarketplaceView: React.FC = () => {
                           <span
                             className={`font-mono font-bold text-xs px-2.5 py-1 rounded-lg shadow-sm ${
                               p.discountPercentage === 100
-                                ? 'bg-[#16382C] text-[#FFD230]'
-                                : 'bg-[#EE4D2D] text-white'
+                                ? 'bg-[#1F281A] text-[#fbe1b5]'
+                                : 'bg-[#f89254] text-white'
                             }`}
                           >
                             {p.discountPercentage === 100 ? 'Donasi 100%' : `${p.discountPercentage}% OFF`}
@@ -250,7 +250,7 @@ export const CustomerMarketplaceView: React.FC = () => {
                         </div>
                         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-black/60 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-lg">
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-[#FFD230]" />
+                            <Clock className="w-3 h-3 text-[#fbe1b5]" />
                             <span>Aman s/d {p.safeConsumptionDeadline}</span>
                           </span>
                           <span className="font-mono">Sisa {p.stock} porsi</span>
@@ -276,7 +276,7 @@ export const CustomerMarketplaceView: React.FC = () => {
                         </p>
 
                         <div className="pt-2 flex items-baseline gap-2">
-                          <span className="text-base font-bold font-mono text-[#16382C]">
+                          <span className="text-base font-bold font-mono text-[#1F281A]">
                             {p.discountedPrice === 0 ? 'Bebas Bayar (Donasi)' : formatRupiah(p.discountedPrice)}
                           </span>
                           <span className="text-xs font-mono text-neutral-400 line-through">
@@ -296,7 +296,7 @@ export const CustomerMarketplaceView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => addToCart(p)}
-                          className="px-3.5 py-2 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                          className="px-3.5 py-2 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
                         >
                           {inCart > 0 ? `+ Tambah (${inCart})` : 'Pesan Sekarang'}
                         </button>
@@ -327,7 +327,7 @@ export const CustomerMarketplaceView: React.FC = () => {
             {!lastCreatedOrder ? (
               <form onSubmit={handleCheckout} className="space-y-4">
                 <div className="flex items-center gap-2 pb-3 border-b border-neutral-100">
-                  <ShoppingBag className="w-5 h-5 text-[#16382C]" />
+                  <ShoppingBag className="w-5 h-5 text-[#1F281A]" />
                   <h3 className="text-base font-bold text-neutral-800">Keranjang Penyelamatan Pangan</h3>
                 </div>
 
@@ -376,7 +376,7 @@ export const CustomerMarketplaceView: React.FC = () => {
 
                     <div className="pt-2 border-t border-neutral-200 flex justify-between font-bold text-sm text-neutral-900">
                       <span>Total Pembayaran:</span>
-                      <span className="font-mono text-[#16382C]">
+                      <span className="font-mono text-[#1F281A]">
                         {calculateCartTotal() === 0 ? 'Rp 0 (Donasi)' : formatRupiah(calculateCartTotal())}
                       </span>
                     </div>
@@ -425,7 +425,7 @@ export const CustomerMarketplaceView: React.FC = () => {
                       </button>
                       <button
                         type="submit"
-                        className="px-5 py-2.5 text-xs font-bold text-white bg-[#EE4D2D] hover:bg-[#D73C1C] rounded-xl shadow-xs"
+                        className="px-5 py-2.5 text-xs font-bold text-white bg-[#f89254] hover:bg-[#e57d3d] rounded-xl shadow-xs"
                       >
                         Konfirmasi & Ambil Tiket QR
                       </button>
@@ -447,15 +447,15 @@ export const CustomerMarketplaceView: React.FC = () => {
                 </div>
 
                 {/* QR Code Graphic Box */}
-                <div className="bg-[#FAF9F6] border-2 border-dashed border-[#16382C]/30 rounded-2xl p-5 max-w-xs mx-auto space-y-2">
+                <div className="bg-white border-2 border-dashed border-[#1F281A]/30 rounded-2xl p-5 max-w-xs mx-auto space-y-2">
                   <div className="w-36 h-36 bg-white p-2 rounded-xl mx-auto shadow-xs border border-neutral-200 flex flex-col items-center justify-center">
-                    <QrCode className="w-28 h-28 text-[#16382C]" />
+                    <QrCode className="w-28 h-28 text-[#1F281A]" />
                   </div>
                   <div>
                     <span className="text-[10px] text-neutral-400 uppercase font-semibold block">
                       Kode Pengambilan (PIN Kasir)
                     </span>
-                    <span className="font-mono font-extrabold text-xl text-[#EE4D2D] tracking-widest">
+                    <span className="font-mono font-extrabold text-xl text-[#f89254] tracking-widest">
                       {lastCreatedOrder.pickupCode}
                     </span>
                   </div>
@@ -485,9 +485,9 @@ export const CustomerMarketplaceView: React.FC = () => {
                       setLastCreatedOrder(null);
                       setActiveTab('qr_pickup');
                     }}
-                    className="flex-1 py-2.5 bg-[#16382C] text-white text-xs font-bold rounded-xl hover:bg-[#214F3F] transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                    className="flex-1 py-2.5 bg-[#1F281A] text-white text-xs font-bold rounded-xl hover:bg-[#2D3A26] transition-colors flex items-center justify-center gap-1.5 shadow-xs"
                   >
-                    <QrCode className="w-4 h-4 text-[#FFD230]" />
+                    <QrCode className="w-4 h-4 text-[#fbe1b5]" />
                     <span>Uji Verifikasi di Portal Mitra</span>
                   </button>
                   <button

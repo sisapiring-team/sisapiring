@@ -180,7 +180,7 @@ export const ChatContainerPage: React.FC<ChatContainerPageProps> = ({
           </button>
           <div>
             <h2 className="text-lg sm:text-xl font-extrabold text-stone-900 tracking-tight flex items-center gap-2">
-              <Store className="w-5 h-5 text-[#16382C]" />
+              <Store className="w-5 h-5 text-[#1F281A]" />
               <span>Chat Penjual Mitra UMKM</span>
             </h2>
             <p className="text-xs text-stone-500 mt-0.5">

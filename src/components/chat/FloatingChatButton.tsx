@@ -45,7 +45,7 @@ export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
         >
           <div className="w-full h-full bg-white rounded-3xl border border-stone-200/90 shadow-2xl flex flex-col overflow-hidden">
             {/* Window Top Controls Bar */}
-            <div className="bg-[#16382C] text-white px-4 py-3 flex items-center justify-between gap-3 shrink-0 shadow-xs">
+            <div className="bg-[#1F281A] text-white px-4 py-3 flex items-center justify-between gap-3 shrink-0 shadow-xs">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-white/10 text-amber-300 flex items-center justify-center shrink-0">
                   <Bot className="w-4 h-4" />
@@ -55,11 +55,11 @@ export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
                     <span className="font-extrabold text-xs sm:text-sm text-white truncate">
                       SisaPiring AI Assistant
                     </span>
-                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#8da249]/25 text-[#8da249] border border-[#8da249]/40 shrink-0">
                       24/7
                     </span>
                   </div>
-                  <span className="text-[10px] text-emerald-200 block truncate">
+                  <span className="text-[10px] text-white/80 block truncate">
                     Asisten Rekomendasi & Panduan Food Safety
                   </span>
                 </div>
@@ -127,20 +127,20 @@ export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="h-12 px-4 rounded-full bg-gradient-to-tr from-[#16382C] to-emerald-800 hover:from-emerald-950 hover:to-emerald-700 text-white shadow-xl hover:shadow-2xl border border-white/25 flex items-center gap-2.5 transition-all transform hover:scale-105 cursor-pointer group"
+            className="h-12 px-4 rounded-full bg-[#8da249] hover:bg-[#7b8e3d] text-white shadow-xl hover:shadow-2xl shadow-[#8da249]/25 border border-white/25 flex items-center gap-2.5 transition-all transform hover:scale-105 cursor-pointer group"
             title="Tanya SisaPiring AI Bot (Rekomendasi & Panduan 24/7)"
             aria-label="Buka Chat dengan Bot AI"
           >
-            <div className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center relative">
-              <Sparkles className="w-4 h-4 text-amber-300 group-hover:rotate-12 transition-transform" />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-[#16382C] animate-pulse" />
+            <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center relative">
+              <Sparkles className="w-4 h-4 text-[#fbe1b5] group-hover:rotate-12 transition-transform" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#f89254] ring-2 ring-[#1F281A] animate-pulse" />
             </div>
 
             <div className="text-left hidden sm:block">
-              <span className="text-xs font-bold font-sans tracking-wide block leading-tight">
+              <span className="text-xs font-bold font-sans tracking-wide block leading-tight text-white">
                 Tanya AI Bot
               </span>
-              <span className="text-[9px] text-amber-300/90 font-mono block leading-none">
+              <span className="text-[9px] text-[#fbe1b5] font-mono block leading-none">
                 Bantuan 24/7
               </span>
             </div>

@@ -322,7 +322,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] pb-12 flex flex-col">
+    <div className="min-h-screen bg-white pb-12 flex flex-col">
       {/* Top Sub-Header with Back Button */}
       <section className="bg-white border-b border-stone-200/90 py-3.5 sm:py-4">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between">
@@ -398,7 +398,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
                     placeholder="Masukkan nama atau email Anda"
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                 </div>
               </div>
@@ -418,7 +418,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="Masukkan kata sandi"
-                    className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                   <button
                     type="button"
@@ -443,7 +443,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full h-12 bg-[#16382C] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs"
+                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs"
               >
                 Masuk Sekarang
               </button>
@@ -454,7 +454,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   <button
                     type="button"
                     onClick={() => switchMode('register')}
-                    className="font-semibold text-[#16382C] underline underline-offset-2 cursor-pointer"
+                    className="font-semibold text-[#1F281A] underline underline-offset-2 cursor-pointer"
                   >
                     Daftar di sini
                   </button>
@@ -489,7 +489,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Contoh: 081234567890"
                     autoFocus
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
+                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
                   />
                 </div>
                 <p className="text-[11px] text-stone-400 mt-1.5">
@@ -505,7 +505,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full h-12 bg-[#16382C] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <span>Lanjut</span>
                 <ArrowRight className="w-4 h-4" />
@@ -517,7 +517,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   <button
                     type="button"
                     onClick={() => switchMode('login')}
-                    className="font-semibold text-[#16382C] underline underline-offset-2 cursor-pointer"
+                    className="font-semibold text-[#1F281A] underline underline-offset-2 cursor-pointer"
                   >
                     Login di sini
                   </button>
@@ -552,7 +552,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Contoh: Nabil Rachman"
                     autoFocus
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                 </div>
               </div>
@@ -572,7 +572,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Contoh: nama@email.com"
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                 </div>
               </div>
@@ -592,7 +592,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimal 6 karakter"
-                    className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                   <button
                     type="button"
@@ -624,7 +624,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Ulangi kata sandi"
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                 </div>
               </div>
@@ -637,7 +637,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full h-12 bg-[#16382C] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <span>Daftarkan Akun</span>
                 <ArrowRight className="w-4 h-4" />
@@ -666,7 +666,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   id="reg-district"
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full h-11 px-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
+                  className="w-full h-11 px-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
                 >
                   {BANDUNG_DISTRICTS.map((d) => (
                     <option key={d} value={d}>
@@ -692,7 +692,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     onChange={(e) => setStreetAddress(e.target.value)}
                     placeholder="Contoh: Jl. Tubagus Ismail Dalam No. 14, RT 02 / RW 05"
                     autoFocus
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                 </div>
               </div>
@@ -710,7 +710,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   value={addressLandmark}
                   onChange={(e) => setAddressLandmark(e.target.value)}
                   placeholder="Contoh: Pagar hitam sebelah warkop"
-                  className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                  className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                 />
               </div>
 
@@ -722,7 +722,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full h-12 bg-[#EE4D2D] hover:bg-[#D73211] active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs"
+                className="w-full h-12 bg-[#f89254] hover:bg-[#e57d3d] active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs"
               >
                 Simpan Alamat Default & Mulai Belanja
               </button>
@@ -732,7 +732,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             <div className="p-5 sm:p-7 space-y-4">
               {umkmSubmitted ? (
                 <div className="py-3 text-center space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-950/10 text-[#16382C] flex items-center justify-center mx-auto">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center mx-auto">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
                   <div className="space-y-1.5">
@@ -744,7 +744,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     </p>
                   </div>
 
-                  <div className="bg-[#FAF9F6] border border-stone-200 rounded-xl p-3.5 text-left space-y-1.5 text-xs text-stone-700">
+                  <div className="bg-white border border-stone-200 rounded-xl p-3.5 text-left space-y-1.5 text-xs text-stone-700">
                     <p>
                       <span className="text-stone-400">Penanggung Jawab:</span>{' '}
                       <strong className="text-stone-900">{umkmOwnerName}</strong>
@@ -770,7 +770,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   <button
                     type="button"
                     onClick={() => switchMode('login')}
-                    className="w-full h-11 bg-[#16382C] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                    className="w-full h-11 bg-[#1F281A] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
                   >
                     Kembali ke Halaman Login
                   </button>
@@ -803,7 +803,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         onChange={(e) => setUmkmOwnerName(e.target.value)}
                         placeholder="Contoh: Bapak Sudarto"
                         autoFocus
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                       />
                     </div>
                   </div>
@@ -823,7 +823,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         value={umkmPhone}
                         onChange={(e) => setUmkmPhone(e.target.value)}
                         placeholder="Contoh: 081234567890"
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
+                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
                       />
                     </div>
                   </div>
@@ -843,7 +843,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         value={umkmEmail}
                         onChange={(e) => setUmkmEmail(e.target.value)}
                         placeholder="Contoh: pemilik@usahaumkm.com"
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                       />
                     </div>
                   </div>
@@ -856,7 +856,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full h-12 bg-[#16382C] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                    className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                   >
                     <span>Lanjut ke Identitas Usaha</span>
                     <ArrowRight className="w-4 h-4" />
@@ -890,7 +890,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         onChange={(e) => setUmkmStoreName(e.target.value)}
                         placeholder="Contoh: Martabak Legit Burangrang"
                         autoFocus
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                       />
                     </div>
                   </div>
@@ -906,7 +906,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       id="umkm-category"
                       value={umkmCategory}
                       onChange={(e) => setUmkmCategory(e.target.value)}
-                      className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
+                      className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
                     >
                       {UMKM_BUSINESS_CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -927,7 +927,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       id="umkm-district"
                       value={umkmDistrict}
                       onChange={(e) => setUmkmDistrict(e.target.value)}
-                      className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
+                      className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
                     >
                       {BANDUNG_DISTRICTS.map((d) => (
                         <option key={d} value={d}>
@@ -952,7 +952,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         value={umkmAddress}
                         onChange={(e) => setUmkmAddress(e.target.value)}
                         placeholder="Contoh: Jl. Burangrang No. 34, Seberang SMA 7 Bandung"
-                        className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                       />
                     </div>
                   </div>
@@ -976,7 +976,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 h-12 bg-[#16382C] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                      className="flex-1 h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                     >
                       <span>Lanjut ke Dokumen Usaha</span>
                       <ArrowRight className="w-4 h-4" />
@@ -1002,7 +1002,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     </label>
                     <label
                       htmlFor="umkm-photo-upload"
-                      className="flex flex-col items-center justify-center border-2 border-dashed border-stone-300 hover:border-[#16382C] bg-[#FAF9F6] rounded-xl p-4 text-center cursor-pointer transition-colors"
+                      className="flex flex-col items-center justify-center border-2 border-dashed border-stone-300 hover:border-[#1F281A] bg-white rounded-xl p-4 text-center cursor-pointer transition-colors"
                     >
                       {umkmPhotoPreview ? (
                         <div className="space-y-2 w-full">
@@ -1011,7 +1011,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                             alt="Preview Foto Usaha"
                             className="w-full h-32 object-cover rounded-lg border border-stone-200"
                           />
-                          <p className="text-xs font-medium text-[#16382C] truncate">
+                          <p className="text-xs font-medium text-[#1F281A] truncate">
                             {umkmPhotoName}
                           </p>
                           <span className="inline-block text-[11px] text-stone-500 underline">
@@ -1054,7 +1054,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         id="umkm-doc-type"
                         value={umkmDocType}
                         onChange={(e) => setUmkmDocType(e.target.value)}
-                        className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
+                        className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
                       >
                         {UMKM_DOC_TYPES.map((doc) => (
                           <option key={doc} value={doc}>
@@ -1066,10 +1066,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
                     <label
                       htmlFor="umkm-doc-upload"
-                      className="flex items-center justify-between gap-3 border border-stone-300 hover:border-[#16382C] bg-[#FAF9F6] rounded-xl px-3.5 py-3 cursor-pointer transition-colors"
+                      className="flex items-center justify-between gap-3 border border-stone-300 hover:border-[#1F281A] bg-white rounded-xl px-3.5 py-3 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-950/10 text-[#16382C] flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-950/10 text-[#1F281A] flex items-center justify-center shrink-0">
                           <FileText className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
@@ -1114,7 +1114,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 h-12 bg-[#16382C] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
+                      className="flex-1 h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
                     >
                       Kirim Pendaftaran UMKM
                     </button>
@@ -1130,9 +1130,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             <button
               type="button"
               onClick={() => switchMode('register-umkm')}
-              className="w-full h-12 bg-white hover:bg-stone-100 text-[#16382C] border border-[#16382C]/30 rounded-2xl text-xs sm:text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors shadow-2xs cursor-pointer"
+              className="w-full h-12 bg-white hover:bg-stone-100 text-[#1F281A] border border-[#1F281A]/30 rounded-2xl text-xs sm:text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors shadow-2xs cursor-pointer"
             >
-              <Store className="w-4 h-4 text-[#16382C]" />
+              <Store className="w-4 h-4 text-[#1F281A]" />
               <span>Daftar UMKM</span>
             </button>
           )}
@@ -1157,7 +1157,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-emerald-950/10 text-[#16382C] flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-6 h-6" />
             </div>
 
@@ -1176,7 +1176,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             <button
               type="button"
               onClick={() => setShowSuccessRegisterPopup(false)}
-              className="w-full h-11 bg-[#16382C] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+              className="w-full h-11 bg-[#1F281A] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
             >
               Lanjut Isi Alamat Default
             </button>

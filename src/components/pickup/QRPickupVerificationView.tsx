@@ -76,7 +76,7 @@ export const QRPickupVerificationView: React.FC = () => {
     <div className="p-4 md:p-8 space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
+        <h1 className="text-xl md:text-2xl font-bold text-[#1F281A] tracking-tight">
           Verifikasi Penjemputan Pesanan (QR & PIN)
         </h1>
         <p className="text-xs text-neutral-500 mt-1">
@@ -91,8 +91,8 @@ export const QRPickupVerificationView: React.FC = () => {
           <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Scan className="w-5 h-5 text-[#EE4D2D]" />
-                <h3 className="text-sm font-bold text-[#16382C]">Scanner QR Kasir</h3>
+                <Scan className="w-5 h-5 text-[#f89254]" />
+                <h3 className="text-sm font-bold text-[#1F281A]">Scanner QR Kasir</h3>
               </div>
               <button
                 type="button"
@@ -104,16 +104,16 @@ export const QRPickupVerificationView: React.FC = () => {
             </div>
 
             {/* Interactive Scanner Viewport */}
-            <div className="relative aspect-4/3 bg-[#0F261E] rounded-xl overflow-hidden flex flex-col items-center justify-center text-white border-2 border-[#16382C] shadow-inner">
+            <div className="relative aspect-4/3 bg-[#141A11] rounded-xl overflow-hidden flex flex-col items-center justify-center text-white border-2 border-[#1F281A] shadow-inner">
               {/* Scan Reticle */}
-              <div className="relative w-48 h-48 sm:w-56 sm:h-56 border-2 border-dashed border-[#FFD230] rounded-2xl flex items-center justify-center p-4">
+              <div className="relative w-48 h-48 sm:w-56 sm:h-56 border-2 border-dashed border-[#fbe1b5] rounded-2xl flex items-center justify-center p-4">
                 {/* Laser animation */}
                 {isScanning && (
-                  <div className="absolute left-0 right-0 h-0.5 bg-[#EE4D2D] shadow-[0_0_12px_#EE4D2D] animate-pulse top-1/2 -translate-y-1/2" />
+                  <div className="absolute left-0 right-0 h-0.5 bg-[#f89254] shadow-[0_0_12px_#f89254] animate-pulse top-1/2 -translate-y-1/2" />
                 )}
 
                 <div className="text-center p-3">
-                  <QrCode className="w-12 h-12 text-[#FFD230] mx-auto opacity-80" />
+                  <QrCode className="w-12 h-12 text-[#fbe1b5] mx-auto opacity-80" />
                   <p className="text-[11px] text-white/80 mt-2 font-medium">
                     Arahkan QR Code Tiket Pembeli SisaPiring ke dalam kotak
                   </p>
@@ -123,7 +123,7 @@ export const QRPickupVerificationView: React.FC = () => {
               {/* Status pill overlay */}
               <div className="absolute bottom-3 left-3 right-3 text-center">
                 <span className="text-[11px] text-white/90 bg-black/50 backdrop-blur-xs px-3 py-1 rounded-full">
-                  Status Scanner: <span className="text-[#FFD230] font-mono">STANDBY / AKTIF</span>
+                  Status Scanner: <span className="text-[#fbe1b5] font-mono">STANDBY / AKTIF</span>
                 </span>
               </div>
             </div>
@@ -141,15 +141,15 @@ export const QRPickupVerificationView: React.FC = () => {
                     onChange={(e) => setInputCode(e.target.value.toUpperCase())}
                     onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
                     placeholder="Contoh: SP-7842 atau SP-BDG-..."
-                    className="w-full px-3.5 py-2.5 text-sm font-mono tracking-wider bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16382C]/20 focus:border-[#16382C]"
+                    className="w-full px-3.5 py-2.5 text-sm font-mono tracking-wider bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F281A]/20 focus:border-[#1F281A]"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => handleVerify()}
-                  className="px-5 py-2.5 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0 flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0 flex items-center gap-1.5"
                 >
-                  <PackageCheck className="w-4 h-4 text-[#FFD230]" />
+                  <PackageCheck className="w-4 h-4 text-[#fbe1b5]" />
                   <span>Verifikasi</span>
                 </button>
               </div>
@@ -171,15 +171,15 @@ export const QRPickupVerificationView: React.FC = () => {
                 <div
                   key={ord.id}
                   onClick={() => handleSimulateScan(ord)}
-                  className="p-2.5 bg-white rounded-xl border border-neutral-200 hover:border-[#16382C] cursor-pointer transition-all flex items-center justify-between text-xs group"
+                  className="p-2.5 bg-white rounded-xl border border-neutral-200 hover:border-[#1F281A] cursor-pointer transition-all flex items-center justify-between text-xs group"
                 >
                   <div className="min-w-0 pr-2">
-                    <p className="font-mono font-bold text-[#EE4D2D] group-hover:text-[#16382C]">
+                    <p className="font-mono font-bold text-[#f89254] group-hover:text-[#1F281A]">
                       {ord.pickupCode}
                     </p>
                     <p className="text-[11px] text-neutral-700 truncate">{ord.customerName}</p>
                   </div>
-                  <span className="text-[10px] font-semibold bg-neutral-100 group-hover:bg-[#16382C] group-hover:text-white px-2 py-1 rounded transition-colors shrink-0">
+                  <span className="text-[10px] font-semibold bg-neutral-100 group-hover:bg-[#1F281A] group-hover:text-white px-2 py-1 rounded transition-colors shrink-0">
                     Scan Ini
                   </span>
                 </div>
@@ -225,7 +225,7 @@ export const QRPickupVerificationView: React.FC = () => {
           {verificationResult.status === 'success' && verificationResult.order && (
             <div className="bg-white rounded-2xl border-2 border-emerald-500 shadow-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
               <div className="bg-emerald-600 text-white p-4 text-center">
-                <CheckCircle2 className="w-10 h-10 mx-auto text-[#FFD230] mb-1" />
+                <CheckCircle2 className="w-10 h-10 mx-auto text-[#fbe1b5] mb-1" />
                 <h3 className="text-base font-bold">Verifikasi Berhasil Disahkan!</h3>
                 <p className="text-xs text-white/90">
                   Status otomatis diubah menjadi <strong>Selesai (Completed)</strong>
@@ -236,11 +236,11 @@ export const QRPickupVerificationView: React.FC = () => {
                 <div className="flex justify-between items-center pb-3 border-b border-neutral-100">
                   <div>
                     <span className="text-neutral-400 text-[10px] uppercase font-semibold">ID Pesanan</span>
-                    <p className="font-mono font-bold text-sm text-[#16382C]">{verificationResult.order.id}</p>
+                    <p className="font-mono font-bold text-sm text-[#1F281A]">{verificationResult.order.id}</p>
                   </div>
                   <div className="text-right">
                     <span className="text-neutral-400 text-[10px] uppercase font-semibold">PIN Tiket</span>
-                    <p className="font-mono font-bold text-sm text-[#EE4D2D]">
+                    <p className="font-mono font-bold text-sm text-[#f89254]">
                       {verificationResult.order.pickupCode}
                     </p>
                   </div>
@@ -271,7 +271,7 @@ export const QRPickupVerificationView: React.FC = () => {
                     ))}
                     <div className="pt-2 border-t border-neutral-200 flex justify-between font-bold text-neutral-900">
                       <span>Total Bayar</span>
-                      <span className="font-mono text-[#16382C]">
+                      <span className="font-mono text-[#1F281A]">
                         {verificationResult.order.totalPayment === 0
                           ? 'Rp 0 (Donasi)'
                           : formatRupiah(verificationResult.order.totalPayment)}

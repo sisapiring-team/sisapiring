@@ -2052,41 +2052,101 @@ function CustomerAndAdminPortal() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-                <div className="p-6 sm:p-7 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 space-y-3 shadow-xs">
-                  <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs">
-                    01
-                  </span>
-                  <h3 className="text-base font-bold text-stone-900">
-                    Pilih Menu Spesifik di Sekitar Anda
-                  </h3>
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                    Setiap pukul 15.00–17.00 WIB, mitra toko roti, kafe, dan rumah makan memperbarui jumlah porsi berlebih mereka dengan potongan harga minimal 50%.
-                  </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+                {/* Langkah 01 */}
+                <div className="p-5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
+                        01
+                      </span>
+                      <h3 className="text-base font-bold text-stone-900 leading-snug">
+                        Pilih Menu Spesifik di Sekitar Anda
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                      Setiap pukul 15.00–17.00 WIB, mitra toko roti, kafe, dan rumah makan memperbarui jumlah porsi berlebih mereka dengan potongan harga minimal 50%.
+                    </p>
+                  </div>
+
+                  <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
+                    <div className="h-44 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                      <ResilientImage
+                        src="/assets/steps/step1-pilih-menu.png"
+                        alt="Tangkapan layar katalog menu etalase di aplikasi SisaPiring"
+                        fallbackTitle="Katalog Menu Etalase"
+                        className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="px-3 py-2 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                      <span className="font-semibold text-stone-700">Tampilan Menu Aplikasi</span>
+                      <span className="text-[#8DA249] font-medium">Etalase Makanan</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="p-6 sm:p-7 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 space-y-3 shadow-xs">
-                  <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs">
-                    02
-                  </span>
-                  <h3 className="text-base font-bold text-stone-900">
-                    Kunci Pesanan & Dapatkan Kode Tiket
-                  </h3>
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                    Pesan langsung dari halaman etalase dan bayar menggunakan QRIS instan bebas biaya admin atau bayar tunai saat mengambil di kasir mitra UMKM.
-                  </p>
+                {/* Langkah 02 */}
+                <div className="p-5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
+                        02
+                      </span>
+                      <h3 className="text-base font-bold text-stone-900 leading-snug">
+                        Kunci Pesanan & Dapatkan Kode Tiket
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                      Pesan langsung dari halaman etalase dan bayar menggunakan QRIS instan bebas biaya admin atau bayar tunai saat mengambil di kasir mitra UMKM.
+                    </p>
+                  </div>
+
+                  <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
+                    <div className="h-44 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                      <ResilientImage
+                        src="/assets/steps/step2-kunci-pesanan.png"
+                        alt="Tangkapan layar kode pesanan dan pembayaran QRIS di aplikasi SisaPiring"
+                        fallbackTitle="Kode Tiket Pesanan"
+                        className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="px-3 py-2 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                      <span className="font-semibold text-stone-700">Kode Tiket & QRIS</span>
+                      <span className="text-[#8DA249] font-medium">Lunas Instan</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="p-6 sm:p-7 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 space-y-3 shadow-xs">
-                  <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs">
-                    03
-                  </span>
-                  <h3 className="text-base font-bold text-stone-900">
-                    Jemput Hidangan pada Jam Penyelamatan
-                  </h3>
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                    Datang ke lokasi UMKM sesuai jadwal ambil (misal 18.30–20.30 WIB), tunjukkan kode tiket pesanan SisaPiring, dan nikmati santapan berkualitas.
-                  </p>
+                {/* Langkah 03 */}
+                <div className="p-5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
+                        03
+                      </span>
+                      <h3 className="text-base font-bold text-stone-900 leading-snug">
+                        Jemput Hidangan pada Jam Penyelamatan
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                      Datang ke lokasi UMKM sesuai jadwal ambil (misal 18.30–20.30 WIB), tunjukkan kode tiket pesanan SisaPiring, dan nikmati santapan berkualitas.
+                    </p>
+                  </div>
+
+                  <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
+                    <div className="h-44 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                      <ResilientImage
+                        src="/assets/steps/step3-jemput-hidangan.png"
+                        alt="Tangkapan layar status pengiriman dan penjemputan pesanan di aplikasi SisaPiring"
+                        fallbackTitle="Pelacakan Pesanan"
+                        className="w-full h-full object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="px-3 py-2 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                      <span className="font-semibold text-stone-700">Pelacakan Real-Time</span>
+                      <span className="text-[#8DA249] font-medium">Status Ambil / Antar</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 

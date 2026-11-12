@@ -25,7 +25,7 @@ import { useApp } from '../context/AppContext';
 import { AdminTab, AdminMacroStats } from './admin/types';
 import { AdminSidebar } from './admin/AdminSidebar';
 import { AdminMobileDrawer } from './admin/AdminMobileDrawer';
-import { AdminFloatingNavbar } from './admin/AdminFloatingNavbar';
+import { AdminTopInfoBar } from './admin/AdminTopInfoBar';
 
 // Modular Admin Tab Views
 import { OverviewTab } from './admin/tabs/OverviewTab';
@@ -283,17 +283,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0c141d] text-neutral-100 font-sans relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-white">
-      {/* Subtle Background Radial Gradient for Aesthetic Depth */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(14,165,233,0.08),rgba(255,255,255,0))]" />
-
+    <div className="flex h-screen w-full bg-[#FAF9F6] text-neutral-900 overflow-hidden font-sans">
       {/* Toast Feedback */}
       {adminToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#131c26]/98 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-cyan-500/40 animate-in fade-in slide-in-from-bottom-4 backdrop-blur-xl">
-          <CheckCircle2 className="w-5 h-5 text-cyan-400 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[#16382C] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-500/30 animate-in fade-in slide-in-from-bottom-4">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <div>
             <h5 className="font-bold text-xs">{adminToast.title}</h5>
-            <p className="text-[11px] text-neutral-300">{adminToast.message}</p>
+            <p className="text-[11px] text-emerald-200">{adminToast.message}</p>
           </div>
           <button
             type="button"
@@ -305,16 +302,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
       )}
 
-      {/* 1. TOP FLOATING NAVBAR (MATCHING SCREENSHOT) */}
-      <AdminFloatingNavbar
-        macroStats={macroStats}
-        onMobileMenuToggle={() => setMobileSidebarOpen(true)}
-        onSwitchToPublicEtalase={onSwitchToPublicEtalase}
-        onSwitchToSellerPortal={onSwitchToSellerPortal}
-      />
-
-      {/* 2. DESKTOP FLOATING LEFT SIDEBAR RAIL (MATCHING SCREENSHOT) */}
-      <div className="hidden lg:block">
+      {/* 1. Desktop Left Sidebar (Navigation Moved Here!) */}
+      <div className="hidden lg:flex shrink-0 h-full">
         <AdminSidebar
           activeTab={activeTab}
           onTabChange={handleTabChange}
@@ -324,7 +313,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         />
       </div>
 
-      {/* 3. MOBILE DRAWER NAVIGATION */}
+      {/* 2. Mobile Drawer Navigation */}
       <AdminMobileDrawer
         isOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
@@ -335,112 +324,120 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         onSwitchToSellerPortal={onSwitchToSellerPortal}
       />
 
-      {/* 4. MAIN SCROLLABLE CONTENT AREA */}
-      <main className="pt-20 sm:pt-24 pl-4 sm:pl-20 xl:pl-24 pr-4 sm:pr-6 pb-12 w-full max-w-7xl mx-auto relative z-10 space-y-6">
-        {activeTab === 'overview' && (
-          <OverviewTab
-            macroStats={macroStats}
-            umkmVerifications={umkmVerifications}
-            catalogItems={catalogItems}
-            orders={orders}
-            onSelectTab={setActiveTab}
-            onExportCSV={handleExportCSV}
-            onFilterPendingUmkm={() => {
-              setActiveTab('seller-governance');
-              setSellerStatusFilter('Menunggu Verifikasi');
-            }}
-          />
-        )}
+      {/* 3. Main Workspace Viewport */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Top Header (Full of Information Only!) */}
+        <AdminTopInfoBar
+          activeTab={activeTab}
+          macroStats={macroStats}
+          onMobileMenuToggle={() => setMobileSidebarOpen(true)}
+        />
 
-        {(activeTab === 'stores' || activeTab === 'seller-governance') && (
-          <SellerGovernanceTab
-            displayUmkmList={displayUmkmList}
-            sellerStatusFilter={sellerStatusFilter}
-            onStatusFilterChange={setSellerStatusFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            sellerProfile={sellerProfile}
-            onSelectUmkm={setSelectedUmkmModal}
-            onOpenPublicStore={onOpenPublicStore}
-            onSwitchToSellerPortal={onSwitchToSellerPortal}
-          />
-        )}
+        {/* Scrollable Tab Workspace */}
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          {activeTab === 'overview' && (
+            <OverviewTab
+              macroStats={macroStats}
+              umkmVerifications={umkmVerifications}
+              onSelectTab={setActiveTab}
+              onExportCSV={handleExportCSV}
+              onFilterPendingUmkm={() => {
+                setActiveTab('seller-governance');
+                setSellerStatusFilter('Menunggu Verifikasi');
+              }}
+            />
+          )}
 
-        {(activeTab === 'products' || activeTab === 'product-curation') && (
-          <ProductCurationTab
-            displayProducts={displayProducts}
-            productMonitoring={productMonitoring}
-            productStatusFilter={productStatusFilter}
-            onStatusFilterChange={setProductStatusFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onRestoreProduct={(itemId, title) => {
-              onUpdateProductMonitoring(itemId, 'Aktif & Aman');
-              showToast('Produk Dipulihkan', `"${title}" kembali tayang di etalase.`);
-            }}
-            onRequestTakedown={setTakedownModalItem}
-          />
-        )}
+          {activeTab === 'seller-governance' && (
+            <SellerGovernanceTab
+              displayUmkmList={displayUmkmList}
+              sellerStatusFilter={sellerStatusFilter}
+              onStatusFilterChange={setSellerStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              sellerProfile={sellerProfile}
+              onSelectUmkm={setSelectedUmkmModal}
+              onOpenPublicStore={onOpenPublicStore}
+              onSwitchToSellerPortal={onSwitchToSellerPortal}
+            />
+          )}
 
-        {(activeTab === 'orders' || activeTab === 'order-escrow') && (
-          <OrderEscrowTab
-            transactions={transactions}
-            orders={orders}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            macroStats={macroStats}
-            onReleaseEscrow={(trx) => {
-              onUpdateTransactionGateway(
-                trx.id,
-                'Selesai (Settled)',
-                'Dilepaskan secara manual oleh Admin setelah audit serah terima barang.'
-              );
-              showToast('Escrow Dicairkan', `Dana pesanan ${trx.orderCode} diteruskan ke UMKM.`);
-            }}
-          />
-        )}
+          {activeTab === 'product-curation' && (
+            <ProductCurationTab
+              displayProducts={displayProducts}
+              productMonitoring={productMonitoring}
+              productStatusFilter={productStatusFilter}
+              onStatusFilterChange={setProductStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onRestoreProduct={(itemId, title) => {
+                onUpdateProductMonitoring(itemId, 'Aktif & Aman');
+                showToast('Produk Dipulihkan', `"${title}" kembali tayang di etalase.`);
+              }}
+              onRequestTakedown={setTakedownModalItem}
+            />
+          )}
 
-        {(activeTab === 'complaints' || activeTab === 'disputes-refund') && (
-          <DisputesRefundTab
-            displayDisputes={displayDisputes}
-            disputeStatusFilter={disputeStatusFilter}
-            onStatusFilterChange={setDisputeStatusFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onSelectDispute={setSelectedDisputeModal}
-            onRejectDispute={(dispute) => {
-              onResolveDispute(
-                dispute.id,
-                'Ditolak (Bukti Tidak Valid)',
-                'Bukti tidak memenuhi kriteria komplain garansi mutu makanan.'
-              );
-              showToast('Laporan Ditolak', `Tiket #${dispute.ticketCode} ditutup.`);
-            }}
-          />
-        )}
+          {activeTab === 'order-escrow' && (
+            <OrderEscrowTab
+              transactions={transactions}
+              orders={orders}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              macroStats={macroStats}
+              onReleaseEscrow={(trx) => {
+                onUpdateTransactionGateway(
+                  trx.id,
+                  'Selesai (Settled)',
+                  'Dilepaskan secara manual oleh Admin setelah audit serah terima barang.'
+                );
+                showToast('Escrow Dicairkan', `Dana pesanan ${trx.orderCode} diteruskan ke UMKM.`);
+              }}
+            />
+          )}
 
-        {activeTab === 'reviews-moderation' && <ReviewsModerationTab />}
+          {activeTab === 'disputes-refund' && (
+            <DisputesRefundTab
+              displayDisputes={displayDisputes}
+              disputeStatusFilter={disputeStatusFilter}
+              onStatusFilterChange={setDisputeStatusFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onSelectDispute={setSelectedDisputeModal}
+              onRejectDispute={(dispute) => {
+                onResolveDispute(
+                  dispute.id,
+                  'Ditolak (Bukti Tidak Valid)',
+                  'Bukti tidak memenuhi kriteria komplain garansi mutu makanan.'
+                );
+                showToast('Laporan Ditolak', `Tiket #${dispute.ticketCode} ditutup.`);
+              }}
+            />
+          )}
 
-        {(activeTab === 'users' || activeTab === 'user-access') && (
-          <UserAccessTab
-            displayUsers={displayUsers}
-            roleFilter={roleFilter}
-            onRoleFilterChange={setRoleFilter}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onOpenAddUserModal={() => setIsAddUserModalOpen(true)}
-            onToggleUserStatus={(u) => {
-              if (u.status === 'Aktif') {
-                onUpdateUserAccess(u.id, u.role, 'Suspended', 'Dibekukan oleh Admin');
-                showToast('Akun Dibekukan', `Akun ${u.name} dinonaktifkan.`);
-              } else {
-                onUpdateUserAccess(u.id, u.role, 'Aktif');
-                showToast('Akun Dipulihkan', `Akun ${u.name} aktif kembali.`);
-              }
-            }}
-          />
-        )}
-      </main>
+          {activeTab === 'reviews-moderation' && <ReviewsModerationTab />}
+
+          {activeTab === 'user-access' && (
+            <UserAccessTab
+              displayUsers={displayUsers}
+              roleFilter={roleFilter}
+              onRoleFilterChange={setRoleFilter}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onOpenAddUserModal={() => setIsAddUserModalOpen(true)}
+              onToggleUserStatus={(u) => {
+                if (u.status === 'Aktif') {
+                  onUpdateUserAccess(u.id, u.role, 'Suspended', 'Dibekukan oleh Admin');
+                  showToast('Akun Dibekukan', `Akun ${u.name} dinonaktifkan.`);
+                } else {
+                  onUpdateUserAccess(u.id, u.role, 'Aktif');
+                  showToast('Akun Dipulihkan', `Akun ${u.name} aktif kembali.`);
+                }
+              }}
+            />
+          )}
+        </main>
+      </div>
 
       {/* 4. Interactive Dialog Modals */}
       <UmkmVerificationModal

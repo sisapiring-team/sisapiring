@@ -19,42 +19,42 @@ export const CULINARY_CATEGORIES: CulinaryCategoryItem[] = [
   {
     id: 'Martabak',
     label: 'Martabak',
-    imageUrl: '/src/assets/images/cat_martabak_1794300332100.jpg',
+    imageUrl: '/assets/images/cat_martabak_1794300332100.jpg',
   },
   {
     id: 'Bakso & soto',
     label: 'Bakso & soto',
-    imageUrl: '/src/assets/images/cat_bakso_soto_1794300332564.jpg',
+    imageUrl: '/assets/images/cat_bakso_soto_1794300332564.jpg',
   },
   {
     id: 'Jajanan',
     label: 'Jajanan',
-    imageUrl: '/src/assets/images/food_kopi_jajanan_pasar_1794295654124.jpg',
+    imageUrl: '/assets/images/food_kopi_jajanan_pasar_1794295654124.jpg',
   },
   {
     id: 'Bakmie',
     label: 'Bakmie',
-    imageUrl: '/src/assets/images/cat_bakmie_1794300333306.jpg',
+    imageUrl: '/assets/images/cat_bakmie_1794300333306.jpg',
   },
   {
     id: 'Roti',
     label: 'Roti',
-    imageUrl: '/src/assets/images/food_artisan_pastry_box_1794295651168.jpg',
+    imageUrl: '/assets/images/food_artisan_pastry_box_1794295651168.jpg',
   },
   {
     id: 'Minuman',
     label: 'Minuman',
-    imageUrl: '/src/assets/images/cat_minuman_es_1794300334138.jpg',
+    imageUrl: '/assets/images/cat_minuman_es_1794300334138.jpg',
   },
   {
     id: 'Nasi & Lauk',
     label: 'Nasi & Lauk',
-    imageUrl: '/src/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
+    imageUrl: '/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
   },
   {
     id: 'Sehat & Segar',
     label: 'Sehat & Segar',
-    imageUrl: '/src/assets/images/food_healthy_salad_wrap_1794295654632.jpg',
+    imageUrl: '/assets/images/food_healthy_salad_wrap_1794295654632.jpg',
   },
 ];
 
@@ -119,8 +119,8 @@ export interface MerchantStory {
   beforeAfterSummary: string;
 }
 
-export const HERO_IMAGE_PATH = '/src/assets/images/hero_umkm_bakery_1794295650050.jpg';
-export const PARTNER_PORTRAIT_PATH = '/src/assets/images/umkm_partner_portrait_1794295655906.jpg';
+export const HERO_IMAGE_PATH = '/assets/images/hero_umkm_bakery_1794295650050.jpg';
+export const PARTNER_PORTRAIT_PATH = '/assets/images/umkm_partner_portrait_1794295655906.jpg';
 
 export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
   {
@@ -144,7 +144,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dipanggang 07.00 WIB',
     rating: 5.0,
     rescuedTotalCount: 420,
-    imageUrl: '/src/assets/images/sisapiring_bakery_1794322284427.jpg',
+    imageUrl: '/assets/images/sisapiring_bakery_1794322284427.jpg',
     shortDescription:
       'Tiga pastry butter premium Prancis yang dipanggang pagi hari. Renyah di luar, lembut berlapis di dalam.',
     contentsList: [
@@ -178,7 +178,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dipanggang 06.30 WIB',
     rating: 4.9,
     rescuedTotalCount: 280,
-    imageUrl: '/src/assets/images/sisapiring_bakery_1794322284427.jpg',
+    imageUrl: '/assets/images/sisapiring_bakery_1794322284427.jpg',
     shortDescription:
       'Roti sourdough fermentasi alami 24 jam dengan tepung gandum utuh. Tanpa pengawet dan perasa buatan.',
     contentsList: [
@@ -212,7 +212,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Disiapkan 09.00 WIB',
     rating: 5.0,
     rescuedTotalCount: 310,
-    imageUrl: '/src/assets/images/sisapiring_pastry_cake_1794322285409.jpg',
+    imageUrl: '/assets/images/sisapiring_pastry_cake_1794322285409.jpg',
     shortDescription:
       'Kombinasi New York cheesecake lembut dengan topping stroberi Ciwidey segar dan eclair cokelat kaya rasa.',
     contentsList: [
@@ -246,7 +246,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dipanggang 18.00 WIB',
     rating: 4.9,
     rescuedTotalCount: 1640,
-    imageUrl: '/src/assets/images/cat_martabak_1794300332100.jpg',
+    imageUrl: '/assets/images/cat_martabak_1794300332100.jpg',
     shortDescription:
       'Satu loyang penuh martabak manis bersarang lembut dengan parutan keju cheddar melimpah, susu kental manis, dan taburan cokelat kacang.',
     contentsList: [
@@ -280,7 +280,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Direbus 15.00 WIB',
     rating: 4.9,
     rescuedTotalCount: 1850,
-    imageUrl: '/src/assets/images/cat_bakso_soto_1794300332564.jpg',
+    imageUrl: '/assets/images/cat_bakso_soto_1794300332564.jpg',
     shortDescription:
       'Dua porsi bakso urat daging sapi giling segar lengkap dengan mie kuning, bihun, tahu bakso, seledri, bawang goreng, dan kuah kaldu tulang.',
     contentsList: [
@@ -315,7 +315,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dibuat 13.00 WIB',
     rating: 4.8,
     rescuedTotalCount: 960,
-    imageUrl: '/src/assets/images/food_kopi_jajanan_pasar_1794295654124.jpg',
+    imageUrl: '/assets/images/food_kopi_jajanan_pasar_1794295654124.jpg',
     shortDescription:
       'Kotak kudapan sore berisi klepon pandan gula merah lumer, kue lumpur kentang kismis, risoles ragout ayam, dan pastel sayur.',
     contentsList: [
@@ -350,7 +350,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Digiling 11.00 WIB',
     rating: 4.9,
     rescuedTotalCount: 1490,
-    imageUrl: '/src/assets/images/cat_bakmie_1794300333306.jpg',
+    imageUrl: '/assets/images/cat_bakmie_1794300333306.jpg',
     shortDescription:
       'Dua porsi mie yamin telur kenyal buatan sendiri khas Bandung dengan topping ayam cincang jamur kecap, sawi hijau segar, pangsit goreng, dan kuah kaldu.',
     contentsList: [
@@ -385,7 +385,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dipanggang 06.30 WIB',
     rating: 4.9,
     rescuedTotalCount: 1420,
-    imageUrl: '/src/assets/images/food_artisan_pastry_box_1794295651168.jpg',
+    imageUrl: '/assets/images/food_artisan_pastry_box_1794295651168.jpg',
     shortDescription:
       'Berisi 4–5 potong pastry panggang pagi ini (Butter Croissant, Pain au Chocolat, dan Cheese Danish) yang masih renyah dan harum mentega.',
     contentsList: [
@@ -420,7 +420,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Diseduh 16.00 WIB',
     rating: 4.8,
     rescuedTotalCount: 1120,
-    imageUrl: '/src/assets/images/cat_minuman_es_1794300334138.jpg',
+    imageUrl: '/assets/images/cat_minuman_es_1794300334138.jpg',
     shortDescription:
       'Bundel hemat 3 minuman ukuran reguler berisi 2 Brown Sugar Boba Fresh Milk susu Lembang dan 1 Authentic Iced Thai Tea dengan boba kenyal.',
     contentsList: [
@@ -454,7 +454,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dimasak 11.30 WIB',
     rating: 4.9,
     rescuedTotalCount: 2180,
-    imageUrl: '/src/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
+    imageUrl: '/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
     shortDescription:
       'Porsi lengkap nasi putih hangat dengan potongan daging rendang empuk, gulai nangka muda, daun singkong rebus, dan sambal lado hijau segar.',
     contentsList: [
@@ -489,7 +489,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Diracik 10.00 WIB',
     rating: 4.9,
     rescuedTotalCount: 1310,
-    imageUrl: '/src/assets/images/food_healthy_salad_wrap_1794295654632.jpg',
+    imageUrl: '/assets/images/food_healthy_salad_wrap_1794295654632.jpg',
     shortDescription:
       'Kombinasi tortilla gandum ayam panggang, semangkuk quinoa sayur panggang Lembang, dan 1 botol jus cold-pressed mangga-nanas murni tanpa gula.',
     contentsList: [
@@ -524,7 +524,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dipanggang 07.00 WIB',
     rating: 5.0,
     rescuedTotalCount: 3040,
-    imageUrl: '/src/assets/images/umkm_partner_portrait_1794295655906.jpg',
+    imageUrl: '/assets/images/umkm_partner_portrait_1794295655906.jpg',
     shortDescription:
       'Kantong kejutan berisi 1 loaf sourdough gandum utuh ukuran medium serta 4 donat kentang klasik dan roti manis isi cokelat keju.',
     contentsList: [
@@ -559,7 +559,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     freshBakedTime: 'Dimasak 14.00 WIB',
     rating: 4.8,
     rescuedTotalCount: 890,
-    imageUrl: '/src/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
+    imageUrl: '/assets/images/food_nasi_kapau_bowl_1794295653656.jpg',
     shortDescription:
       'Porsi cukup untuk 2–3 orang berisi empal daging bumbu ketumbar, tahu tempe bacem, tumis buncis teri, dan dua porsi nasi hangat.',
     contentsList: [

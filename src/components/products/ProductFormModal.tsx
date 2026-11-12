@@ -25,10 +25,10 @@ interface ProductFormModalProps {
 }
 
 const SAMPLE_FOOD_IMAGES = [
-  { label: 'Artisan Bakery & Croissant', url: '/src/assets/images/sisapiring_bakery_1794322284427.jpg' },
-  { label: 'Nasi Kotak Ayam Bakar', url: '/src/assets/images/sisapiring_nasi_kotak_1794322285485.jpg' },
-  { label: 'Pastry & Cheesecake Slice', url: '/src/assets/images/sisapiring_pastry_cake_1794322285409.jpg' },
-  { label: 'Storefront Kala Bakehouse', url: '/src/assets/images/sisapiring_storefront_1794322286782.jpg' },
+  { label: 'Artisan Bakery & Croissant', url: '/assets/images/sisapiring_bakery_1794322284427.jpg' },
+  { label: 'Nasi Kotak Ayam Bakar', url: '/assets/images/sisapiring_nasi_kotak_1794322285485.jpg' },
+  { label: 'Pastry & Cheesecake Slice', url: '/assets/images/sisapiring_pastry_cake_1794322285409.jpg' },
+  { label: 'Storefront Kala Bakehouse', url: '/assets/images/sisapiring_storefront_1794322286782.jpg' },
 ];
 
 export const ProductFormModal: React.FC<ProductFormModalProps> = ({

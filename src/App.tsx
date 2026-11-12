@@ -155,7 +155,7 @@ function CustomerAndAdminPortal() {
         return route.page;
       }
     }
-    return activeTab === 'admin' ? 'admin' : 'etalase';
+    return activeTab === 'admin' ? 'admin' : 'landing';
   });
 
   // Sync activeTab with activePage for direct routing between Seller, Customer, and Admin portals
@@ -476,6 +476,8 @@ function CustomerAndAdminPortal() {
 
   const navigateToSection = (sectionId: string) => {
     if (activePage !== 'landing') {
+      pushRoute('/');
+      setActiveTab('marketplace');
       setActivePage('landing');
       window.setTimeout(() => {
         const el = document.getElementById(sectionId);
@@ -890,7 +892,7 @@ function CustomerAndAdminPortal() {
           ? 'h-screen max-h-screen overflow-hidden'
           : 'min-h-screen overflow-x-hidden'
       } flex flex-col bg-white text-stone-900 ${
-        activePage !== 'auth' && activePage !== 'admin'
+        activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
           ? 'pb-16'
           : ''
       }`}
@@ -908,102 +910,153 @@ function CustomerAndAdminPortal() {
             SisaPiring
           </button>
 
-          {/* Zone 2: 7 concise single-line navigation links (Desktop) */}
+          {/* Zone 2: Navigation Links (Desktop) */}
           <nav
             aria-label="Navigasi Utama"
-            className="hidden lg:flex items-center gap-6 xl:gap-7 text-sm font-display font-medium text-stone-100"
+            className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-display font-medium text-stone-100"
           >
-            <button
-              type="button"
-              onClick={openLandingPage}
-              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'landing' ? 'text-[#8da249] underline' : ''
-              }`}
-            >
-              Beranda
-            </button>
-            <button
-              type="button"
-              onClick={openEtalasePage}
-              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'etalase' ? 'text-[#8da249] underline' : ''
-              }`}
-            >
-              Etalase Makanan
-            </button>
-            <button
-              type="button"
-              onClick={() => openChatPage()}
-              className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                activePage === 'chat' ? 'text-[#8da249] underline' : ''
-              }`}
-            >
-              Chat Penjual
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateToSection('cara-kerja')}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Cara Kerja
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateToSection('dampak-umkm')}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Dampak UMKM
-            </button>
-            <button
-              type="button"
-              onClick={() => openSellerPage()}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Mitra UMKM
-            </button>
-            <button
-              type="button"
-              onClick={openAdminPage}
-              className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Panel Admin
-            </button>
+            {activePage === 'landing' ? (
+              /* ON LANDING PAGE: Only Beranda, Cara Kerja, Dampak UMKM */
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('beranda');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    else openLandingPage();
+                  }}
+                  className="text-[#8da249] font-bold underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Beranda
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigateToSection('cara-kerja')}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Cara Kerja
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigateToSection('dampak-umkm')}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Dampak UMKM
+                </button>
+              </>
+            ) : (
+              /* INSIDE APP: Etalase Makanan, Pesanan, Chat Penjual, History, Beranda, Mitra UMKM, Panel Admin */
+              <>
+                <button
+                  type="button"
+                  onClick={openEtalasePage}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'etalase' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  Etalase Makanan
+                </button>
+                <button
+                  type="button"
+                  onClick={openOrdersPage}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'pesanan' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  Pesanan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openChatPage()}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'chat' || activePage === 'chat-bot' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  Chat Penjual
+                </button>
+                <button
+                  type="button"
+                  onClick={openHistoryPage}
+                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    activePage === 'history' ? 'text-[#8da249] font-bold underline' : ''
+                  }`}
+                >
+                  History
+                </button>
+                <button
+                  type="button"
+                  onClick={openLandingPage}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Beranda
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openSellerPage()}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Mitra UMKM
+                </button>
+                <button
+                  type="button"
+                  onClick={openAdminPage}
+                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Panel Admin
+                </button>
+              </>
+            )}
           </nav>
 
-          {/* Zone 3: Chat + Cart + Login/User + Mobile Hamburger */}
+          {/* Zone 3: Header Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => openChatPage()}
-              title="Pusat Pesan & Chat Penjual"
-              aria-label="Pusat Pesan & Chat Penjual"
-              className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                activePage === 'chat'
-                  ? 'bg-white/30 border-[#8da249]'
-                  : 'bg-white/15 border-white/25 hover:bg-white/25'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#f89254] ring-2 ring-[#1F281A]" />
-            </button>
+            {activePage === 'landing' ? (
+              /* ON LANDING PAGE: CTA button to enter app + Login/User + Hamburger */
+              <button
+                type="button"
+                onClick={openEtalasePage}
+                className="h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 bg-[#8DA249] hover:bg-[#7b8e3d] text-white shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span>Mulai Pakai</span>
+              </button>
+            ) : (
+              /* INSIDE APP: Chat + Cart + Login/User + Hamburger */
+              <>
+                <button
+                  type="button"
+                  onClick={() => openChatPage()}
+                  title="Pusat Pesan & Chat Penjual"
+                  aria-label="Pusat Pesan & Chat Penjual"
+                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
+                    activePage === 'chat'
+                      ? 'bg-white/30 border-[#8da249]'
+                      : 'bg-white/15 border-white/25 hover:bg-white/25'
+                  }`}
+                >
+                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#f89254] ring-2 ring-[#1F281A]" />
+                </button>
 
-            <button
-              type="button"
-              onClick={openCartPage}
-              aria-label={`Kantong Belanja (${totalCartItems} item)`}
-              className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                activePage === 'kantong'
-                  ? 'bg-white/30 border-[#8da249]'
-                  : 'bg-white/15 border-white/25 hover:bg-white/25'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-              {totalCartItems > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
-                  {totalCartItems}
-                </span>
-              )}
-            </button>
+                <button
+                  type="button"
+                  onClick={openCartPage}
+                  aria-label={`Kantong Belanja (${totalCartItems} item)`}
+                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
+                    activePage === 'kantong'
+                      ? 'bg-white/30 border-[#8da249]'
+                      : 'bg-white/15 border-white/25 hover:bg-white/25'
+                  }`}
+                >
+                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
+                  {totalCartItems > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
+                      {totalCartItems}
+                    </span>
+                  )}
+                </button>
+              </>
+            )}
 
             {!currentUser ? (
               <button
@@ -1180,68 +1233,126 @@ function CustomerAndAdminPortal() {
               </div>
 
               <div className="py-4 space-y-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openLandingPage();
-                  }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                    activePage === 'landing'
-                      ? 'bg-[#8da249]/15 text-[#8da249]'
-                      : 'text-stone-700 hover:bg-stone-100'
-                  }`}
-                >
-                  Beranda
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openEtalasePage();
-                  }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                    activePage === 'etalase'
-                      ? 'bg-[#8da249]/15 text-[#8da249]'
-                      : 'text-stone-700 hover:bg-stone-100'
-                  }`}
-                >
-                  Etalase Makanan
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openChatPage();
-                  }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                    activePage === 'chat'
-                      ? 'bg-[#8da249]/15 text-[#8da249]'
-                      : 'text-stone-700 hover:bg-stone-100'
-                  }`}
-                >
-                  Chat Penjual
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    navigateToSection('cara-kerja');
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
-                >
-                  Cara Kerja
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    navigateToSection('dampak-umkm');
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
-                >
-                  Dampak UMKM
-                </button>
+                {activePage === 'landing' ? (
+                  /* ON LANDING PAGE: Beranda, Cara Kerja, Dampak UMKM + Mulai Pakai CTA */
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        const el = document.getElementById('beranda');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        else openLandingPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold bg-[#8da249]/15 text-[#8da249] transition-colors cursor-pointer"
+                    >
+                      Beranda
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        navigateToSection('cara-kerja');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                    >
+                      Cara Kerja
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        navigateToSection('dampak-umkm');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                    >
+                      Dampak UMKM
+                    </button>
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMobileNavOpen(false);
+                          openEtalasePage();
+                        }}
+                        className="w-full text-center px-4 py-2.5 rounded-xl text-sm font-bold bg-[#8DA249] hover:bg-[#7b8e3d] text-white flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        <span>Mulai Pakai (Buka Etalase)</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  /* INSIDE APP: Etalase Makanan, Pesanan, Chat Penjual, History, Beranda */
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openEtalasePage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'etalase'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      Etalase Makanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openOrdersPage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'pesanan'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      Pesanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openChatPage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'chat' || activePage === 'chat-bot'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      Chat Penjual
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openHistoryPage();
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                        activePage === 'history'
+                          ? 'bg-[#8da249]/15 text-[#8da249]'
+                          : 'text-stone-700 hover:bg-stone-100'
+                      }`}
+                    >
+                      History Pesanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openLandingPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                    >
+                      Beranda (Landing)
+                    </button>
+                  </>
+                )}
               </div>
 
               <div className="pt-3 border-t border-stone-100 space-y-2">
@@ -1858,7 +1969,7 @@ function CustomerAndAdminPortal() {
                       onClick={openEtalasePage}
                       className="w-full sm:w-auto min-h-[48px] px-10 py-3.5 bg-[#8DA249] hover:bg-[#7b8e3d] active:scale-[0.99] text-white font-display font-semibold text-base rounded-full transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-[#8DA249]/30"
                     >
-                      Pesan Sekarang
+                      Mulai Pakai
                     </button>
                   </div>
                 </div>
@@ -2736,8 +2847,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY */}
-      {activePage !== 'auth' && activePage !== 'admin' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY (Hanya di dalam aplikasi pemesanan) */}
+      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2746,7 +2857,7 @@ function CustomerAndAdminPortal() {
             type="button"
             onClick={openEtalasePage}
             className={`flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
-              activePage === 'etalase' || activePage === 'landing'
+              activePage === 'etalase'
                 ? 'text-[#8da249] font-bold'
                 : 'text-stone-400 hover:text-stone-700 font-medium'
             }`}
@@ -2806,8 +2917,8 @@ function CustomerAndAdminPortal() {
         </nav>
       )}
 
-      {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE) */}
-      {activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE - HANYA DI DALAM APLIKASI PEMESANAN) */}
+      {activePage !== 'landing' && activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <FloatingChatButton
           onOpenChatBot={openChatBotPage}
         />

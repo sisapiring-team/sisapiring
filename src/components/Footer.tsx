@@ -173,7 +173,7 @@ export const Footer: React.FC<FooterProps> = ({
         </nav>
 
         {/* 4. CONTACT, HOURS & OPERATIONAL COVERAGE (CENTERED) */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-3 text-xs text-stone-400 text-center max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-2.5 sm:gap-y-3 text-xs text-stone-400 text-center max-w-4xl mx-auto px-2">
           <div className="inline-flex items-center justify-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-[#8DA249] shrink-0" />
             <span>Kawasan Aktif: Coblong, Dago, Braga, Buahbatu & Sekitar Kota Bandung</span>

@@ -2065,12 +2065,12 @@ function CustomerAndAdminPortal() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 items-stretch">
                 {/* Langkah 01 */}
-                <div className="p-5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
-                  <div className="space-y-3">
+                <div className="p-4.5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-2.5 sm:space-y-3">
                     <div className="flex items-center gap-3">
-                      <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
+                      <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-sm sm:text-base flex items-center justify-center shadow-xs shrink-0">
                         01
                       </span>
                       <h3 className="text-base font-bold text-stone-900 leading-snug">
@@ -2083,7 +2083,7 @@ function CustomerAndAdminPortal() {
                   </div>
 
                   <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
-                    <div className="h-44 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                    <div className="h-36 xs:h-40 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
                       <ResilientImage
                         src="/assets/steps/step1-pilih-menu.png"
                         alt="Tangkapan layar katalog menu etalase di aplikasi SisaPiring"
@@ -2099,10 +2099,10 @@ function CustomerAndAdminPortal() {
                 </div>
 
                 {/* Langkah 02 */}
-                <div className="p-5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
-                  <div className="space-y-3">
+                <div className="p-4.5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-2.5 sm:space-y-3">
                     <div className="flex items-center gap-3">
-                      <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
+                      <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-sm sm:text-base flex items-center justify-center shadow-xs shrink-0">
                         02
                       </span>
                       <h3 className="text-base font-bold text-stone-900 leading-snug">
@@ -2115,7 +2115,7 @@ function CustomerAndAdminPortal() {
                   </div>
 
                   <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
-                    <div className="h-44 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                    <div className="h-36 xs:h-40 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
                       <ResilientImage
                         src="/assets/steps/step2-kunci-pesanan.png"
                         alt="Tangkapan layar kode pesanan dan pembayaran QRIS di aplikasi SisaPiring"
@@ -2131,10 +2131,10 @@ function CustomerAndAdminPortal() {
                 </div>
 
                 {/* Langkah 03 */}
-                <div className="p-5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
-                  <div className="space-y-3">
+                <div className="p-4.5 sm:p-6 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 flex flex-col justify-between space-y-4 shadow-xs hover:border-[#8DA249]/50 transition-colors">
+                  <div className="space-y-2.5 sm:space-y-3">
                     <div className="flex items-center gap-3">
-                      <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs shrink-0">
+                      <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-sm sm:text-base flex items-center justify-center shadow-xs shrink-0">
                         03
                       </span>
                       <h3 className="text-base font-bold text-stone-900 leading-snug">
@@ -2147,7 +2147,7 @@ function CustomerAndAdminPortal() {
                   </div>
 
                   <div className="mt-2 rounded-xl overflow-hidden border border-stone-200/90 bg-white shadow-2xs group">
-                    <div className="h-44 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
+                    <div className="h-36 xs:h-40 sm:h-48 md:h-44 lg:h-48 w-full overflow-hidden bg-stone-100 flex items-center justify-center">
                       <ResilientImage
                         src="/assets/steps/step3-jemput-hidangan.png"
                         alt="Tangkapan layar status pengiriman dan penjemputan pesanan di aplikasi SisaPiring"

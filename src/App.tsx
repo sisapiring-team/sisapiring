@@ -95,6 +95,7 @@ import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
 import { BotChatView } from './components/chat/BotChatView';
 import { parseRoute, pushRoute } from './utils/navigation';
+import { Footer } from './components/Footer';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -1925,6 +1926,17 @@ function CustomerAndAdminPortal() {
             onOpenDetail={(item) => setActiveProductModal(item)}
             onOpenCart={openCartPage}
           />
+          <Footer
+            extraPaddingBottom={true}
+            onNavigateHome={openLandingPage}
+            onNavigateSection={(sec) => {
+              openLandingPage();
+              window.setTimeout(() => navigateToSection(sec), 150);
+            }}
+            onNavigateEtalase={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onNavigateOrders={openOrdersPage}
+            onNavigateChat={openChatPage}
+          />
         </main>
       ) : (
         /* PAGE 1: DEDICATED LANDING PAGE */
@@ -2474,6 +2486,16 @@ function CustomerAndAdminPortal() {
               </div>
             </div>
           </section>
+
+          {/* SECTION 4: DEDICATED CENTER-ALIGNED WEBSITE FOOTER */}
+          <Footer
+            extraPaddingBottom={false}
+            onNavigateHome={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onNavigateSection={(sec) => navigateToSection(sec)}
+            onNavigateEtalase={openEtalasePage}
+            onNavigateOrders={openOrdersPage}
+            onNavigateChat={openChatPage}
+          />
         </main>
       )}
 

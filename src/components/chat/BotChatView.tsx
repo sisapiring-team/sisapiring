@@ -167,13 +167,13 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
             >
               <div
                 className={`max-w-[90%] sm:max-w-[75%] rounded-3xl p-4 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${isUser
-                    ? 'bg-[#1F281A] text-white rounded-br-xs'
-                    : 'bg-white text-stone-800 border border-stone-200/90 rounded-bl-xs'
+                    ? 'bg-[#1F281A] text-white border-2 border-[#1F281A] rounded-br-xs'
+                    : 'bg-white text-stone-900 border-2 border-[#8da249]/70 rounded-bl-xs shadow-xs'
                   }`}
               >
                 {!isUser && (
-                  <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-stone-100 text-[11px] font-bold text-[#1F281A]">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <div className="flex items-center gap-1.5 mb-2 pb-1.5 border-b border-[#8da249]/20 text-[11px] font-bold text-[#1F281A]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#8da249]" />
                     <span>SisaPiring AI</span>
                   </div>
                 )}
@@ -254,7 +254,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
         {/* Typing indicator bubble */}
         {isTyping && (
           <div className="flex items-start">
-            <div className="bg-white border border-stone-200/90 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-1.5">
+            <div className="bg-white border-2 border-[#8da249]/70 rounded-2xl rounded-bl-xs px-4 py-3 shadow-xs flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce" />
               <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce [animation-delay:0.2s]" />
               <span className="w-2 h-2 rounded-full bg-[#8da249] animate-bounce [animation-delay:0.4s]" />

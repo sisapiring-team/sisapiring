@@ -407,8 +407,8 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
                     <div
                       className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${
                         isUser
-                          ? 'bg-[#1F281A] text-white rounded-br-xs'
-                          : 'bg-white text-stone-800 border border-stone-200/80 rounded-bl-xs'
+                          ? 'bg-[#1F281A] text-white border-2 border-[#1F281A] rounded-br-xs'
+                          : 'bg-white text-stone-900 border-2 border-[#8da249]/70 rounded-bl-xs shadow-xs'
                       }`}
                     >
                       {msg.attachmentName && (

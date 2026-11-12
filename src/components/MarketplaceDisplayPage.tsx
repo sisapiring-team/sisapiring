@@ -257,7 +257,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     <button
                       type="button"
                       onClick={() => handleBannerAction(banner.actionType)}
-                      className="px-4 py-2 bg-[#1F281A] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer"
+                      className="px-4 py-2 bg-[#8DA249] hover:bg-[#7b8e3d] text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer shadow-md shadow-[#8DA249]/30"
                     >
                       {banner.ctaLabel}
                     </button>
@@ -296,7 +296,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
               aria-label={`Slide banner ${idx + 1}`}
               className={`h-1.5 rounded-full transition-all cursor-pointer ${
                 activeBannerIdx === idx
-                  ? 'w-6 bg-amber-300'
+                  ? 'w-6 bg-[#8DA249]'
                   : 'w-1.5 bg-white/60 hover:bg-white'
               }`}
             />
@@ -305,7 +305,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
       </div>
 
       {/* SEARCH + PRICE FILTER & CIRCULAR CULINARY CATEGORY SELECTOR */}
-      <section className="bg-white border-b border-stone-200/90 pt-4 pb-5 sm:pt-5 sm:pb-6">
+      <section className="bg-[#F4F6EC] border-b border-[#8DA249]/20 pt-4 pb-5 sm:pt-5 sm:pb-6">
         <div className="max-w-5xl mx-auto px-3.5 sm:px-6 space-y-4 sm:space-y-5">
           {/* Row 1: Search Input + Price Filter Side-by-Side */}
           <div className="relative">
@@ -319,7 +319,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari Martabak, Bakso, Croissant, atau toko di Bandung..."
                   aria-label="Cari makanan di etalase Bandung"
-                  className="w-full h-11 sm:h-12 pl-10 sm:pl-11 pr-14 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                  className="w-full h-11 sm:h-12 pl-10 sm:pl-11 pr-14 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-[#8DA249] focus:bg-white transition-colors"
                 />
                 {searchQuery && (
                   <button
@@ -341,7 +341,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                   aria-label="Filter Harga Maksimal"
                   className={`h-11 sm:h-12 px-3 sm:px-4 rounded-xl border text-xs sm:text-sm font-medium inline-flex items-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap cursor-pointer ${
                     maxPrice < 60000
-                      ? 'bg-[#1F281A] text-white border-[#1F281A]'
+                      ? 'bg-[#8DA249] text-white border-[#8DA249]'
                       : 'bg-white text-stone-800 border-stone-300 hover:bg-stone-100'
                   }`}
                 >
@@ -431,7 +431,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedCategory('Semua')}
-                  className="text-xs font-semibold text-[#00880C] hover:underline cursor-pointer"
+                  className="text-xs font-semibold text-[#8DA249] hover:underline cursor-pointer"
                 >
                   Lihat Semua Kuliner
                 </button>
@@ -454,10 +454,10 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     className="group flex flex-col items-center text-center focus:outline-none cursor-pointer"
                   >
                     <div
-                      className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-stone-100 transition-all duration-150 ${
+                      className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white transition-all duration-150 ${
                         isSelected
-                          ? 'ring-3 ring-[#00880C] ring-offset-2 scale-[1.03] shadow-sm'
-                          : 'border border-stone-200/80 group-hover:scale-[1.03] group-hover:shadow-xs'
+                          ? 'ring-3 ring-[#8DA249] ring-offset-2 scale-[1.03] shadow-sm'
+                          : 'border border-[#8DA249]/20 group-hover:scale-[1.03] group-hover:shadow-xs'
                       }`}
                     >
                       <ResilientImage
@@ -470,8 +470,8 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     <span
                       className={`mt-2 text-xs sm:text-sm leading-tight transition-colors ${
                         isSelected
-                          ? 'font-bold text-[#00880C]'
-                          : 'font-medium text-stone-800 group-hover:text-stone-950'
+                          ? 'font-bold text-[#8DA249]'
+                          : 'font-medium text-stone-800 group-hover:text-[#1F281A]'
                       }`}
                     >
                       {cat.label}

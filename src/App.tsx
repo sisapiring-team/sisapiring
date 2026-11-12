@@ -1558,7 +1558,7 @@ function CustomerAndAdminPortal() {
                     <button
                       type="button"
                       onClick={openEtalasePage}
-                      className="w-full sm:w-auto min-h-[48px] px-10 py-3.5 bg-[#E58E00] hover:bg-[#CC7E00] active:scale-[0.99] text-white font-display font-semibold text-base rounded-full transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-md"
+                      className="w-full sm:w-auto min-h-[48px] px-10 py-3.5 bg-[#8DA249] hover:bg-[#7b8e3d] active:scale-[0.99] text-white font-display font-semibold text-base rounded-full transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-[#8DA249]/30"
                     >
                       Pesan Sekarang
                     </button>
@@ -1571,11 +1571,11 @@ function CustomerAndAdminPortal() {
           {/* Full-Width 4-Column Quantitative Proof Strip Below Hero */}
           <section
             aria-label="Ringkasan Dampak SisaPiring"
-            className="bg-white border-b border-stone-200/80 py-8 sm:py-10"
+            className="bg-[#F4F6EC] border-b border-[#8DA249]/20 py-8 sm:py-10"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
               <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-stone-900 font-mono-tabular">
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
                   18.420 Porsi
                 </p>
                 <p className="text-xs text-stone-600 mt-1">
@@ -1583,7 +1583,7 @@ function CustomerAndAdminPortal() {
                 </p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-stone-900 font-mono-tabular">
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
                   Rp 412 Juta
                 </p>
                 <p className="text-xs text-stone-600 mt-1">
@@ -1591,7 +1591,7 @@ function CustomerAndAdminPortal() {
                 </p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-emerald-900 font-mono-tabular">
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8DA249] font-mono-tabular">
                   55% – 61%
                 </p>
                 <p className="text-xs text-stone-600 mt-1">
@@ -1599,7 +1599,7 @@ function CustomerAndAdminPortal() {
                 </p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-stone-900 font-mono-tabular">
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
                   14,7 Ton CO₂e
                 </p>
                 <p className="text-xs text-stone-600 mt-1">
@@ -1674,13 +1674,13 @@ function CustomerAndAdminPortal() {
           {/* SECTION 3: PROOF OF IMPACT, ATTRIBUTABLE UMKM STORIES & PARTNER FORM */}
           <section
             id="dampak-umkm"
-            className="border-t border-stone-200/80 bg-white py-12 sm:py-16 md:py-24"
+            className="border-t border-[#8DA249]/20 bg-[#F4F6EC] py-12 sm:py-16 md:py-24"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
               {/* Top Sub-Block: Documentary Portrait + Attributable Testimonials */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
                 <div className="lg:col-span-5">
-                  <div className="relative h-full min-h-[280px] sm:min-h-[320px] rounded-2xl overflow-hidden border border-stone-200">
+                  <div className="relative h-full min-h-[280px] sm:min-h-[320px] rounded-2xl overflow-hidden border border-[#8DA249]/30">
                     <ResilientImage
                       src={PARTNER_PORTRAIT_PATH}
                       alt="Ibu Sari Rahmawati mengemas roti segar ke dalam kantong kertas di Sari Bakery Kotagede"
@@ -1715,7 +1715,7 @@ function CustomerAndAdminPortal() {
                     {MERCHANT_STORIES.map((story) => (
                       <div
                         key={story.id}
-                        className="p-5 sm:p-6 bg-white border border-stone-200/90 rounded-2xl space-y-3"
+                        className="p-5 sm:p-6 bg-white border border-[#8DA249]/20 rounded-2xl space-y-3 shadow-xs"
                       >
                         <div className="text-xs text-stone-500 flex flex-wrap items-center gap-x-2 gap-y-1">
                           <strong className="text-stone-900">{story.ownerName}</strong>
@@ -1724,7 +1724,7 @@ function CustomerAndAdminPortal() {
                             {story.role}, {story.businessName} ({story.city})
                           </span>
                           <span aria-hidden="true">·</span>
-                          <span className="text-emerald-900 font-mono-tabular font-semibold">
+                          <span className="text-[#8DA249] font-mono-tabular font-bold">
                             +{story.monthlyRecoveredRupiah}
                           </span>
                         </div>

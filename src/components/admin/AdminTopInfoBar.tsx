@@ -22,7 +22,7 @@ export const AdminTopInfoBar: React.FC<AdminTopInfoBarProps> = ({
   macroStats,
   onMobileMenuToggle,
 }) => {
-  const tabTitles: Record<AdminTab, { title: string; subtitle: string }> = {
+  const tabTitles: Partial<Record<AdminTab, { title: string; subtitle: string }>> = {
     overview: {
       title: 'Ringkasan Ekosistem & Dampak Makro',
       subtitle: 'Analisis metrik makro pencegahan sampah pangan Kota Bandung',

@@ -1,15 +1,13 @@
 import React from 'react';
 import {
-  ShieldCheck,
-  TrendingUp,
+  LayoutGrid,
   Store,
-  PackageCheck,
+  UtensilsCrossed,
   Receipt,
-  AlertTriangle,
-  Star,
+  ShieldAlert,
   Users,
-  ShoppingBag,
   ExternalLink,
+  ShoppingBag,
 } from 'lucide-react';
 import { AdminTab, AdminMacroStats } from './types';
 
@@ -30,107 +28,125 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onSwitchToSellerPortal,
   expanded = false,
 }) => {
+  // Navigation mapping strictly focused on live operational monitoring
   const navItems = [
     {
       id: 'overview' as AdminTab,
-      label: 'Ringkasan & Dampak',
-      icon: TrendingUp,
-      desc: 'Metrik makro & statistik',
+      canonicalId: 'overview' as AdminTab,
+      label: 'Ringkasan Monitoring',
+      icon: LayoutGrid,
+      desc: 'Ikhtisar operasional & kesehatan ekosistem',
+      hasDot: false,
     },
     {
-      id: 'seller-governance' as AdminTab,
-      label: 'Mitra UMKM (Penjual)',
+      id: 'stores' as AdminTab,
+      canonicalId: 'seller-governance' as AdminTab,
+      label: 'Monitoring Toko Mitra',
       icon: Store,
-      desc: 'Verifikasi legalitas KYB',
+      desc: 'Verifikasi legalitas & status buka toko',
       badge: macroStats.pendingUmkmCount,
-      badgeColor: 'bg-amber-500',
+      hasDot: true,
     },
     {
-      id: 'product-curation' as AdminTab,
-      label: 'Menu & Food Safety',
-      icon: PackageCheck,
-      desc: 'Kurasi & kontrol take down',
+      id: 'products' as AdminTab,
+      canonicalId: 'product-curation' as AdminTab,
+      label: 'Monitoring Menu Sisa Piring',
+      icon: UtensilsCrossed,
+      desc: 'Batas jam aman konsumsi & take down',
+      hasDot: true,
     },
     {
-      id: 'order-escrow' as AdminTab,
-      label: 'Pesanan & Escrow',
+      id: 'orders' as AdminTab,
+      canonicalId: 'order-escrow' as AdminTab,
+      label: 'Monitoring Pesanan Pembeli',
       icon: Receipt,
-      desc: 'Pelacakan rekening bersama',
+      desc: 'Pelacakan transaksi & kode pickup',
+      hasDot: false,
     },
     {
-      id: 'disputes-refund' as AdminTab,
-      label: 'Komplain & Refund',
-      icon: AlertTriangle,
-      desc: 'Pusat garansi pembeli',
+      id: 'complaints' as AdminTab,
+      canonicalId: 'disputes-refund' as AdminTab,
+      label: 'Monitoring Komplain & Refund',
+      icon: ShieldAlert,
+      desc: 'Laporan makanan & resolusi sengketa',
       badge: macroStats.openDisputesCount,
-      badgeColor: 'bg-rose-500',
+      hasDot: false,
     },
     {
-      id: 'reviews-moderation' as AdminTab,
-      label: 'Ulasan & Kepuasan',
-      icon: Star,
-      desc: 'Rating & testimoni warga',
-    },
-    {
-      id: 'user-access' as AdminTab,
-      label: 'Manajemen Akun',
+      id: 'users' as AdminTab,
+      canonicalId: 'user-access' as AdminTab,
+      label: 'Monitoring Akun Pengguna',
       icon: Users,
-      desc: 'Hak akses pengguna (RBAC)',
+      desc: 'Pengaturan akun pembeli, mitra & admin',
+      hasDot: false,
     },
   ];
 
-  // ==========================================
+  // Helper to determine if item is active (matching either new alias or legacy tab id)
+  const isItemActive = (item: (typeof navItems)[0]) => {
+    return (
+      activeTab === item.id ||
+      activeTab === item.canonicalId ||
+      (item.id === 'stores' && activeTab === 'seller-governance') ||
+      (item.id === 'products' && activeTab === 'product-curation') ||
+      (item.id === 'orders' && activeTab === 'order-escrow') ||
+      (item.id === 'complaints' && activeTab === 'disputes-refund') ||
+      (item.id === 'users' && activeTab === 'user-access')
+    );
+  };
+
+  // ========================================================
   // 1. EXPANDED MODE (FOR MOBILE DRAWER)
-  // ==========================================
+  // ========================================================
   if (expanded) {
     return (
-      <aside className="w-72 bg-[#122e24] text-white flex flex-col h-full border-r border-emerald-950/80 shadow-2xl select-none">
+      <aside className="w-72 bg-[#0c141d] text-white flex flex-col h-full border-r border-white/10 shadow-2xl select-none">
         <div className="p-5 border-b border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-300 font-bold shrink-0">
-            <ShieldCheck className="w-6 h-6 text-amber-300" />
+          <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 font-bold shrink-0">
+            <LayoutGrid className="w-5 h-5 text-cyan-300" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-sm text-white">SisaPiring</span>
-              <span className="text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 px-1.5 py-0.2 rounded border border-amber-300/30 uppercase">
+              <span className="text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 px-1.5 py-0.2 rounded border border-cyan-300/30 uppercase">
                 Admin
               </span>
             </div>
-            <span className="text-[11px] text-emerald-200/70 block">Pusat Tata Kelola Bandung</span>
+            <span className="text-[11px] text-cyan-200/70 block">Pusat Monitoring Bandung</span>
           </div>
         </div>
 
-        <div className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <div className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = isItemActive(item);
+
             return (
               <button
                 key={item.id}
                 type="button"
-                onClick={() => onTabChange(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs transition-colors cursor-pointer text-left ${isActive
-                    ? 'bg-emerald-800 text-white font-bold border border-emerald-600/40 shadow-sm'
-                    : 'text-emerald-100/75 hover:bg-white/5 hover:text-white'
-                  }`}
+                onClick={() => onTabChange(item.canonicalId)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs transition-colors cursor-pointer text-left ${
+                  isActive
+                    ? 'bg-cyan-500/20 text-white font-bold border border-cyan-400/40 shadow-sm'
+                    : 'text-neutral-300 hover:bg-white/5 hover:text-white'
+                }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${isActive ? 'bg-amber-400 text-neutral-950' : 'bg-white/10 text-emerald-300'
-                      }`}
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                      isActive ? 'bg-cyan-500 text-neutral-950 font-bold' : 'bg-white/10 text-cyan-300'
+                    }`}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <span className="block truncate text-xs">{item.label}</span>
-                    <span className="block text-[10px] text-emerald-300/60 truncate">{item.desc}</span>
+                    <span className="truncate block font-semibold">{item.label}</span>
+                    <span className="text-[10px] text-neutral-400 truncate block">{item.desc}</span>
                   </div>
                 </div>
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold text-white ${item.badgeColor || 'bg-amber-500'
-                      }`}
-                  >
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold text-neutral-950 bg-cyan-400">
                     {item.badge}
                   </span>
                 )}
@@ -139,162 +155,135 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           })}
         </div>
 
-        <div className="p-3 border-t border-white/10 space-y-2 bg-[#0e241c]">
+        <div className="p-4 border-t border-white/10 space-y-2 bg-[#101924]">
           <button
             type="button"
             onClick={onSwitchToPublicEtalase}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-emerald-100 border border-white/5 cursor-pointer"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="w-4 h-4 text-amber-300" />
-              <span>Etalase Pembeli</span>
-            </div>
-            <ExternalLink className="w-3.5 h-3.5 text-emerald-400/60" />
+            <ShoppingBag className="w-4 h-4 text-amber-400" />
+            <span>Buka Etalase Pembeli</span>
           </button>
-
-          <button
-            type="button"
-            onClick={onSwitchToSellerPortal}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-700/60 hover:bg-emerald-600 text-white border border-emerald-500/30 cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <Store className="w-4 h-4 text-emerald-200" />
-              <span>Portal Mitra UMKM</span>
-            </div>
-            <ExternalLink className="w-3.5 h-3.5 text-emerald-300/60" />
-          </button>
+          {onSwitchToSellerPortal && (
+            <button
+              type="button"
+              onClick={onSwitchToSellerPortal}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <Store className="w-4 h-4 text-emerald-400" />
+              <span>Buka Portal Mitra UMKM</span>
+            </button>
+          )}
         </div>
       </aside>
     );
   }
 
-  // ==========================================
-  // 2. SLIM ICON-ONLY RAIL (DEFAULT DESKTOP)
-  // Width: w-16 (64px) or xl:w-20 (80px)
-  // Hover Tooltips dynamically popup on right
-  // ==========================================
+  // ========================================================
+  // 2. FLOATING PILL RAIL (MATCHING SCREENSHOT!)
+  // ========================================================
   return (
-    <aside className="w-16 xl:w-20 bg-[#122e24] text-white flex flex-col h-full border-r border-emerald-950/80 shadow-xl select-none shrink-0 z-40">
-      {/* 1. Brand Logo Shield with Hover Tooltip */}
-      <div className="relative group p-3 xl:p-4 flex items-center justify-center border-b border-white/10">
-        <div className="w-10 h-10 xl:w-11 xl:h-11 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-300 font-bold shrink-0 shadow-inner cursor-default transition-transform group-hover:scale-105">
-          <ShieldCheck className="w-5 h-5 xl:w-6 xl:h-6 text-amber-300" />
-        </div>
-
-        {/* Hover Tooltip Popup */}
-        <div className="absolute left-full ml-3.5 px-3.5 py-2 bg-neutral-900/95 backdrop-blur-md text-white rounded-xl shadow-2xl border border-white/15 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50 whitespace-nowrap">
-          <div className="flex items-center gap-1.5">
-            <span className="font-extrabold text-xs text-white">SisaPiring Admin</span>
-            <span className="text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 px-1 rounded uppercase">
-              Bandung
-            </span>
-          </div>
-          <span className="text-[10px] text-emerald-300/80 block mt-0.5">
-            Pusat Tata Kelola Platform Terpadu
-          </span>
-          {/* Tooltip arrow */}
-          <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-neutral-900/95" />
-        </div>
-      </div>
-
-      {/* 2. Slim Vertical Navigation Rail */}
-      <div className="flex-1 py-4 px-2 xl:px-3 space-y-2.5 overflow-y-auto overflow-x-visible scrollbar-none flex flex-col items-center">
+    <aside className="fixed left-4 top-20 bottom-6 z-30 w-14 xl:w-16 rounded-3xl bg-[#131c26]/90 border border-white/10 backdrop-blur-md shadow-2xl flex flex-col items-center justify-between py-4 select-none">
+      {/* Top Group: Main Navigation Icons */}
+      <nav className="flex flex-col items-center gap-3 w-full px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
+          const isActive = isItemActive(item);
 
           return (
-            <div key={item.id} className="relative group flex items-center justify-center w-full">
+            <div key={item.id} className="relative group w-full flex justify-center">
               <button
                 type="button"
-                onClick={() => onTabChange(item.id)}
-                className={`w-11 h-11 xl:w-12 xl:h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer relative ${isActive
-                    ? 'bg-amber-400 text-neutral-950 font-bold shadow-md shadow-amber-400/20 scale-105'
-                    : 'text-emerald-100/70 hover:bg-white/10 hover:text-white hover:scale-105'
-                  }`}
+                onClick={() => onTabChange(item.canonicalId)}
+                className={`w-10 h-10 xl:w-11 xl:h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer relative ${
+                  isActive
+                    ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-400/50 shadow-lg shadow-cyan-500/20 scale-105'
+                    : 'text-neutral-400 hover:text-white hover:bg-white/10 hover:scale-105'
+                }`}
                 aria-label={item.label}
               >
                 <Icon className="w-5 h-5" />
 
-                {/* Counter Badge Dot */}
+                {/* Status Indicator Dot (e.g. for active toko & active menu) */}
+                {item.hasDot && !isActive && (
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 ring-2 ring-[#131c26]" />
+                )}
+
+                {/* Counter Badge Dot (e.g. for pending verification or open disputes) */}
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span
-                    className={`absolute -top-1 -right-1 w-4 h-4 rounded-full ${item.badgeColor || 'bg-amber-500'
-                      } text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs border-2 border-[#122e24]`}
-                  >
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-cyan-400 text-neutral-950 font-mono text-[9px] font-black flex items-center justify-center shadow-xs ring-2 ring-[#131c26]">
                     {item.badge}
                   </span>
                 )}
               </button>
 
-              {/* Floating Hover Tooltip on Mouse Enter */}
-              <div className="absolute left-full ml-3 px-3 py-2 bg-neutral-900/95 backdrop-blur-md text-white rounded-xl shadow-2xl border border-white/15 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50 whitespace-nowrap">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-xs text-white">{item.label}</span>
+              {/* Floating Hover Tooltip Popup (Appears on Mouse Enter) */}
+              <div className="pointer-events-none absolute left-full ml-3.5 top-1/2 -translate-y-1/2 z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 transform translate-x-1 group-hover:translate-x-0 whitespace-nowrap">
+                <div className="bg-[#111923]/98 text-white px-3.5 py-2 rounded-xl shadow-2xl border border-white/15 text-left flex items-center gap-2.5 backdrop-blur-xl">
+                  <div>
+                    <span className="font-bold text-xs text-white block">{item.label}</span>
+                    <span className="text-[10px] text-neutral-400 block">{item.desc}</span>
+                  </div>
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span
-                      className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold text-white ${item.badgeColor || 'bg-amber-500'
-                        }`}
-                    >
+                    <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-cyan-400 text-neutral-950">
                       {item.badge}
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] text-emerald-300/80 block mt-0.5">{item.desc}</span>
-                {/* Tooltip arrow */}
-                <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-neutral-900/95" />
+                {/* Arrow */}
+                <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#111923]" />
               </div>
             </div>
           );
         })}
-      </div>
+      </nav>
 
-      {/* 3. Bottom Slim Actions (Portal Switchers & Profile) */}
-      <div className="p-2 border-t border-white/10 space-y-2 bg-[#0e241c] flex flex-col items-center">
-        {/* Etalase Pembeli Icon Action */}
-        <div className="relative group">
+      {/* Bottom Group: Portal Switcher & SA Avatar */}
+      <div className="flex flex-col items-center gap-3 w-full px-2 pt-3 border-t border-white/10">
+        {/* Quick Portal Switcher Icon */}
+        <div className="relative group w-full flex justify-center">
           <button
             type="button"
             onClick={onSwitchToPublicEtalase}
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/15 text-amber-300 transition-colors cursor-pointer border border-white/5"
+            className="w-10 h-10 xl:w-11 xl:h-11 rounded-2xl bg-white/5 hover:bg-white/15 text-neutral-300 hover:text-white border border-white/10 flex items-center justify-center transition-all cursor-pointer"
+            title="Buka Etalase Pembeli"
             aria-label="Buka Etalase Pembeli"
           >
-            <ShoppingBag className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4" />
           </button>
-          <div className="absolute left-full ml-3 px-3 py-1.5 bg-neutral-900/95 backdrop-blur-md text-white rounded-xl shadow-xl border border-white/15 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50 whitespace-nowrap">
-            <span className="font-bold text-xs text-white block">Buka Etalase Pembeli</span>
-            <span className="text-[10px] text-neutral-400 block">Uji coba simulasi belanja konsumen</span>
-            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-neutral-900/95" />
+
+          {/* Hover Tooltip */}
+          <div className="pointer-events-none absolute left-full ml-3.5 top-1/2 -translate-y-1/2 z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 transform translate-x-1 group-hover:translate-x-0 whitespace-nowrap">
+            <div className="bg-[#111923]/98 text-white px-3 py-1.5 rounded-xl shadow-2xl border border-white/15 text-left backdrop-blur-xl">
+              <span className="font-bold text-xs text-white block">Pintas Etalase Konsumen</span>
+              <span className="text-[10px] text-neutral-400 block">Buka tampilan pasar sisa piring</span>
+            </div>
+            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#111923]" />
           </div>
         </div>
 
-        {/* Portal Mitra UMKM Icon Action */}
-        <div className="relative group">
-          <button
-            type="button"
+        {/* Super Administrator Avatar Circle */}
+        <div className="relative group w-full flex justify-center">
+          <div
             onClick={onSwitchToSellerPortal}
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-700/60 hover:bg-emerald-600 text-white transition-colors cursor-pointer border border-emerald-500/30"
-            aria-label="Buka Portal Mitra UMKM"
+            className="w-9 h-9 xl:w-10 xl:h-10 rounded-2xl bg-cyan-600/70 hover:bg-cyan-500 border border-cyan-400/40 text-cyan-100 font-extrabold text-xs flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-pointer"
+            title="Super Administrator (SA)"
           >
-            <Store className="w-4 h-4 text-emerald-200" />
-          </button>
-          <div className="absolute left-full ml-3 px-3 py-1.5 bg-neutral-900/95 backdrop-blur-md text-white rounded-xl shadow-xl border border-white/15 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50 whitespace-nowrap">
-            <span className="font-bold text-xs text-white block">Buka Portal Mitra UMKM</span>
-            <span className="text-[10px] text-neutral-400 block">Uji coba pesanan & produk seller</span>
-            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-neutral-900/95" />
+            SA
           </div>
-        </div>
 
-        {/* Admin Profile Circle */}
-        <div className="relative group pt-1">
-          <div className="w-9 h-9 rounded-full bg-emerald-800 text-white flex items-center justify-center font-bold text-xs cursor-default border border-emerald-600/50">
-            AD
-            <span className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0e241c] rounded-full" />
-          </div>
-          <div className="absolute left-full ml-3 px-3 py-1.5 bg-neutral-900/95 backdrop-blur-md text-white rounded-xl shadow-xl border border-white/15 pointer-events-none opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50 whitespace-nowrap">
-            <span className="font-bold text-xs text-white block">Admin Tata Kelola</span>
-            <span className="text-[10px] text-emerald-300 block">Diskominfokot Bandung • Online</span>
-            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-neutral-900/95" />
+          {/* Hover Tooltip */}
+          <div className="pointer-events-none absolute left-full ml-3.5 top-1/2 -translate-y-1/2 z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 transform translate-x-1 group-hover:translate-x-0 whitespace-nowrap">
+            <div className="bg-[#111923]/98 text-white px-3 py-1.5 rounded-xl shadow-2xl border border-white/15 text-left backdrop-blur-xl">
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-xs text-white">Super Administrator</span>
+                <span className="text-[9px] text-emerald-400 font-bold bg-emerald-500/10 px-1 rounded">
+                  Online
+                </span>
+              </div>
+              <span className="text-[10px] text-neutral-400 block">admin@sisapiring.id</span>
+            </div>
+            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#111923]" />
           </div>
         </div>
       </div>

@@ -80,7 +80,6 @@ import {
   mapComplaintToAdminDispute,
 } from './data/adminData';
 import { ResilientImage } from './components/ResilientImage';
-import { ImpactCalculator } from './components/ImpactCalculator';
 import {
   ProductDetailModal,
   RescueCartPage,
@@ -2032,64 +2031,74 @@ function CustomerAndAdminPortal() {
             </div>
           </section>
 
-          {/* SECTION 2: MECHANISM & INTERACTIVE SAVINGS CALCULATOR ("CARA KERJA") */}
+          {/* SECTION 2: MECHANISM ("CARA KERJA") */}
           <section
             id="cara-kerja"
             className="py-12 sm:py-16 md:py-24 bg-white"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                {/* Left 5 Columns: Editorial 3-Step Mechanism */}
-                <div className="lg:col-span-5 space-y-6 sm:space-y-8">
-                  <div>
-                    <p className="text-xs text-stone-500 mb-1.5">
-                      Mekanisme Transparan · Menguntungkan Warga & UMKM
-                    </p>
-                    <h2
-                      className="text-2xl md:text-3xl font-semibold text-stone-900 tracking-tight"
-                      style={{ textWrap: 'balance' }}
-                    >
-                      Cara Menyelamatkan Makanan Tanpa Ribet
-                    </h2>
-                    <p className="text-xs sm:text-sm text-stone-600 mt-2.5 leading-relaxed">
-                      Makanan yang dijual di SisaPiring bukanlah makanan bekas, melainkan stok produksi baru hari ini yang melebihi kuota penjualan harian UMKM.
-                    </p>
-                  </div>
+              <div className="max-w-3xl mx-auto text-center space-y-3 mb-10 sm:mb-14">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#8DA249]">
+                  Mekanisme Transparan · Menguntungkan Warga & UMKM
+                </p>
+                <h2
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-stone-900 tracking-tight font-display"
+                  style={{ textWrap: 'balance' }}
+                >
+                  Cara Menyelamatkan Makanan Tanpa Ribet
+                </h2>
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-2xl mx-auto">
+                  Makanan yang dijual di SisaPiring bukanlah makanan bekas, melainkan stok produksi baru hari ini yang melebihi kuota penjualan harian UMKM dengan potongan harga hemat.
+                </p>
+              </div>
 
-                  <div className="divide-y divide-stone-200/90 border-t border-b border-stone-200/90">
-                    <div className="py-4 sm:py-5 space-y-1.5">
-                      <h3 className="text-sm sm:text-base font-semibold text-stone-900">
-                        01. Pilih Paket Kejutan atau Menu Spesifik di Sekitar Anda
-                      </h3>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        Setiap pukul 15.00–17.00 WIB, mitra toko roti, kafe, dan rumah makan memperbarui jumlah porsi berlebih mereka dengan potongan harga minimal 50%.
-                      </p>
-                    </div>
-
-                    <div className="py-4 sm:py-5 space-y-1.5">
-                      <h3 className="text-sm sm:text-base font-semibold text-stone-900">
-                        02. Kunci Pesanan & Dapatkan Kode Tiket Pengambilan
-                      </h3>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        Pesan langsung dari halaman etalase dan pilih pembayaran QRIS instan bebas biaya admin atau bayar tunai saat mengambil di kasir UMKM.
-                      </p>
-                    </div>
-
-                    <div className="py-4 sm:py-5 space-y-1.5">
-                      <h3 className="text-sm sm:text-base font-semibold text-stone-900">
-                        03. Jemput Hidangan pada Jendela Jam Penyelamatan
-                      </h3>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        Datang ke lokasi UMKM sesuai jam ambil (misal 18.30–20.30 WIB), tunjukkan kode tiket SisaPiring, dan bawa pulang hidangan hangat berkualitas.
-                      </p>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                <div className="p-6 sm:p-7 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 space-y-3 shadow-xs">
+                  <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs">
+                    01
+                  </span>
+                  <h3 className="text-base font-bold text-stone-900">
+                    Pilih Menu Spesifik di Sekitar Anda
+                  </h3>
+                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Setiap pukul 15.00–17.00 WIB, mitra toko roti, kafe, dan rumah makan memperbarui jumlah porsi berlebih mereka dengan potongan harga minimal 50%.
+                  </p>
                 </div>
 
-                {/* Right 7 Columns: Interactive Savings & UMKM Calculator */}
-                <div className="lg:col-span-7">
-                  <ImpactCalculator onExploreClick={openEtalasePage} />
+                <div className="p-6 sm:p-7 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 space-y-3 shadow-xs">
+                  <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs">
+                    02
+                  </span>
+                  <h3 className="text-base font-bold text-stone-900">
+                    Kunci Pesanan & Dapatkan Kode Tiket
+                  </h3>
+                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Pesan langsung dari halaman etalase dan bayar menggunakan QRIS instan bebas biaya admin atau bayar tunai saat mengambil di kasir mitra UMKM.
+                  </p>
                 </div>
+
+                <div className="p-6 sm:p-7 rounded-2xl bg-[#F4F6EC]/80 border border-[#8DA249]/25 space-y-3 shadow-xs">
+                  <span className="w-10 h-10 rounded-xl bg-[#8DA249] text-white font-mono font-bold text-base flex items-center justify-center shadow-xs">
+                    03
+                  </span>
+                  <h3 className="text-base font-bold text-stone-900">
+                    Jemput Hidangan pada Jam Penyelamatan
+                  </h3>
+                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Datang ke lokasi UMKM sesuai jadwal ambil (misal 18.30–20.30 WIB), tunjukkan kode tiket pesanan SisaPiring, dan nikmati santapan berkualitas.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-10 sm:mt-12 text-center">
+                <button
+                  type="button"
+                  onClick={openEtalasePage}
+                  className="min-h-[46px] px-8 py-3 bg-[#1F281A] hover:bg-[#2e434f] text-white text-xs sm:text-sm font-semibold rounded-full shadow-md transition-colors cursor-pointer inline-flex items-center gap-2"
+                >
+                  <ShoppingBag className="w-4 h-4 text-[#8DA249]" />
+                  <span>Jelajahi Etalase Kuliner Sekarang</span>
+                </button>
               </div>
             </div>
           </section>

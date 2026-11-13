@@ -66,7 +66,7 @@ export const RescueDealsView: React.FC = () => {
 
   const needAction = rows.filter((r) => !r.ok).length;
 
-  const apply = (p: SisaPiringProduct, tier: number) => {
+  const apply = (p: SisaPiringProduct, tier: SisaPiringProduct['discountPercentage']) => {
     applyDiscount(p.id, tier);
     showToast(
       'Diskon dipasang',

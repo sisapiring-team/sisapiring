@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiErrorMessage, loginRemote, registerRemote } from '../lib/api';
 import {
   ArrowLeft,
   ArrowRight,
@@ -104,6 +105,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showSuccessRegisterPopup, setShowSuccessRegisterPopup] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const switchMode = (nextMode: 'login' | 'register' | 'register-umkm') => {
     setMode(nextMode);
@@ -113,35 +115,39 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     setErrorMsg('');
   };
 
-  // Handler for Single-Page Login (Nama/Email + Password)
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  // Handler for Single-Page Login (Email + Password)
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
     if (!loginIdentifier.trim()) {
-      setErrorMsg('Mohon masukkan nama atau alamat email Anda.');
+      setErrorMsg('Mohon masukkan alamat email Anda.');
       return;
     }
-    if (!loginPassword || loginPassword.length < 4) {
+    if (!loginIdentifier.includes('@')) {
+      setErrorMsg('Masuk menggunakan alamat email yang terdaftar.');
+      return;
+    }
+    if (!loginPassword) {
       setErrorMsg('Mohon masukkan kata sandi Anda.');
       return;
     }
 
-    const rawId = loginIdentifier.trim();
-    const displayName = rawId.includes('@')
-      ? rawId
-          .split('@')[0]
-          .replace(/[._-]/g, ' ')
-          .replace(/\b\w/g, (l) => l.toUpperCase())
-      : rawId;
-
-    onSuccessLogin({
-      name: displayName,
-      email: rawId.includes('@') ? rawId : `${rawId.toLowerCase().replace(/\s+/g, '')}@email.com`,
-      phone: '081234567890',
-      district: 'Coblong (Dago / Dipatiukur)',
-      defaultAddress: 'Jl. Dipatiukur No. 42, Coblong, Kota Bandung',
-    });
+    setIsSubmitting(true);
+    try {
+      const { user } = await loginRemote(loginIdentifier.trim(), loginPassword);
+      onSuccessLogin({
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '081234567890',
+        district: user.district || 'Coblong (Dago / Dipatiukur)',
+        defaultAddress: user.defaultAddress || '',
+      });
+    } catch (error) {
+      setErrorMsg(apiErrorMessage(error, 'Email atau kata sandi tidak sesuai.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Page 1 Registration: Validate Phone Number -> Go to Page 2
@@ -172,8 +178,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       setErrorMsg('Mohon masukkan alamat email yang valid.');
       return;
     }
-    if (password.length < 6) {
-      setErrorMsg('Kata sandi minimal terdiri dari 6 karakter.');
+    if (password.length < 8) {
+      setErrorMsg('Kata sandi minimal terdiri dari 8 karakter.');
       return;
     }
     if (password !== confirmPassword) {
@@ -187,7 +193,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   };
 
   // Page 3 Registration: Save Default Address -> Complete Registration & Login
-  const handleStep3AddressSubmit = (e: React.FormEvent) => {
+  const handleStep3AddressSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -200,13 +206,31 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       ? `${streetAddress.trim()} (${addressLandmark.trim()}), ${district}, Bandung`
       : `${streetAddress.trim()}, ${district}, Bandung`;
 
-    onSuccessLogin({
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      district,
-      defaultAddress: fullDefaultAddress,
-    });
+    setIsSubmitting(true);
+    try {
+      const { user } = await registerRemote({
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        district,
+        default_address: fullDefaultAddress,
+        password,
+        password_confirmation: confirmPassword,
+        role: 'buyer',
+      });
+
+      onSuccessLogin({
+        name: user.name,
+        email: user.email,
+        phone: user.phone || phone.trim(),
+        district: user.district || district,
+        defaultAddress: user.defaultAddress || fullDefaultAddress,
+      });
+    } catch (error) {
+      setErrorMsg(apiErrorMessage(error, 'Pendaftaran gagal. Silakan periksa data Anda.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleHeaderBack = () => {
@@ -379,7 +403,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   Selamat Datang Kembali
                 </h2>
                 <p className="text-xs text-stone-500 leading-relaxed">
-                  Masukkan nama atau email beserta kata sandi Anda untuk langsung masuk.
+                  Masukkan email terdaftar beserta kata sandi Anda untuk langsung masuk.
                 </p>
               </div>
 
@@ -388,16 +412,16 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   htmlFor="login-identifier"
                   className="block text-xs font-medium text-stone-700 mb-1"
                 >
-                  Nama atau Email
+                  Email
                 </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     id="login-identifier"
-                    type="text"
+                    type="email"
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
-                    placeholder="Masukkan nama atau email Anda"
+                    placeholder="nama@email.com"
                     className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
                   />
                 </div>
@@ -443,9 +467,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs"
+                disabled={isSubmitting}
+                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-wait"
               >
-                Masuk Sekarang
+                {isSubmitting ? 'Memproses...' : 'Masuk Sekarang'}
               </button>
 
               <div className="pt-2 border-t border-stone-100 text-center">
@@ -722,9 +747,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full h-12 bg-[#f89254] hover:bg-[#e57d3d] active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs"
+                disabled={isSubmitting}
+                className="w-full h-12 bg-[#f89254] hover:bg-[#e57d3d] active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-wait"
               >
-                Simpan Alamat Default & Mulai Belanja
+                {isSubmitting ? 'Mendaftarkan...' : 'Simpan Alamat Default & Mulai Belanja'}
               </button>
             </form>
           ) : (
@@ -1166,10 +1192,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 id="popup-reg-success-title"
                 className="text-base sm:text-lg font-bold text-stone-900 font-display"
               >
-                Pendaftaran Akun Berhasil, {name}!
+                Data Akun Lengkap, {name}!
               </h3>
               <p className="text-xs text-stone-600 leading-relaxed">
-                Akun SisaPiring Anda telah terdaftar. Silakan lengkapi alamat default Anda di Kota Bandung terlebih dahulu.
+                Satu langkah lagi: lengkapi alamat default Anda di Kota Bandung untuk menyelesaikan pendaftaran.
               </p>
             </div>
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { INITIAL_ORDERS, INITIAL_PRODUCTS, INITIAL_SELLER_PROFILE } from '../data/initialData';
 import {
   applyProductDiscountRemote,
@@ -74,6 +74,7 @@ interface AppContextType {
   showToast: (title: string, message: string, type?: 'success' | 'error' | 'warning' | 'info') => void;
   removeToast: (id: string) => void;
   resetAllDemoData: () => void;
+  refreshRemoteData: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -201,33 +202,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Hydrate from the Laravel API when it is reachable. Falling back to the
   // localStorage snapshot keeps the SPA usable while the backend is offline.
-  useEffect(() => {
-    let active = true;
+  const refreshRemoteData = useCallback(async () => {
+    const [merchantResult, productsResult, ordersResult] = await Promise.allSettled([
+      fetchCurrentMerchant(),
+      fetchProducts(),
+      fetchOrders(),
+    ]);
 
-    Promise.allSettled([fetchCurrentMerchant(), fetchProducts(), fetchOrders()]).then(
-      ([merchantResult, productsResult, ordersResult]) => {
-        if (!active) {
-          return;
-        }
+    if (merchantResult.status === 'fulfilled' && merchantResult.value) {
+      setSellerProfile((prev) => ({ ...prev, ...merchantResult.value }));
+    }
 
-        if (merchantResult.status === 'fulfilled' && merchantResult.value) {
-          setSellerProfile((prev) => ({ ...prev, ...merchantResult.value }));
-        }
+    if (productsResult.status === 'fulfilled' && productsResult.value.length > 0) {
+      setProducts(productsResult.value);
+    }
 
-        if (productsResult.status === 'fulfilled' && productsResult.value.length > 0) {
-          setProducts(productsResult.value);
-        }
-
-        if (ordersResult.status === 'fulfilled' && ordersResult.value.length > 0) {
-          setOrders(ordersResult.value);
-        }
-      }
-    );
-
-    return () => {
-      active = false;
-    };
+    if (ordersResult.status === 'fulfilled' && ordersResult.value.length > 0) {
+      setOrders(ordersResult.value);
+    }
   }, []);
+
+  useEffect(() => {
+    void refreshRemoteData();
+  }, [refreshRemoteData]);
 
   const showToast = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
     const id = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -327,16 +324,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateStock = (id: string, delta: number) => {
+    const current = products.find((p) => p.id === id);
+    const nextStock = Math.max(0, (current?.stock ?? 0) + delta);
+
     setProducts((prev) =>
-      prev.map((p) => {
-        if (p.id === id) {
-          const newStock = Math.max(0, p.stock + delta);
-          return { ...p, stock: newStock };
-        }
-        return p;
-      })
+      prev.map((p) => (p.id === id ? { ...p, stock: nextStock } : p))
     );
-    void updateProductStockRemote(id, delta).catch(() => undefined);
+    void updateProductStockRemote(id, nextStock).catch(() => undefined);
   };
 
   const applyDiscount = (id: string, discount: 50 | 70 | 90 | 100) => {
@@ -490,7 +484,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       })
     );
 
-    void verifyOrderRemote(order.id).catch(() => undefined);
+    void verifyOrderRemote(order.id, order.pickupCode).catch(() => undefined);
 
     // Update portionsRescuedCount for the products
     setProducts((prev) =>
@@ -653,6 +647,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         showToast,
         removeToast,
         resetAllDemoData,
+        refreshRemoteData,
       }}
     >
       {children}

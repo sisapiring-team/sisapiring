@@ -18,6 +18,7 @@ class ImpactLog extends Model
         'weight_rescued_kg',
         'co2_prevented_kg',
         'methane_prevented_kg',
+        'water_saved_liters',
         'money_saved_idr',
     ];
 
@@ -26,6 +27,7 @@ class ImpactLog extends Model
         'weight_rescued_kg' => 'decimal:3',
         'co2_prevented_kg' => 'decimal:3',
         'methane_prevented_kg' => 'decimal:3',
+        'water_saved_liters' => 'decimal:2',
         'money_saved_idr' => 'decimal:2',
     ];
 
@@ -45,19 +47,22 @@ class ImpactLog extends Model
     }
 
     /**
-     * Compute impact metrics from portion count and weight
-     * Standard factors:
-     * - 1 portion ~ 0.35 kg
-     * - 1 kg food waste prevented = 2.5 kg CO2e prevented
-     * - 1 kg food waste diverted from landfill = 0.082 kg (82g) CH4 (Methane) prevented
+     * Compute impact metrics using the centralised config factors.
+     *
+     * @return array<string, int|float>
      */
     public static function calculateMetrics(int $portions, float $weightKg, float $moneySaved): array
     {
+        $co2PerKg = (float) config('impact.co2_kg_per_kg_food', 2.5);
+        $methanePerKg = (float) config('impact.methane_kg_per_kg_food', 0.082);
+        $waterPerPortion = (float) config('impact.water_liters_per_portion', 62);
+
         return [
             'portions_rescued' => $portions,
             'weight_rescued_kg' => round($weightKg, 3),
-            'co2_prevented_kg' => round($weightKg * 2.5, 3),
-            'methane_prevented_kg' => round($weightKg * 0.082, 3),
+            'co2_prevented_kg' => round($weightKg * $co2PerKg, 3),
+            'methane_prevented_kg' => round($weightKg * $methanePerKg, 3),
+            'water_saved_liters' => round($portions * $waterPerPortion, 2),
             'money_saved_idr' => round($moneySaved, 2),
         ];
     }

@@ -8,14 +8,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ProductResource extends JsonResource
 {
     /**
-     * Transform the resource into the seller-portal product contract.
-     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->code,
+            'productId' => $this->id,
+            'merchantId' => $this->merchant_id,
             'name' => $this->name,
             'category' => $this->category,
             'image' => $this->image,
@@ -29,14 +29,19 @@ class ProductResource extends JsonResource
             'productionTime' => $this->production_time,
             'safeConsumptionDeadline' => $this->safe_consumption_deadline,
             'safeDeadlineTimestamp' => $this->safe_deadline_at?->getTimestampMs(),
+            'safeDeadlineAt' => $this->safe_deadline_at?->toIso8601String(),
             'pickupScheduleStart' => $this->pickup_schedule_start,
             'pickupScheduleEnd' => $this->pickup_schedule_end,
             'storageInstruction' => $this->storage_instruction,
             'isActive' => (bool) $this->is_active,
+            'moderationStatus' => $this->moderation_status?->value,
+            'takedownReason' => $this->takedown_reason,
             'foodSafetyChecklist' => $this->food_safety_checklist ?? [],
             'description' => $this->description,
             'portionsRescuedCount' => (int) $this->portions_rescued_count,
+            'rating' => $this->whenLoaded('merchant', fn () => (float) $this->merchant?->rating),
             'createdAt' => $this->created_at?->toIso8601String(),
+            'merchant' => $this->whenLoaded('merchant', fn () => new MerchantResource($this->merchant)),
         ];
     }
 }

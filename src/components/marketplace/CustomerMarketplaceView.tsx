@@ -250,7 +250,7 @@ export const CustomerMarketplaceView: React.FC = () => {
                         </div>
                         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-black/60 backdrop-blur-xs text-white text-[11px] px-2.5 py-1 rounded-lg">
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-[#fbe1b5]" />
+  
                             <span>Aman s/d {p.safeConsumptionDeadline}</span>
                           </span>
                           <span className="font-mono">Sisa {p.stock} porsi</span>
@@ -262,7 +262,7 @@ export const CustomerMarketplaceView: React.FC = () => {
                         <div className="flex items-center justify-between text-[11px] text-neutral-500">
                           <span>{p.category}</span>
                           <span className="inline-flex items-center gap-1 text-emerald-700 font-medium">
-                            <ShieldCheck className="w-3.5 h-3.5" />
+                            
                             <span>Lulus Uji Pangan</span>
                           </span>
                         </div>

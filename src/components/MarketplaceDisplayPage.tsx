@@ -12,6 +12,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ShoppingBag,
+  User,
 } from 'lucide-react';
 import {
   SisaPiringItem,
@@ -31,6 +33,8 @@ interface MarketplaceDisplayPageProps {
   onUpdateCartQty: (id: string, delta: number) => void;
   onOpenDetail: (item: SisaPiringItem) => void;
   onOpenCart: () => void;
+  onOpenAuth?: () => void;
+  currentUserName?: string | null;
 }
 
 const PRICE_OPTIONS = [
@@ -84,6 +88,9 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
   onAddToCart,
   onUpdateCartQty,
   onOpenDetail,
+  onOpenCart,
+  onOpenAuth,
+  currentUserName,
 }) => {
   const [displayLayout, setDisplayLayout] = useState<'rak-menu' | 'per-toko'>('rak-menu');
   const [selectedCategory, setSelectedCategory] = useState<FoodCategory>('Semua');
@@ -222,6 +229,8 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
     const found = cart.find((c) => c.item.id === id);
     return found ? found.quantity : 0;
   };
+
+  const totalCartItems = cart.reduce((acc, e) => acc + e.quantity, 0);
 
   return (
     <div className="min-h-screen bg-white pb-24">

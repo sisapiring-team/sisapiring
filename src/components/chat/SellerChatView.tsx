@@ -1,92 +1,200 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Send,
-  Search,
-  CheckCheck,
-  Check,
+  ArrowLeft,
   Store,
   MapPin,
   Clock,
   ShieldCheck,
-  Image as ImageIcon,
   Paperclip,
-  ExternalLink,
-  ArrowLeft,
+  CheckCheck,
+  RotateCcw,
+  Sparkles,
   ShoppingBag,
-  MessageSquare,
-  Users,
+  ExternalLink,
+  X,
+  Plus,
 } from 'lucide-react';
-import { SellerConversation, ChatMessage } from './types';
-import { SELLER_QUICK_QUESTIONS } from './chatData';
+import { ChatMessage } from './types';
+import { SisaPiringItem, formatRupiah } from '../../data/sisaPiringCatalog';
 import { ResilientImage } from '../ResilientImage';
 
 interface SellerChatViewProps {
-  conversations: SellerConversation[];
-  activeConversationId?: string | null;
-  onSelectConversation: (id: string | null) => void;
-  onSendMessage: (conversationId: string, text: string, attachmentName?: string) => void;
+  merchantName: string;
+  product?: SisaPiringItem | null;
+  catalog: SisaPiringItem[];
+  onBackToEtalase: () => void;
   onOpenStore?: (merchantName: string) => void;
   onOpenOrder?: (orderCode: string) => void;
-  onBackToEtalase?: () => void;
+  onSelectProduct?: (item: SisaPiringItem) => void;
 }
 
+const QUICK_QUESTIONS = [
+  'Apakah porsi ini masih hangat & segar?',
+  'Bisa diambil jam berapa sekarang?',
+  'Apakah kemasan aman untuk dibawa naik motor?',
+  'Bisa tolong pisahkan sambal / bumbu pelengkap?',
+  'Apakah ada porsi tambahan yang bisa diselamatkan?',
+];
+
 export const SellerChatView: React.FC<SellerChatViewProps> = ({
-  conversations,
-  activeConversationId,
-  onSelectConversation,
-  onSendMessage,
+  merchantName,
+  product,
+  catalog,
+  onBackToEtalase,
   onOpenStore,
   onOpenOrder,
-  onBackToEtalase,
+  onSelectProduct,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'active_order' | 'coblong' | 'bandung_wetan'>('all');
-  const [inputText, setInputText] = useState('');
-  const [selectedAttachment, setSelectedAttachment] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Find matching catalog items for this merchant to get real metadata
+  const storeItems = catalog.filter(
+    (c) => c.merchantName.toLowerCase() === merchantName.toLowerCase()
+  );
+  const primaryItem = product || storeItems[0] || null;
+  const merchantDistrict = primaryItem?.district || 'Bandung';
+  const merchantAddress = primaryItem?.address || 'Kota Bandung';
+  const pickupWindow = primaryItem?.pickupWindow || '17:00 – 21:30 WIB';
+  const merchantAvatar = primaryItem?.imageUrl || '';
 
-  // Active conversation object (null if viewing contact list on mobile or unselected on desktop)
-  const activeConv = activeConversationId
-    ? conversations.find((c) => c.id === activeConversationId) || null
-    : null;
+  // Every time the component mounts, messages are initialized fresh
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    const greetingText = product
+      ? `Halo Kak! Selamat datang di gerai ${merchantName}. Ada yang ingin ditanyakan tentang hidangan sisa piring "${product.title}" atau jadwal pengambilan hari ini?`
+      : `Halo Kak! Selamat datang di gerai ${merchantName}. Silakan tanyakan ketersediaan porsi atau detail waktu pengambilan pesanan sisa piring kami ya!`;
 
-  // Auto scroll to bottom of active chat thread
-  useEffect(() => {
-    if (activeConv) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [activeConv?.messages]);
-
-  // Filter conversations
-  const filteredConversations = conversations.filter((c) => {
-    const matchesSearch =
-      c.merchantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.merchantDistrict.toLowerCase().includes(searchQuery.toLowerCase());
-    if (!matchesSearch) return false;
-
-    if (selectedFilter === 'active_order') return !!c.activeOrderCode;
-    if (selectedFilter === 'coblong') return c.merchantDistrict.toLowerCase().includes('coblong');
-    if (selectedFilter === 'bandung_wetan') return c.merchantDistrict.toLowerCase().includes('bandung wetan');
-
-    return true;
+    const initialMsg: ChatMessage = {
+      id: `init-${Date.now()}`,
+      sender: 'seller',
+      text: greetingText,
+      timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+      status: 'read',
+      productCard: product
+        ? {
+            id: product.id,
+            title: product.title,
+            merchantName: product.merchantName,
+            price: product.rescuePrice,
+            originalPrice: product.originalPrice,
+            imageUrl: product.imageUrl,
+          }
+        : undefined,
+    };
+    return [initialMsg];
   });
 
-  const handleSend = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!inputText.trim() && !selectedAttachment) return;
+  const [inputText, setInputText] = useState('');
+  const [selectedAttachment, setSelectedAttachment] = useState<string | null>(null);
+  const [isSellerTyping, setIsSellerTyping] = useState(false);
+  const [showProductBanner, setShowProductBanner] = useState<boolean>(Boolean(product));
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    if (activeConv) {
-      onSendMessage(activeConv.id, inputText.trim(), selectedAttachment || undefined);
-      setInputText('');
-      setSelectedAttachment(null);
-    }
+  // Auto-scroll to bottom whenever messages or typing changes
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isSellerTyping]);
+
+  // Focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const handleSend = (textToSend?: string) => {
+    const text = (textToSend || inputText).trim();
+    if (!text && !selectedAttachment) return;
+
+    const timestamp = new Date().toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const userMsg: ChatMessage = {
+      id: `user-${Date.now()}`,
+      sender: 'user',
+      text,
+      timestamp,
+      status: 'sent',
+      attachmentName: selectedAttachment || undefined,
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInputText('');
+    setSelectedAttachment(null);
+    setIsSellerTyping(true);
+
+    // Simulate smart seller reply tailored to question
+    setTimeout(() => {
+      const lower = text.toLowerCase();
+      let replyText = `Terima kasih atas pertanyaannya Kak! Porsi sisa piring di gerai ${merchantName} kami siapkan dengan standar higienitas ketat sesuai komitmen platform.`;
+
+      if (lower.includes('hangat') || lower.includes('segar') || lower.includes('basi')) {
+        replyText = `Betul Kak, hidangan kami simpan di etalase bersuhu stabil dan baru selesai batch dapur sore ini. Kondisinya masih sangat segar, higienis, dan layak santap 100%!`;
+      } else if (
+        lower.includes('jam') ||
+        lower.includes('kapan') ||
+        lower.includes('ambil') ||
+        lower.includes('waktu')
+      ) {
+        replyText = `Jendela pengambilan kami aktif pukul ${pickupWindow}. Kakak bisa langsung datang dan menyebutkan nama atau menunjukkan kode pesanan ke kasir kami ya.`;
+      } else if (
+        lower.includes('motor') ||
+        lower.includes('kemasan') ||
+        lower.includes('bawa') ||
+        lower.includes('tumpah')
+      ) {
+        replyText = `Kemasan kami menggunakan kotak food-grade bersegel kuat dan tertutup rapat Kak, dijamin aman dan tidak mudah tumpah untuk dibawa berkendara motor.`;
+      } else if (
+        lower.includes('sambal') ||
+        lower.includes('saus') ||
+        lower.includes('bumbu') ||
+        lower.includes('pisah')
+      ) {
+        replyText = `Siap Kak! Sambal, saus, dan bumbu pelengkap kami sediakan di wadah terpisah agar kerenyahan dan kesegaran hidangan tetap terjaga.`;
+      } else if (lower.includes('stok') || lower.includes('porsi') || lower.includes('ada')) {
+        replyText = `Stok di aplikasi selalu tersinkronisasi langsung dengan dapur kami Kak. Selama masih bisa diklik di etalase, porsinya masih tersedia!`;
+      }
+
+      const sellerReply: ChatMessage = {
+        id: `reply-${Date.now()}`,
+        sender: 'seller',
+        text: replyText,
+        timestamp: new Date().toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        status: 'read',
+      };
+
+      setIsSellerTyping(false);
+      setMessages((prev) => [...prev, sellerReply]);
+    }, 1100);
   };
 
-  const handleQuickQuestionClick = (question: string) => {
-    if (activeConv) {
-      onSendMessage(activeConv.id, question);
-    }
+  const handleResetChat = () => {
+    const greetingText = product
+      ? `Halo Kak! Selamat datang di gerai ${merchantName}. Ada yang ingin ditanyakan tentang hidangan sisa piring "${product.title}" atau jadwal pengambilan hari ini?`
+      : `Halo Kak! Selamat datang di gerai ${merchantName}. Silakan tanyakan ketersediaan porsi atau detail waktu pengambilan pesanan sisa piring kami ya!`;
+
+    setMessages([
+      {
+        id: `init-${Date.now()}`,
+        sender: 'seller',
+        text: greetingText,
+        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+        status: 'read',
+        productCard: product
+          ? {
+              id: product.id,
+              title: product.title,
+              merchantName: product.merchantName,
+              price: product.rescuePrice,
+              originalPrice: product.originalPrice,
+              imageUrl: product.imageUrl,
+            }
+          : undefined,
+      },
+    ]);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,504 +205,354 @@ export const SellerChatView: React.FC<SellerChatViewProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col md:flex-row overflow-hidden bg-white font-sans">
-      {/* ======================================================== */}
-      {/* COLUMN 1: DAFTAR KONTAK PENJUAL MITRA UMKM               */}
-      {/* Visible always on desktop (md:flex), and on mobile when  */}
-      {/* no conversation is actively selected (!activeConv)       */}
-      {/* ======================================================== */}
-      <div
-        className={`${
-          activeConv ? 'hidden md:flex' : 'flex'
-        } flex-col w-full md:w-80 lg:w-96 border-r border-stone-200 h-full shrink-0 bg-white overflow-hidden`}
-      >
-        {/* Contact List Header */}
-        <div className="p-3.5 sm:p-4 border-b border-stone-200 bg-white space-y-3 shrink-0">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              {onBackToEtalase && (
-                <button
-                  type="button"
-                  onClick={onBackToEtalase}
-                  className="p-1.5 -ml-1 text-stone-500 hover:text-stone-900 rounded-lg hover:bg-stone-100 transition-colors md:hidden cursor-pointer"
-                  title="Kembali ke Etalase"
-                  aria-label="Kembali ke Etalase"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-              )}
-              <div className="w-8 h-8 rounded-xl bg-[#1F281A]/10 text-[#1F281A] flex items-center justify-center font-bold">
-                <Users className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="font-extrabold text-sm sm:text-base text-stone-900 tracking-tight">
-                  Chat Penjual UMKM
-                </h3>
-                <p className="text-[11px] text-stone-500">
-                  {conversations.length} Toko Mitra Tersedia
-                </p>
-              </div>
-            </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-[#1F281A] border border-emerald-200">
-              Online
-            </span>
-          </div>
+    <div className="w-full h-full flex flex-col bg-stone-50 overflow-hidden font-sans select-none">
+      {/* 1. TOP HEADER (Sticky, Focused 1-on-1 Seller Bar) */}
+      <header className="sticky top-0 z-30 h-16 sm:h-18 bg-white border-b border-stone-200/90 px-3 sm:px-6 flex items-center justify-between gap-3 shrink-0 shadow-xs">
+        {/* Left: Back button + Store Avatar + Info */}
+        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <button
+            type="button"
+            onClick={onBackToEtalase}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer shrink-0"
+            title="Tutup Chat & Kembali ke Etalase"
+            aria-label="Kembali ke Etalase"
+          >
+            <ArrowLeft className="w-5 h-5 text-stone-800" />
+            <span className="hidden sm:inline text-xs font-bold">Kembali</span>
+          </button>
 
-          {/* Search Box */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari toko atau kecamatan..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-stone-50 border border-stone-300 rounded-xl focus:outline-none focus:border-[#8da249] focus:bg-white transition-colors"
-            />
-          </div>
+          <div className="h-6 w-px bg-stone-200 hidden sm:block" />
 
-          {/* Quick Filters */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-            <button
-              type="button"
-              onClick={() => setSelectedFilter('all')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shrink-0 ${
-                selectedFilter === 'all'
-                  ? 'bg-[#1F281A] text-white'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-              }`}
-            >
-              Semua
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedFilter('active_order')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shrink-0 ${
-                selectedFilter === 'active_order'
-                  ? 'bg-[#1F281A] text-white'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-              }`}
-            >
-              Ada Pesanan
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedFilter('coblong')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shrink-0 ${
-                selectedFilter === 'coblong'
-                  ? 'bg-[#1F281A] text-white'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-              }`}
-            >
-              Coblong
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedFilter('bandung_wetan')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shrink-0 ${
-                selectedFilter === 'bandung_wetan'
-                  ? 'bg-[#1F281A] text-white'
-                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-              }`}
-            >
-              Bd. Wetan
-            </button>
-          </div>
-        </div>
-
-        {/* Contacts List Scrollable */}
-        <div className="flex-1 overflow-y-auto divide-y divide-stone-100">
-          {/* Mobile Quick Hint Banner */}
-          <div className="md:hidden px-3.5 py-2.5 bg-emerald-50/70 border-b border-emerald-100/80 flex items-center justify-between text-[11px] text-stone-700">
-            <span className="flex items-center gap-1.5 font-medium truncate">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
-              Pilih toko untuk mulai kirim pesan:
-            </span>
-            <button
-              type="button"
-              onClick={() => onSelectConversation(conversations[0]?.id)}
-              className="text-[11px] font-bold text-[#1F281A] hover:underline cursor-pointer shrink-0 ml-2"
-            >
-              Buka Chat Pertama →
-            </button>
-          </div>
-
-          {filteredConversations.length === 0 ? (
-            <div className="p-8 text-center text-stone-400 space-y-2">
-              <Store className="w-8 h-8 text-stone-300 mx-auto" />
-              <p className="text-xs font-semibold">Toko tidak ditemukan.</p>
-            </div>
-          ) : (
-            filteredConversations.map((conv) => {
-              const isSelected = activeConv?.id === conv.id;
-              return (
-                <div
-                  key={conv.id}
-                  onClick={() => onSelectConversation(conv.id)}
-                  className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#8da249]/10 border-l-4 border-l-[#8da249]'
-                      : 'hover:bg-stone-50 border-l-4 border-l-transparent'
-                  }`}
-                >
-                  {/* Store Avatar with Online Status */}
-                  <div className="relative shrink-0">
-                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-stone-200 border border-stone-300/80">
-                      {conv.merchantAvatar ? (
-                        <ResilientImage
-                          src={conv.merchantAvatar}
-                          alt={conv.merchantName}
-                          fallbackTitle={conv.merchantName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center font-bold text-[#1F281A] text-sm">
-                          {conv.merchantName.slice(0, 2).toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                    {conv.isOnline && (
-                      <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
-                    )}
-                  </div>
-
-                  {/* Store Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1 mb-0.5">
-                      <div className="flex items-center gap-1 min-w-0">
-                        <h4
-                          className={`font-bold text-xs truncate ${
-                            isSelected ? 'text-[#1F281A]' : 'text-stone-900'
-                          }`}
-                        >
-                          {conv.merchantName}
-                        </h4>
-                        {conv.isVerified && (
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                        )}
-                      </div>
-                      <span className="text-[10px] text-stone-400 font-mono shrink-0">
-                        {conv.lastMessageTime}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1 text-[11px] text-stone-500 truncate mb-1">
-                      <MapPin className="w-3 h-3 text-stone-400 shrink-0" />
-                      <span className="truncate">{conv.merchantDistrict}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] text-stone-600 truncate flex-1">
-                        {conv.lastMessage}
-                      </p>
-                      {conv.unreadCount > 0 && (
-                        <span className="w-4 h-4 rounded-full bg-[#f89254] text-white text-[9px] font-mono font-bold flex items-center justify-center shrink-0">
-                          {conv.unreadCount}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-
-      {/* ======================================================== */}
-      {/* COLUMN 2: RUANG OBROLAN AKTIF (ACTIVE CHAT THREAD)       */}
-      {/* Visible always on desktop (md:flex), and on mobile when  */}
-      {/* an active conversation is selected (activeConv !== null) */}
-      {/* ======================================================== */}
-      <div
-        className={`${
-          activeConv ? 'flex' : 'hidden md:flex'
-        } flex-1 flex-col h-full overflow-hidden bg-white`}
-      >
-        {activeConv ? (
-          <div className="flex flex-col h-full w-full overflow-hidden">
-            {/* 1. Header Obrolan Toko */}
-            <div className="px-4 py-3 border-b border-stone-200 bg-white flex items-center justify-between gap-3 shadow-2xs shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
-                {/* Back button to return to Contact List (visible on mobile) */}
-                <button
-                  type="button"
-                  onClick={() => onSelectConversation(null)}
-                  className="p-1.5 -ml-1 text-stone-600 hover:text-stone-900 rounded-xl hover:bg-stone-100 transition-colors flex items-center gap-1 text-xs font-bold cursor-pointer shrink-0"
-                  title="Kembali ke Daftar Kontak Penjual"
-                  aria-label="Kembali ke Daftar Kontak"
-                >
-                  <ArrowLeft className="w-5 h-5 text-stone-700" />
-                  <span className="hidden sm:inline">Daftar Kontak</span>
-                </button>
-
-                <div className="h-6 w-px bg-stone-200" />
-
-                {/* Store Avatar */}
-                <div className="w-9 h-9 rounded-xl overflow-hidden bg-stone-200 border border-stone-300/80 shrink-0">
-                  {activeConv.merchantAvatar ? (
-                    <ResilientImage
-                      src={activeConv.merchantAvatar}
-                      alt={activeConv.merchantName}
-                      fallbackTitle={activeConv.merchantName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center font-bold text-[#1F281A] text-xs">
-                      {activeConv.merchantName.slice(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-
-                {/* Store Info */}
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="font-extrabold text-xs sm:text-sm text-stone-900 truncate">
-                      {activeConv.merchantName}
-                    </h4>
-                    {activeConv.isVerified && (
-                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 shrink-0">
-                        <ShieldCheck className="w-3 h-3" />
-                        Verified
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px] text-stone-500 truncate mt-0.5">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-amber-600" />
-                      Ambil: <strong className="font-mono text-stone-800">{activeConv.pickupWindow}</strong>
-                    </span>
-                    <span>•</span>
-                    <span className="truncate">{activeConv.merchantDistrict}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action: Open Store Catalog */}
-              {onOpenStore && (
-                <button
-                  type="button"
-                  onClick={() => onOpenStore(activeConv.merchantName)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors shrink-0 cursor-pointer"
-                  title="Lihat Etalase Toko"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-stone-500" />
-                  <span className="hidden sm:inline">Katalog Toko</span>
-                </button>
-              )}
-            </div>
-
-            {/* Active Order Banner (if exists) */}
-            {activeConv.activeOrderCode && (
-              <div className="px-4 py-2 bg-amber-50/90 border-b border-amber-200/70 flex items-center justify-between gap-2 shrink-0">
-                <div className="flex items-center gap-2 text-xs">
-                  <ShoppingBag className="w-4 h-4 text-amber-700 shrink-0" />
-                  <span className="text-amber-900 text-[11px]">
-                    Pesanan Aktif: <strong className="font-mono font-bold">#{activeConv.activeOrderCode}</strong>
-                  </span>
-                </div>
-                {onOpenOrder && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenOrder(activeConv.activeOrderCode!)}
-                    className="text-[11px] font-bold text-emerald-800 hover:underline cursor-pointer"
-                  >
-                    Buka Tiket Pesanan & QR
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* 2. Messages Stream */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-stone-50/40">
-              <div className="text-center my-2">
-                <span className="px-3.5 py-1 bg-stone-200/80 text-stone-600 text-[10px] font-medium rounded-full">
-                  Obrolan Terenkripsi • Terhubung Langsung ke Dapur Mitra UMKM
-                </span>
-              </div>
-
-              {activeConv.messages.map((msg) => {
-                const isUser = msg.sender === 'user';
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
-                  >
-                    <div
-                      className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed shadow-xs relative ${
-                        isUser
-                          ? 'bg-[#1F281A] text-white border-2 border-[#1F281A] rounded-br-xs'
-                          : 'bg-white text-stone-900 border-2 border-[#8da249]/70 rounded-bl-xs shadow-xs'
-                      }`}
-                    >
-                      {msg.attachmentName && (
-                        <div className="mb-2 p-2 rounded-xl bg-black/10 flex items-center gap-2 text-[11px]">
-                          <ImageIcon className="w-4 h-4 shrink-0" />
-                          <span className="truncate">{msg.attachmentName}</span>
-                        </div>
-                      )}
-
-                      <p className="whitespace-pre-wrap">{msg.text}</p>
-
-                      <div
-                        className={`flex items-center justify-end gap-1 mt-1 text-[9px] font-mono ${
-                          isUser ? 'text-emerald-200' : 'text-stone-400'
-                        }`}
-                      >
-                        <span>{msg.timestamp}</span>
-                        {isUser && (
-                          <span>
-                            {msg.status === 'read' ? (
-                              <CheckCheck className="w-3 h-3 text-emerald-300" />
-                            ) : (
-                              <Check className="w-3 h-3" />
-                            )}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Action chips attached to message */}
-                    {msg.actionChips && msg.actionChips.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {msg.actionChips.map((chip, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => {
-                              if (chip.action === 'view_order' && onOpenOrder && chip.payload) {
-                                onOpenOrder(chip.payload);
-                              } else if (chip.action === 'maps') {
-                                alert(`Alamat toko: ${activeConv.merchantAddress}`);
-                              }
-                            }}
-                            className="px-2.5 py-1 text-[11px] font-semibold bg-white border border-stone-200 rounded-full hover:bg-stone-100 text-stone-700 transition-colors shadow-2xs cursor-pointer"
-                          >
-                            {chip.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* 3. Quick Questions Chips Carousel */}
-            <div className="px-4 py-2 bg-white border-t border-stone-200/70 overflow-x-auto flex items-center gap-1.5 shrink-0 scrollbar-none">
-              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider shrink-0 mr-1">
-                Pintas:
-              </span>
-              {SELLER_QUICK_QUESTIONS.map((q, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleQuickQuestionClick(q)}
-                  className="px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 border border-stone-200 hover:border-[#1F281A] text-stone-700 hover:text-[#1F281A] text-[11px] whitespace-nowrap transition-colors shadow-2xs shrink-0 cursor-pointer"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-
-            {/* 4. Message Input Form */}
-            <form
-              onSubmit={handleSend}
-              className="p-3 sm:p-3.5 bg-white border-t border-stone-200/90 shadow-[0_-2px_10px_rgba(0,0,0,0.04)] sticky bottom-0 z-20 flex items-center gap-2 shrink-0"
-            >
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="p-2 sm:p-2.5 text-stone-500 hover:text-[#1F281A] hover:bg-stone-100 rounded-xl transition-colors cursor-pointer shrink-0"
-                title="Lampirkan Foto"
-                aria-label="Lampirkan Foto"
-              >
-                <Paperclip className="w-5 h-5" />
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-
-              <div className="flex-1 relative">
-                {selectedAttachment && (
-                  <div className="absolute -top-9 left-0 right-0 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1 text-[11px] text-[#1F281A] flex items-center justify-between shadow-xs">
-                    <span className="truncate">Lampiran: {selectedAttachment}</span>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedAttachment(null)}
-                      className="text-stone-400 hover:text-stone-800 ml-2 font-bold cursor-pointer"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-                <input
-                  type="text"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder={`Ketik pesan ke ${activeConv.merchantName}...`}
-                  className="w-full px-4 py-2.5 sm:py-3 text-xs sm:text-sm bg-stone-50 hover:bg-white focus:bg-white border border-stone-300 focus:border-[#8da249] rounded-2xl focus:outline-none transition-colors text-stone-900 placeholder:text-stone-400 shadow-inner"
+          {/* Store Avatar */}
+          <div className="relative shrink-0">
+            {merchantAvatar ? (
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border border-stone-200 bg-stone-100">
+                <ResilientImage
+                  src={merchantAvatar}
+                  alt={merchantName}
+                  fallbackTitle={merchantName}
+                  className="w-full h-full object-cover"
                 />
               </div>
-
-              <button
-                type="submit"
-                disabled={!inputText.trim() && !selectedAttachment}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#1F281A] hover:bg-emerald-900 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-sm cursor-pointer shrink-0"
-                aria-label="Kirim Pesan"
-              >
-                <Send className="w-4 h-4 ml-0.5" />
-              </button>
-            </form>
+            ) : (
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#1F281A] text-white flex items-center justify-center font-bold text-sm">
+                {merchantName.slice(0, 2).toUpperCase()}
+              </div>
+            )}
+            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white" />
           </div>
-        ) : (
-          /* Empty State when no conversation selected yet (Desktop Placeholder) */
-          <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center bg-stone-50/50">
-            <div className="w-16 h-16 rounded-3xl bg-[#8da249]/15 text-[#1F281A] flex items-center justify-center mb-4 shadow-xs">
-              <MessageSquare className="w-8 h-8 text-[#8da249]" />
+
+          {/* Store Name, District, Online Status */}
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h1 className="text-sm sm:text-base font-extrabold text-stone-900 truncate tracking-tight">
+                {merchantName}
+              </h1>
+              <span
+                className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-md bg-[#F4F6EC] text-[#3f4d13] border border-[#8da249]/30 text-[10px] font-bold shrink-0"
+                title="Mitra Resmi Terverifikasi SisaPiring"
+              >
+                <ShieldCheck className="w-3 h-3 text-[#8da249]" />
+                <span>Terverifikasi</span>
+              </span>
             </div>
-            <h3 className="text-base sm:text-lg font-extrabold text-stone-900 mb-1">
-              Pusat Chat Mitra UMKM
-            </h3>
-            <p className="text-xs text-stone-500 max-w-sm mb-4 leading-relaxed">
-              Pilih salah satu toko mitra di daftar sebelah kiri untuk menanyakan stok sisa piring, konfirmasi pesanan, atau koordinasi waktu ambil langsung.
-            </p>
-            {conversations.length > 0 && (
+            <div className="flex items-center gap-2 text-[11px] text-stone-500 mt-0.5 truncate">
+              <span className="flex items-center gap-1 font-medium text-emerald-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Online
+              </span>
+              <span>•</span>
+              <span className="truncate flex items-center gap-1">
+                <Clock className="w-3 h-3 text-stone-400 shrink-0" />
+                Ambil {pickupWindow}
+              </span>
+              <span className="hidden lg:inline">•</span>
+              <span className="hidden lg:inline truncate text-stone-400">
+                {merchantDistrict}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Action: Open Store Catalog or Reset Chat */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleResetChat}
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl text-stone-500 hover:text-stone-800 hover:bg-stone-100 border border-stone-200/70 transition-colors text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer"
+            title="Mulai Ulang Percakapan"
+          >
+            <RotateCcw className="w-4 h-4 text-stone-500" />
+            <span className="hidden md:inline">Mulai Ulang</span>
+          </button>
+
+          {onOpenStore && (
+            <button
+              type="button"
+              onClick={() => onOpenStore(merchantName)}
+              className="px-3 sm:px-3.5 py-2 rounded-xl bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            >
+              <Store className="w-3.5 h-3.5 text-[#8da249]" />
+              <span className="hidden sm:inline">Katalog Toko</span>
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* 2. OPTIONAL PINNED PRODUCT CONTEXT BANNER */}
+      {primaryItem && showProductBanner && (
+        <div className="bg-white border-b border-stone-200/90 px-3 sm:px-6 py-2.5 flex items-center justify-between gap-3 shadow-2xs z-20">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-11 h-11 rounded-xl overflow-hidden bg-stone-100 border border-stone-200 shrink-0">
+              <ResilientImage
+                src={primaryItem.imageUrl}
+                alt={primaryItem.title}
+                fallbackTitle={primaryItem.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#4a5a18] bg-[#F4F6EC] px-2 py-0.2 rounded border border-[#8da249]/30">
+                  Konteks Produk
+                </span>
+                <span className="text-[11px] text-stone-500 hidden sm:inline">
+                  Tersisa {primaryItem.remainingStock} paket
+                </span>
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-stone-900 truncate mt-0.5">
+                {primaryItem.title}
+              </h4>
+              <div className="flex items-center gap-2 text-xs font-mono-tabular">
+                <strong className="text-emerald-900 font-bold">
+                  {formatRupiah(primaryItem.rescuePrice)}
+                </strong>
+                <span className="text-stone-400 line-through text-[11px]">
+                  {formatRupiah(primaryItem.originalPrice)}
+                </span>
+                <span className="text-[10px] font-bold text-[#8da249]">
+                  Hemat {primaryItem.discountPercent}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {onSelectProduct && (
               <button
                 type="button"
-                onClick={() => onSelectConversation(conversations[0]?.id)}
-                className="mb-6 px-5 py-2.5 bg-[#1F281A] text-white text-xs font-bold rounded-xl hover:bg-emerald-900 transition-colors shadow-xs cursor-pointer flex items-center gap-2"
+                onClick={() => onSelectProduct(primaryItem)}
+                className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-800 transition-colors cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4" />
-                <span>Mulai Chat dengan {conversations[0]?.merchantName}</span>
+                <span>Lihat Detail</span>
               </button>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md w-full text-left">
-              <div className="p-3 bg-white border border-stone-200/80 rounded-2xl shadow-2xs">
-                <div className="flex items-center gap-2 mb-1">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span className="text-xs font-bold text-stone-900">Garansi Escrow</span>
+            <button
+              type="button"
+              onClick={() => setShowProductBanner(false)}
+              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
+              title="Tutup ringkasan produk"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 3. CHAT THREAD MESSAGES AREA */}
+      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 space-y-4">
+        {/* Date Session Divider */}
+        <div className="flex items-center justify-center my-2">
+          <span className="px-3 py-1 rounded-full bg-stone-200/80 text-stone-600 text-[11px] font-medium">
+            Hari ini · Sesi Chat Langsung
+          </span>
+        </div>
+
+        {/* Security / Food Safety Reassurance Notice */}
+        <div className="max-w-md mx-auto p-3 rounded-2xl bg-[#F4F6EC] border border-[#8da249]/30 text-center text-xs text-[#3a4914] flex items-center justify-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-[#8da249] shrink-0" />
+          <span>
+            Percakapan dilindungi SOP higienitas & jaminan penjemputan resmi SisaPiring.
+          </span>
+        </div>
+
+        {/* Messages Stream */}
+        {messages.map((msg) => {
+          const isUser = msg.sender === 'user';
+
+          return (
+            <div
+              key={msg.id}
+              className={`flex items-end gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
+            >
+              {!isUser && (
+                <div className="w-8 h-8 rounded-full bg-[#1F281A] text-white flex items-center justify-center text-xs font-bold shrink-0 mb-1">
+                  {merchantName[0]}
                 </div>
-                <p className="text-[11px] text-stone-500">
-                  Dana Anda aman di escrow hingga pesanan diterima dengan baik.
+              )}
+
+              <div
+                className={`max-w-[85%] sm:max-w-md rounded-2xl px-4 py-3 space-y-2 shadow-xs ${
+                  isUser
+                    ? 'bg-[#1F281A] text-white rounded-br-xs'
+                    : 'bg-white text-stone-900 border border-stone-200/90 rounded-bl-xs'
+                }`}
+              >
+                {/* Linked Product Card Snippet (if message has productCard attached) */}
+                {msg.productCard && (
+                  <div
+                    onClick={() => {
+                      if (onSelectProduct && primaryItem) onSelectProduct(primaryItem);
+                    }}
+                    className={`p-2 rounded-xl flex items-center gap-2.5 cursor-pointer transition-colors ${
+                      isUser
+                        ? 'bg-white/10 hover:bg-white/15 text-white'
+                        : 'bg-stone-50 hover:bg-stone-100 text-stone-900 border border-stone-200/70'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-stone-200">
+                      <ResilientImage
+                        src={msg.productCard.imageUrl}
+                        alt={msg.productCard.title}
+                        fallbackTitle={msg.productCard.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs font-bold block truncate">
+                        {msg.productCard.title}
+                      </span>
+                      <span className="text-[11px] font-mono block opacity-90">
+                        {formatRupiah(msg.productCard.price)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Message Body */}
+                <p className="text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap">
+                  {msg.text}
                 </p>
-              </div>
-              <div className="p-3 bg-white border border-stone-200/80 rounded-2xl shadow-2xs">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4 text-amber-600" />
-                  <span className="text-xs font-bold text-stone-900">Respon Cepat</span>
+
+                {/* Optional Attachment */}
+                {msg.attachmentName && (
+                  <div
+                    className={`p-2 rounded-xl flex items-center gap-2 text-xs ${
+                      isUser ? 'bg-white/10 text-white' : 'bg-stone-100 text-stone-800'
+                    }`}
+                  >
+                    <Paperclip className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{msg.attachmentName}</span>
+                  </div>
+                )}
+
+                {/* Meta: Timestamp & Read Status */}
+                <div
+                  className={`flex items-center justify-end gap-1 text-[10px] ${
+                    isUser ? 'text-neutral-400' : 'text-neutral-400'
+                  }`}
+                >
+                  <span>{msg.timestamp}</span>
+                  {isUser && <CheckCheck className="w-3.5 h-3.5 text-[#8da249]" />}
                 </div>
-                <p className="text-[11px] text-stone-500">
-                  Dapur mitra siap merespons pertanyaan ketersediaan porsi sore.
-                </p>
               </div>
             </div>
+          );
+        })}
+
+        {/* Typing indicator */}
+        {isSellerTyping && (
+          <div className="flex items-center gap-2 text-xs text-stone-500 animate-pulse pl-10">
+            <span className="w-2 h-2 rounded-full bg-[#8da249]" />
+            <span>{merchantName} sedang mengetik balasan...</span>
           </div>
         )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* 4. QUICK SUGGESTIONS CHIPS (Single-click to send) */}
+      <div className="bg-white/95 border-t border-stone-200/80 px-3 sm:px-6 py-2 overflow-x-auto shrink-0 flex items-center gap-2 no-scrollbar">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 shrink-0">
+          Tanya Cepat:
+        </span>
+        {QUICK_QUESTIONS.map((q, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => handleSend(q)}
+            className="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-[#F4F6EC] hover:text-[#3f4d13] text-stone-700 text-xs font-semibold whitespace-nowrap border border-stone-200/80 transition-colors shrink-0 cursor-pointer"
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+
+      {/* 5. BOTTOM INPUT BAR (Sticky, Form-Ready, No Overlap) */}
+      <div className="bg-white border-t border-stone-200/90 p-3 sm:p-4 shrink-0">
+        {selectedAttachment && (
+          <div className="max-w-4xl mx-auto mb-2 px-3 py-1.5 bg-stone-100 rounded-xl text-xs flex items-center justify-between gap-2 border border-stone-200">
+            <div className="flex items-center gap-2 min-w-0">
+              <Paperclip className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+              <span className="truncate text-stone-700 font-medium">{selectedAttachment}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedAttachment(null)}
+              className="text-stone-400 hover:text-stone-700 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+          className="max-w-4xl mx-auto flex items-center gap-2"
+        >
+          {/* File input attachment */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            accept="image/*,.pdf"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2.5 sm:p-3 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-600 hover:text-stone-900 border border-stone-200/80 transition-colors cursor-pointer shrink-0"
+            title="Kirim Foto / Berkas"
+            aria-label="Kirim Foto / Berkas"
+          >
+            <Paperclip className="w-4 h-4" />
+          </button>
+
+          {/* Text Input */}
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder={`Tulis pesan untuk ${merchantName}...`}
+            className="flex-1 px-4 py-2.5 sm:py-3 bg-stone-50 border border-stone-300 rounded-2xl text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#8da249]/40 focus:border-[#8da249]"
+          />
+
+          {/* Send Button */}
+          <button
+            type="submit"
+            disabled={!inputText.trim() && !selectedAttachment}
+            className="h-10 sm:h-11 px-4 sm:px-5 rounded-2xl bg-[#8da249] hover:bg-[#7b8e3d] disabled:opacity-40 text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
+            aria-label="Kirim Pesan"
+          >
+            <Send className="w-4 h-4" />
+            <span className="hidden sm:inline">Kirim</span>
+          </button>
+        </form>
       </div>
     </div>
   );

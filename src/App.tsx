@@ -4,6 +4,7 @@ import { ToastContainer } from './components/common/ToastContainer';
 import { SellerSidebar } from './components/layout/SellerSidebar';
 import { SellerHeader } from './components/layout/SellerHeader';
 import { MobileNav } from './components/layout/MobileNav';
+import { UserNavbar } from './components/layout/UserNavbar';
 
 // Seller Views
 import { SellerDashboardView } from './components/dashboard/SellerDashboardView';
@@ -91,6 +92,7 @@ import { StoreCatalogPage } from './components/StoreCatalogPage';
 import { AuthPage, UserAccount } from './components/AuthPage';
 import { fetchCatalog, fetchMe, logoutRemote } from './lib/api';
 import { AdminDashboardPage } from './components/AdminDashboardPage';
+import { AdminLoginGate } from './components/admin/AdminLoginGate';
 import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
 import { BotChatView } from './components/chat/BotChatView';
@@ -221,6 +223,8 @@ function CustomerAndAdminPortal() {
     return undefined;
   });
 
+  const [chatTargetProduct, setChatTargetProduct] = useState<SisaPiringItem | null>(null);
+
   const [selectedStoreName, setSelectedStoreName] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const route = parseRoute(window.location.pathname);
@@ -260,6 +264,7 @@ function CustomerAndAdminPortal() {
             name: user.name,
             email: user.email,
             phone: user.phone || '081234567890',
+            role: user.role,
             district: user.district || 'Coblong (Dago / Dipatiukur)',
             defaultAddress: user.defaultAddress || '',
           });
@@ -549,9 +554,10 @@ function CustomerAndAdminPortal() {
     scrollToTop();
   };
 
-  const openChatPage = (merchantName?: string) => {
+  const openChatPage = (merchantName?: string, product?: SisaPiringItem) => {
     pushRoute(merchantName ? `/chat/${encodeURIComponent(merchantName)}` : '/chat');
     setChatTargetMerchant(merchantName);
+    setChatTargetProduct(product || null);
     setActiveTab('marketplace');
     setActivePage('chat');
     scrollToTop();
@@ -936,309 +942,16 @@ function CustomerAndAdminPortal() {
           : ''
       }`}
     >
-      {/* Top Navigation Bar — Hidden on Login/Register Page & Admin Workspace */}
+      {/* UserNavbar — semua page user kecuali auth & admin */}
       {activePage !== 'auth' && activePage !== 'admin' && (
-        <header className="sticky top-0 z-30 h-14 md:h-16 bg-[#1F281A] text-white border-b border-white/10 flex items-center">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2 sm:gap-4 md:gap-8 px-3 sm:px-6">
-          {/* Zone 1: Single text element wordmark */}
-          <button
-            type="button"
-            onClick={openLandingPage}
-            className="text-lg md:text-xl font-bold tracking-tight text-white font-display whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            SisaPiring
-          </button>
-
-          {/* Zone 2: Navigation Links (Desktop) */}
-          <nav
-            aria-label="Navigasi Utama"
-            className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-display font-medium text-stone-100"
-          >
-            {activePage === 'landing' ? (
-              /* ON LANDING PAGE: Only Beranda, Cara Kerja, Dampak UMKM */
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById('beranda');
-                    if (el) scrollToElement(el);
-                    else openLandingPage();
-                  }}
-                  className="text-[#8da249] font-bold underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Beranda
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigateToSection('cara-kerja')}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Cara Kerja
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigateToSection('dampak-umkm')}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Fakta Limbah Pangan
-                </button>
-              </>
-            ) : (
-              /* INSIDE APP: Etalase Makanan, Pesanan, Chat Penjual, History, Beranda, Mitra UMKM, Panel Admin */
-              <>
-                <button
-                  type="button"
-                  onClick={openEtalasePage}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'etalase' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  Etalase Makanan
-                </button>
-                <button
-                  type="button"
-                  onClick={openOrdersPage}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'pesanan' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  Pesanan
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openChatPage()}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'chat' || activePage === 'chat-bot' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  Chat Penjual
-                </button>
-                <button
-                  type="button"
-                  onClick={openHistoryPage}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'history' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  History
-                </button>
-                <button
-                  type="button"
-                  onClick={openLandingPage}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Beranda
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openSellerPage()}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Mitra UMKM
-                </button>
-                <button
-                  type="button"
-                  onClick={openAdminPage}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Panel Admin
-                </button>
-              </>
-            )}
-          </nav>
-
-          {/* Zone 3: Header Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {activePage === 'landing' ? (
-              /* ON LANDING PAGE: CTA button to enter app + Login/User + Hamburger */
-              <button
-                type="button"
-                onClick={openEtalasePage}
-                className="h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 bg-[#8DA249] hover:bg-[#7b8e3d] text-white shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <ShoppingBag className="w-3.5 h-3.5" />
-                <span>Mulai Pakai</span>
-              </button>
-            ) : (
-              /* INSIDE APP: Chat + Cart + Login/User + Hamburger */
-              <>
-                <button
-                  type="button"
-                  onClick={() => openChatPage()}
-                  title="Pusat Pesan & Chat Penjual"
-                  aria-label="Pusat Pesan & Chat Penjual"
-                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                    activePage === 'chat'
-                      ? 'bg-white/30 border-[#8da249]'
-                      : 'bg-white/15 border-white/25 hover:bg-white/25'
-                  }`}
-                >
-                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#f89254] ring-2 ring-[#1F281A]" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={openCartPage}
-                  aria-label={`Kantong Belanja (${totalCartItems} item)`}
-                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                    activePage === 'kantong'
-                      ? 'bg-white/30 border-[#8da249]'
-                      : 'bg-white/15 border-white/25 hover:bg-white/25'
-                  }`}
-                >
-                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-                  {totalCartItems > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
-                      {totalCartItems}
-                    </span>
-                  )}
-                </button>
-              </>
-            )}
-
-            {!currentUser ? (
-              <button
-                type="button"
-                onClick={openAuthPage}
-                className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border bg-white text-[#1F281A] border-white hover:bg-stone-100 shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <User className="w-3.5 h-3.5 shrink-0" />
-                <span>Login</span>
-              </button>
-            ) : (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsAccountMenuOpen((prev) => !prev)}
-                  aria-label="Menu Akun Pengguna"
-                  aria-expanded={isAccountMenuOpen}
-                  className={`w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                    isAccountMenuOpen
-                      ? 'bg-white/30 border-[#8da249]'
-                      : 'bg-white/15 border-white/25 hover:bg-white/25'
-                  }`}
-                >
-                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-                </button>
-
-                {isAccountMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white text-stone-900 border border-stone-200 rounded-2xl shadow-xl py-2 z-50 overflow-hidden">
-                    {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-stone-100 bg-white">
-                      <p className="text-xs font-bold text-stone-900 truncate">
-                        {currentUser.name}
-                      </p>
-                      <p className="text-[11px] text-stone-500 truncate">
-                        {currentUser.email}
-                      </p>
-                      <p className="text-[11px] font-mono-tabular text-stone-500 mt-0.5">
-                        {currentUser.phone}
-                      </p>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="py-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditDistrictText(currentUser.district || 'Coblong (Dago / Dipatiukur)');
-                          setEditAddressText(currentUser.defaultAddress || '');
-                          setAccountModalMode('address');
-                          setIsAccountMenuOpen(false);
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-start gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <MapPin className="w-4 h-4 text-[#1F281A] shrink-0 mt-0.5" />
-                        <div className="min-w-0 flex-1">
-                          <span className="block font-semibold text-stone-900">
-                            Alamat Default
-                          </span>
-                          <span className="block text-[11px] text-stone-500 truncate">
-                            {currentUser.defaultAddress || 'Belum diatur'}
-                          </span>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditNameText(currentUser.name);
-                          setEditPhoneText(currentUser.phone);
-                          setAccountModalMode('profile');
-                          setIsAccountMenuOpen(false);
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <Settings className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Pengaturan Profil & Nomor</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAccountMenuOpen(false);
-                          openCartPage();
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <ShoppingBag className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Kantong Penyelamatan ({totalCartItems})</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAccountMenuOpen(false);
-                          setActiveTab('dashboard');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <Store className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Portal Mitra UMKM</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAccountMenuOpen(false);
-                          openAdminPage();
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <ShieldCheck className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Panel Admin (Pengelola)</span>
-                      </button>
-                    </div>
-
-                    {/* Logout Action */}
-                    <div className="pt-1 border-t border-stone-100">
-                      <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="w-full px-4 py-2.5 text-left text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <LogOut className="w-4 h-4 shrink-0" />
-                        <span>Keluar (Logout)</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Mobile Navigation Drawer Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsMobileNavOpen(true)}
-              aria-label="Buka Menu Navigasi"
-              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border border-white/20 bg-white/10 hover:bg-white/20 rounded-xl transition-colors shrink-0 cursor-pointer"
-            >
-              <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </button>
-          </div>
-        </div>
-      </header>
+        <UserNavbar
+          activePage={activePage}
+          totalCartItems={totalCartItems}
+          currentUserName={currentUser?.name ?? null}
+          onGoHome={openLandingPage}
+          onGoCart={openCartPage}
+          onGoAuth={openAuthPage}
+        />
       )}
 
       {/* Mobile Navigation Drawer for Customer & Portal Links */}
@@ -1343,20 +1056,6 @@ function CustomerAndAdminPortal() {
                       }`}
                     >
                       Pesanan
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        openChatPage();
-                      }}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                        activePage === 'chat' || activePage === 'chat-bot'
-                          ? 'bg-[#8da249]/15 text-[#8da249]'
-                          : 'text-stone-700 hover:bg-stone-100'
-                      }`}
-                    >
-                      Chat Penjual
                     </button>
                     <button
                       type="button"
@@ -1473,7 +1172,17 @@ function CustomerAndAdminPortal() {
       {activePage === 'admin' ? (
         /* PAGE 8: DEDICATED PLATFORM ADMIN GOVERNANCE CONSOLE */
         <main className="flex-1">
-          <AdminDashboardPage
+          {currentUser?.role !== 'admin' ? (
+            <AdminLoginGate
+              onLoginSuccess={(name, email) => {
+                setCurrentUser((prev) => prev
+                  ? { ...prev, name, email, role: 'admin' }
+                  : { name, email, phone: '', role: 'admin' }
+                );
+              }}
+            />
+          ) : (
+            <AdminDashboardPage
             catalogItems={catalogItems}
             productMonitoring={productMonitoring}
             umkmVerifications={umkmVerifications}
@@ -1495,6 +1204,7 @@ function CustomerAndAdminPortal() {
             onSwitchToSellerPortal={() => setActiveTab('dashboard')}
             onOpenPublicStore={openStorePage}
           />
+          )}
         </main>
       ) : activePage === 'auth' ? (
         /* PAGE 4: SEPARATE LOGIN & REGISTER PAGE */
@@ -1543,11 +1253,16 @@ function CustomerAndAdminPortal() {
         </main>
       ) : activePage === 'chat' ? (
         /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
-        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white mb-16">
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white">
           <ChatContainerPage
             initialMerchantName={chatTargetMerchant}
+            initialProduct={chatTargetProduct}
             catalog={publicVisibleCatalogItems}
-            onBack={openEtalasePage}
+            onBack={() => {
+              setChatTargetMerchant(undefined);
+              setChatTargetProduct(null);
+              openEtalasePage();
+            }}
             onOpenStore={(mName) => openStorePage(mName)}
             onOpenOrder={(orderCode) => openOrdersPage()}
             onOpenEtalase={openEtalasePage}
@@ -2477,7 +2192,7 @@ function CustomerAndAdminPortal() {
         onClose={() => setActiveProductModal(null)}
         onAddToCart={handleAddToCart}
         onOpenStore={openStorePage}
-        onChatStore={(mName) => openChatPage(mName)}
+        onChatStore={(mName, item) => openChatPage(mName, item)}
       />
 
       {/* MODAL BERI RATING & ULASAN UMKM SETELAH PESANAN SELESAI */}
@@ -2924,8 +2639,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY (Hanya di dalam aplikasi pemesanan) */}
-      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY (Hanya di dalam aplikasi pemesanan) */}
+      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2961,22 +2676,6 @@ function CustomerAndAdminPortal() {
               )}
             </div>
             <span className="text-[11px]">Pesanan</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => openChatPage()}
-            className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
-              activePage === 'chat' || activePage === 'chat-bot'
-                ? 'text-[#8da249] font-bold'
-                : 'text-stone-400 hover:text-stone-700 font-medium'
-            }`}
-          >
-            <div className="relative">
-              <MessageSquare className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-[#f89254]" />
-            </div>
-            <span className="text-[11px]">Chat Penjual</span>
           </button>
 
           <button

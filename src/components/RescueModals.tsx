@@ -43,7 +43,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   onAddToCart: (item: SisaPiringItem, qty: number) => void;
   onOpenStore?: (merchantName: string) => void;
-  onChatStore?: (merchantName: string) => void;
+  onChatStore?: (merchantName: string, item?: SisaPiringItem) => void;
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -136,11 +136,27 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </span>
               </div>
 
-              {/* Store Information Card + Button to View Store Catalog & Reviews */}
-              <div className="mb-4 p-3.5 rounded-xl bg-white border border-stone-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-start gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center shrink-0 mt-0.5">
-                    <Store className="w-4 h-4" />
+              {/* Store Information Card + Chat Penjual Icon Beside Store Icon */}
+              <div className="mb-4 p-3.5 rounded-2xl bg-stone-50 border border-stone-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center shrink-0">
+                      <Store className="w-4 h-4" />
+                    </div>
+                    {onChatStore && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onChatStore(item.merchantName, item);
+                          onClose();
+                        }}
+                        className="w-10 h-10 rounded-xl bg-[#8da249] hover:bg-[#7a8e3d] text-white flex items-center justify-center shrink-0 transition-transform active:scale-95 shadow-xs cursor-pointer group"
+                        title={`Chat Penjual (${item.merchantName})`}
+                        aria-label="Chat Penjual"
+                      >
+                        <MessageSquare className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </button>
+                    )}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
@@ -158,20 +174,36 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </div>
                 </div>
 
-                {onOpenStore && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const targetMerchant = item.merchantName;
-                      onClose();
-                      onOpenStore(targetMerchant);
-                    }}
-                    className="h-9 px-3.5 rounded-lg bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <Store className="w-3.5 h-3.5" />
-                    <span>Lihat Katalog Toko</span>
-                  </button>
-                )}
+                <div className="flex items-center gap-2 shrink-0">
+                  {onChatStore && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChatStore(item.merchantName, item);
+                        onClose();
+                      }}
+                      className="h-9 px-3 rounded-xl bg-[#8da249] hover:bg-[#7a8e3d] text-white text-xs font-bold inline-flex items-center justify-center gap-0 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
+                      title={`Chat langsung dengan penjual ${item.merchantName}`}
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      
+                    </button>
+                  )}
+                  {onOpenStore && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const targetMerchant = item.merchantName;
+                        onClose();
+                        onOpenStore(targetMerchant);
+                      }}
+                      className="h-9 px-3 rounded-xl bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <Store className="w-3.5 h-3.5" />
+                      <span>Lihat Toko</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mb-4">
@@ -252,14 +284,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <button
               type="button"
               onClick={() => {
-                onChatStore(item.merchantName);
+                onChatStore(item.merchantName, item);
                 onClose();
               }}
-              className="h-12 px-3.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+              className="h-12 px-3.5 bg-[#8da249]/15 hover:bg-[#8da249]/25 text-[#3a4914] text-xs font-bold rounded-xl inline-flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer border border-[#8da249]/30"
               title={`Chat penjual ${item.merchantName}`}
             >
-              <MessageSquare className="w-4 h-4 text-emerald-800" />
-              <span className="hidden sm:inline">Tanya Penjual</span>
+              <MessageSquare className="w-4 h-4 text-[#4a5a18]" />
+              <span className="hidden sm:inline">Chat Penjual</span>
             </button>
           )}
 

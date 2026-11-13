@@ -22,6 +22,7 @@ export interface UserAccount {
   name: string;
   email: string;
   phone: string;
+  role?: 'buyer' | 'seller' | 'admin';
   district?: string;
   defaultAddress?: string;
 }
@@ -140,6 +141,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         name: user.name,
         email: user.email,
         phone: user.phone || '081234567890',
+        role: user.role,
         district: user.district || 'Coblong (Dago / Dipatiukur)',
         defaultAddress: user.defaultAddress || '',
       });
@@ -223,6 +225,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         name: user.name,
         email: user.email,
         phone: user.phone || phone.trim(),
+        role: user.role,
         district: user.district || district,
         defaultAddress: user.defaultAddress || fullDefaultAddress,
       });

@@ -9,7 +9,7 @@ export const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
   onOpenChatBot,
 }) => {
   return (
-    <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 select-none">
+    <div className="fixed bottom-20 right-4 sm:right-6 z-40 select-none">
       <button
         type="button"
         onClick={onOpenChatBot}

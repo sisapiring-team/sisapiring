@@ -350,91 +350,26 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
 
           {activeTab === 'seller-governance' && (
             <SellerGovernanceTab
-              displayUmkmList={displayUmkmList}
-              sellerStatusFilter={sellerStatusFilter}
-              onStatusFilterChange={setSellerStatusFilter}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              sellerProfile={sellerProfile}
-              onSelectUmkm={setSelectedUmkmModal}
-              onOpenPublicStore={onOpenPublicStore}
               onSwitchToSellerPortal={onSwitchToSellerPortal}
             />
           )}
 
           {activeTab === 'product-curation' && (
-            <ProductCurationTab
-              displayProducts={displayProducts}
-              productMonitoring={productMonitoring}
-              productStatusFilter={productStatusFilter}
-              onStatusFilterChange={setProductStatusFilter}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onRestoreProduct={(itemId, title) => {
-                onUpdateProductMonitoring(itemId, 'Aktif & Aman');
-                showToast('Produk Dipulihkan', `"${title}" kembali tayang di etalase.`);
-              }}
-              onRequestTakedown={setTakedownModalItem}
-            />
+            <ProductCurationTab />
           )}
 
           {activeTab === 'order-escrow' && (
-            <OrderEscrowTab
-              transactions={transactions}
-              orders={orders}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              macroStats={macroStats}
-              onReleaseEscrow={(trx) => {
-                onUpdateTransactionGateway(
-                  trx.id,
-                  'Selesai (Settled)',
-                  'Dilepaskan secara manual oleh Admin setelah audit serah terima barang.'
-                );
-                showToast('Escrow Dicairkan', `Dana pesanan ${trx.orderCode} diteruskan ke UMKM.`);
-              }}
-            />
+            <OrderEscrowTab />
           )}
 
           {activeTab === 'disputes-refund' && (
-            <DisputesRefundTab
-              displayDisputes={displayDisputes}
-              disputeStatusFilter={disputeStatusFilter}
-              onStatusFilterChange={setDisputeStatusFilter}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onSelectDispute={setSelectedDisputeModal}
-              onRejectDispute={(dispute) => {
-                onResolveDispute(
-                  dispute.id,
-                  'Ditolak (Bukti Tidak Valid)',
-                  'Bukti tidak memenuhi kriteria komplain garansi mutu makanan.'
-                );
-                showToast('Laporan Ditolak', `Tiket #${dispute.ticketCode} ditutup.`);
-              }}
-            />
+            <DisputesRefundTab />
           )}
 
           {activeTab === 'reviews-moderation' && <ReviewsModerationTab />}
 
           {activeTab === 'user-access' && (
-            <UserAccessTab
-              displayUsers={displayUsers}
-              roleFilter={roleFilter}
-              onRoleFilterChange={setRoleFilter}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onOpenAddUserModal={() => setIsAddUserModalOpen(true)}
-              onToggleUserStatus={(u) => {
-                if (u.status === 'Aktif') {
-                  onUpdateUserAccess(u.id, u.role, 'Suspended', 'Dibekukan oleh Admin');
-                  showToast('Akun Dibekukan', `Akun ${u.name} dinonaktifkan.`);
-                } else {
-                  onUpdateUserAccess(u.id, u.role, 'Aktif');
-                  showToast('Akun Dipulihkan', `Akun ${u.name} aktif kembali.`);
-                }
-              }}
-            />
+            <UserAccessTab />
           )}
         </main>
 

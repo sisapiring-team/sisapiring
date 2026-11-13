@@ -380,3 +380,165 @@ export async function verifyOrderRemote(orderId: string, pickupCode?: string): P
   });
   return mapOrder(asRecord(unwrap<Record<string, unknown>>(response.data)));
 }
+
+// ─── ADMIN API ────────────────────────────────────────────────────────────────
+
+export interface AdminMerchant {
+  id: string;             // code
+  merchantId: number;
+  ownerName: string;
+  ownerPhone: string;
+  businessName: string;
+  businessCategory: string;
+  businessAddress: string;
+  district: string;
+  businessPhoto: string | null;
+  nibNumber: string | null;
+  ktpMasked: string | null;
+  halalOrPirtNumber: string | null;
+  hygieneCommitmentSigned: boolean;
+  verificationStatus: 'pending_review' | 'verified' | 'rejected';
+  verificationNotes: string | null;
+  rating: number;
+  productsCount: number;
+  joinedDate: string;
+  suspendedReason?: string | null;
+}
+
+export interface AdminMerchantsResponse {
+  data: AdminMerchant[];
+  meta: { current_page: number; last_page: number; total: number; per_page: number };
+}
+
+export interface AdminProduct {
+  id: string;             // code
+  productId: number;
+  name: string;
+  category: string;
+  image: string | null;
+  originalPrice: number;
+  discountedPrice: number;
+  discountPercentage: number;
+  stock: number;
+  moderationStatus: 'active' | 'under_review' | 'taken_down';
+  takedownReason: string | null;
+  isActive: boolean;
+  merchant: AdminMerchant | null;
+  pickupScheduleStart: string;
+  pickupScheduleEnd: string;
+}
+
+export interface AdminProductsResponse {
+  data: AdminProduct[];
+  meta: { current_page: number; last_page: number; total: number; per_page: number };
+}
+
+function mapAdminMerchant(raw: Record<string, unknown>): AdminMerchant {
+  return {
+    id: String(raw.id ?? ''),
+    merchantId: Number(raw.merchantId ?? 0),
+    ownerName: String(raw.ownerName ?? ''),
+    ownerPhone: String(raw.ownerPhone ?? ''),
+    businessName: String(raw.businessName ?? ''),
+    businessCategory: String(raw.businessCategory ?? ''),
+    businessAddress: String(raw.businessAddress ?? ''),
+    district: String(raw.district ?? ''),
+    businessPhoto: (raw.businessPhoto as string) || null,
+    nibNumber: (raw.nibNumber as string) || null,
+    ktpMasked: (raw.ktpMasked as string) || null,
+    halalOrPirtNumber: (raw.halalOrPirtNumber as string) || null,
+    hygieneCommitmentSigned: Boolean(raw.hygieneCommitmentSigned ?? false),
+    verificationStatus: (raw.verificationStatus as AdminMerchant['verificationStatus']) || 'pending_review',
+    verificationNotes: (raw.verificationNotes as string) || null,
+    rating: Number(raw.rating ?? 0),
+    productsCount: Number(raw.productsCount ?? 0),
+    joinedDate: String(raw.joinedDate ?? ''),
+    suspendedReason: (raw.suspendedReason as string) || null,
+  };
+}
+
+function mapAdminProduct(raw: Record<string, unknown>): AdminProduct {
+  return {
+    id: String(raw.id ?? ''),
+    productId: Number(raw.productId ?? 0),
+    name: String(raw.name ?? ''),
+    category: String(raw.category ?? ''),
+    image: (raw.image as string) || null,
+    originalPrice: Number(raw.originalPrice ?? 0),
+    discountedPrice: Number(raw.discountedPrice ?? 0),
+    discountPercentage: Number(raw.discountPercentage ?? 0),
+    stock: Number(raw.stock ?? 0),
+    moderationStatus: (raw.moderationStatus as AdminProduct['moderationStatus']) || 'active',
+    takedownReason: (raw.takedownReason as string) || null,
+    isActive: Boolean(raw.isActive ?? true),
+    merchant: raw.merchant ? mapAdminMerchant(asRecord(raw.merchant)) : null,
+    pickupScheduleStart: String(raw.pickupScheduleStart ?? ''),
+    pickupScheduleEnd: String(raw.pickupScheduleEnd ?? ''),
+  };
+}
+
+// ── Merchants ──────────────────────────────────────────────────────────────────
+
+export async function fetchAdminMerchants(params?: {
+  status?: string;
+  q?: string;
+  page?: number;
+  per_page?: number;
+}): Promise<AdminMerchantsResponse> {
+  const response = await api.get('/admin/merchants', { params });
+  const raw = response.data as { data: Record<string, unknown>[]; meta: Record<string, unknown> };
+  return {
+    data: raw.data.map(mapAdminMerchant),
+    meta: raw.meta as AdminMerchantsResponse['meta'],
+  };
+}
+
+export async function fetchAdminMerchantDetail(code: string): Promise<AdminMerchant> {
+  const response = await api.get(`/admin/merchants/${code}`);
+  return mapAdminMerchant(asRecord(unwrap<Record<string, unknown>>(response.data)));
+}
+
+export async function verifyAdminMerchant(
+  code: string,
+  status: 'pending_review' | 'verified' | 'rejected',
+  note?: string,
+): Promise<AdminMerchant> {
+  const response = await api.post(`/admin/merchants/${code}/verify`, { status, note });
+  return mapAdminMerchant(asRecord(unwrap<Record<string, unknown>>(response.data)));
+}
+
+export async function suspendAdminMerchant(code: string, reason: string): Promise<AdminMerchant> {
+  const response = await api.post(`/admin/merchants/${code}/suspend`, { reason });
+  return mapAdminMerchant(asRecord(unwrap<Record<string, unknown>>(response.data)));
+}
+
+export async function reinstateAdminMerchant(code: string): Promise<AdminMerchant> {
+  const response = await api.post(`/admin/merchants/${code}/reinstate`);
+  return mapAdminMerchant(asRecord(unwrap<Record<string, unknown>>(response.data)));
+}
+
+// ── Products ───────────────────────────────────────────────────────────────────
+
+export async function fetchAdminProducts(params?: {
+  status?: string;
+  merchant?: string;
+  q?: string;
+  page?: number;
+  per_page?: number;
+}): Promise<AdminProductsResponse> {
+  const response = await api.get('/admin/products', { params });
+  const raw = response.data as { data: Record<string, unknown>[]; meta: Record<string, unknown> };
+  return {
+    data: raw.data.map(mapAdminProduct),
+    meta: raw.meta as AdminProductsResponse['meta'],
+  };
+}
+
+export async function moderateAdminProduct(
+  code: string,
+  status: 'active' | 'under_review' | 'taken_down',
+  reason?: string,
+): Promise<AdminProduct> {
+  const response = await api.post(`/admin/products/${code}/moderate`, { status, reason });
+  return mapAdminProduct(asRecord(unwrap<Record<string, unknown>>(response.data)));
+}

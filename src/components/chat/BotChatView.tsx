@@ -15,6 +15,7 @@ import { INITIAL_BOT_MESSAGES } from './chatData';
 import { generateBotResponse } from './botEngine';
 import { SisaPiringItem } from '../../data/sisaPiringCatalog';
 import { ResilientImage } from '../ResilientImage';
+import { apiClient } from '../../lib/api';
 
 interface BotChatViewProps {
   catalog: SisaPiringItem[];
@@ -36,6 +37,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_BOT_MESSAGES);
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [conversationId, setConversationId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll to bottom
@@ -46,10 +48,11 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isTyping) return;
 
+    const trimmedText = text.trim();
     const userMessage: ChatMessage = {
       id: `usr-msg-${Date.now()}`,
       sender: 'user',
-      text: text.trim(),
+      text: trimmedText,
       timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
     };
 
@@ -57,10 +60,61 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
     setInputQuery('');
     setIsTyping(true);
 
-    // Simulate AI thinking and retrieve intelligent response
-    setTimeout(async () => {
+    try {
+      const payload: { message: string; conversation_id?: number } = {
+        message: trimmedText,
+      };
+      if (conversationId) {
+        payload.conversation_id = conversationId;
+      }
+
+      const response = await apiClient.post<{
+        conversationId?: number;
+        reply?: string;
+        usedFallback?: boolean;
+      }>('/assistant/chat', payload, {
+        timeout: 8000,
+      });
+
+      const data = response.data;
+
+      if (data?.conversationId) {
+        setConversationId(data.conversationId);
+      }
+
+      // Check if backend used fallback or reply is empty
+      if (data?.usedFallback || !data?.reply) {
+        const botResponse = await generateBotResponse(trimmedText, catalog);
+        const botMessage: ChatMessage = {
+          id: `bot-msg-${Date.now()}`,
+          sender: 'bot',
+          text: botResponse.text || data?.reply || 'Ada hal lain yang dapat saya bantu terkait penyelamatan makanan?',
+          timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+          actionChips: botResponse.actionChips,
+          productCard: botResponse.productCard,
+        };
+
+        setMessages((prev) => [...prev, botMessage]);
+      } else {
+        // Successful Live Gemini LLM response
+        const botMessage: ChatMessage = {
+          id: `bot-msg-${Date.now()}`,
+          sender: 'bot',
+          text: data.reply,
+          timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+          actionChips: [
+            { label: 'Lihat Semua di Etalase', action: 'open_etalase' },
+            { label: 'Cek Status Pesanan', action: 'open_orders' },
+            { label: 'Tips Food Safety', action: 'ask', payload: 'Tips panaskan makanan' },
+          ],
+        };
+
+        setMessages((prev) => [...prev, botMessage]);
+      }
+    } catch (_error) {
+      // Fallback to botEngine if network, timeout (8s), 401, or 500 error occurs
       try {
-        const botResponse = await generateBotResponse(text, catalog);
+        const botResponse = await generateBotResponse(trimmedText, catalog);
         const botMessage: ChatMessage = {
           id: `bot-msg-${Date.now()}`,
           sender: 'bot',
@@ -71,21 +125,21 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
         };
 
         setMessages((prev) => [...prev, botMessage]);
-      } catch (err) {
+      } catch (_fallbackError) {
         setMessages((prev) => [
           ...prev,
           {
             id: `bot-err-${Date.now()}`,
             sender: 'bot',
-            text: 'Maaf, terjadi sedikit kendala teknis. Namun Anda tetap dapat menjelajahi menu sisa piring langsung di etalase!',
+            text: 'Maaf, terjadi sedikit kendala koneksi. Namun Anda tetap dapat menjelajahi menu sisa piring langsung di etalase!',
             timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
             actionChips: [{ label: 'Buka Etalase Makanan', action: 'open_etalase' }],
           },
         ]);
-      } finally {
-        setIsTyping(false);
       }
-    }, 800);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleActionChipClick = (action: string, payload?: string) => {
@@ -102,6 +156,7 @@ export const BotChatView: React.FC<BotChatViewProps> = ({
 
   const handleResetChat = () => {
     setMessages(INITIAL_BOT_MESSAGES);
+    setConversationId(null);
   };
 
   return (

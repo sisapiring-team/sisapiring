@@ -42,6 +42,7 @@ class GeminiService
 
         $response = Http::baseUrl((string) config('services.gemini.base_url'))
             ->timeout((int) config('services.gemini.timeout', 30))
+            ->withoutVerifying()
             ->acceptJson()
             ->post('/models/'.config('services.gemini.model').':generateContent?key='.config('services.gemini.api_key'), $payload);
 

@@ -2,64 +2,49 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\ReviewStatus;
+use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MerchantResource;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\ReviewResource;
 use App\Models\Merchant;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class MerchantController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return MerchantResource::collection(Merchant::query()->latest()->get());
+        $merchants = Merchant::query()
+            ->where('verification_status', VerificationStatus::Verified->value)
+            ->withCount('products')
+            ->when($request->filled('q'), fn ($query) => $query->where('business_name', 'like', '%'.$request->string('q').'%'))
+            ->when($request->filled('district'), fn ($query) => $query->where('district', $request->string('district')))
+            ->when($request->filled('category'), fn ($query) => $query->where('business_category', $request->string('category')))
+            ->orderByDesc('rating')
+            ->paginate((int) $request->integer('per_page', 12));
+
+        return MerchantResource::collection($merchants->withQueryString());
     }
 
-    public function show(Merchant $merchant): MerchantResource
+    public function show(Merchant $merchant): JsonResponse
     {
-        return new MerchantResource($merchant);
-    }
+        abort_unless($merchant->verification_status === VerificationStatus::Verified, 404);
 
-    public function current(Request $request): MerchantResource
-    {
-        $merchant = $request->user()?->merchant
-            ?? Merchant::query()->orderBy('id')->firstOrFail();
-
-        return new MerchantResource($merchant);
-    }
-
-    public function update(Request $request, Merchant $merchant): MerchantResource
-    {
-        $validated = $request->validate([
-            'businessName' => ['sometimes', 'string', 'max:255'],
-            'businessAddress' => ['sometimes', 'string'],
-            'ownerName' => ['sometimes', 'string', 'max:255'],
-            'ownerPhone' => ['sometimes', 'string', 'max:50'],
-            'ownerEmail' => ['sometimes', 'email', 'max:255'],
-            'district' => ['sometimes', 'string', 'max:255'],
-            'operatingHours' => ['sometimes', 'string', 'max:255'],
-            'pickupWindow' => ['sometimes', 'string', 'max:255'],
-            'storeBio' => ['sometimes', 'nullable', 'string'],
-            'isOpenToday' => ['sometimes', 'boolean'],
-            'verificationStatus' => ['sometimes', 'in:pending_review,verified,rejected'],
-            'verificationNotes' => ['sometimes', 'nullable', 'string'],
+        $merchant->load([
+            'products' => fn ($query) => $query->visible()->orderByDesc('created_at')->limit(24),
+            'reviews' => fn ($query) => $query->where('moderation_status', ReviewStatus::Published->value)
+                ->with('reviewer')
+                ->latest()
+                ->limit(20),
         ]);
 
-        $merchant->update([
-            'business_name' => $validated['businessName'] ?? $merchant->business_name,
-            'business_address' => $validated['businessAddress'] ?? $merchant->business_address,
-            'owner_name' => $validated['ownerName'] ?? $merchant->owner_name,
-            'owner_phone' => $validated['ownerPhone'] ?? $merchant->owner_phone,
-            'owner_email' => $validated['ownerEmail'] ?? $merchant->owner_email,
-            'district' => $validated['district'] ?? $merchant->district,
-            'operating_hours' => $validated['operatingHours'] ?? $merchant->operating_hours,
-            'pickup_window' => $validated['pickupWindow'] ?? $merchant->pickup_window,
-            'store_bio' => $validated['storeBio'] ?? $merchant->store_bio,
-            'is_open_today' => $validated['isOpenToday'] ?? $merchant->is_open_today,
-            'verification_status' => $validated['verificationStatus'] ?? $merchant->verification_status,
-            'verification_notes' => $validated['verificationNotes'] ?? $merchant->verification_notes,
+        return response()->json([
+            'merchant' => new MerchantResource($merchant),
+            'products' => ProductResource::collection($merchant->products),
+            'reviews' => ReviewResource::collection($merchant->reviews),
         ]);
-
-        return new MerchantResource($merchant->refresh());
     }
 }

@@ -89,7 +89,7 @@ import {
 import { MarketplaceDisplayPage } from './components/MarketplaceDisplayPage';
 import { StoreCatalogPage } from './components/StoreCatalogPage';
 import { AuthPage, UserAccount } from './components/AuthPage';
-import { fetchCatalog } from './lib/api';
+import { fetchCatalog, fetchMe, logoutRemote } from './lib/api';
 import { AdminDashboardPage } from './components/AdminDashboardPage';
 import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
@@ -97,6 +97,8 @@ import { BotChatView } from './components/chat/BotChatView';
 import { parseRoute, pushRoute } from './utils/navigation';
 import { Footer } from './components/Footer';
 import { FoodWasteFunFacts } from './components/FoodWasteFunFacts';
+import { useSmoothScrollArea } from './hooks/useSmoothScrollArea';
+import { scrollToElement, scrollToTop } from './lib/smoothScroll';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -134,6 +136,7 @@ function CustomerAndAdminPortal() {
     registerCustomerOrder,
     updateProduct,
     setVerificationStatus,
+    refreshRemoteData,
   } = useApp();
   // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot')
   const [activePage, setActivePage] = useState<
@@ -246,6 +249,28 @@ function CustomerAndAdminPortal() {
   const [modalComplaintFile, setModalComplaintFile] = useState<string>('');
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    let active = true;
+
+    fetchMe()
+      .then((user) => {
+        if (active && user) {
+          setCurrentUser({
+            name: user.name,
+            email: user.email,
+            phone: user.phone || '081234567890',
+            district: user.district || 'Coblong (Dago / Dipatiukur)',
+            defaultAddress: user.defaultAddress || '',
+          });
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, []);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
   const [accountModalMode, setAccountModalMode] = useState<'address' | 'profile' | null>(null);
   const [editAddressText, setEditAddressText] = useState<string>('');
@@ -482,11 +507,11 @@ function CustomerAndAdminPortal() {
       setActivePage('landing');
       window.setTimeout(() => {
         const el = document.getElementById(sectionId);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        if (el) scrollToElement(el);
       }, 60);
     } else {
       const el = document.getElementById(sectionId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (el) scrollToElement(el);
     }
   };
 
@@ -494,34 +519,34 @@ function CustomerAndAdminPortal() {
     pushRoute('/');
     setActiveTab('marketplace');
     setActivePage('landing');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openEtalasePage = () => {
     pushRoute('/etalase');
     setActiveTab('marketplace');
     setActivePage('etalase');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openCartPage = () => {
     pushRoute('/kantong');
     setActivePage('kantong');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openOrdersPage = () => {
     pushRoute('/pesanan');
     setActiveTab('marketplace');
     setActivePage('pesanan');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openHistoryPage = () => {
     pushRoute('/history');
     setActiveTab('marketplace');
     setActivePage('history');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openChatPage = (merchantName?: string) => {
@@ -529,34 +554,34 @@ function CustomerAndAdminPortal() {
     setChatTargetMerchant(merchantName);
     setActiveTab('marketplace');
     setActivePage('chat');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openChatBotPage = () => {
     pushRoute('/chat/bot');
     setActiveTab('marketplace');
     setActivePage('chat-bot');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openStorePage = (merchantName: string) => {
     pushRoute(`/toko/${encodeURIComponent(merchantName)}`);
     setSelectedStoreName(merchantName);
     setActivePage('store');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openAdminPage = () => {
     pushRoute('/admin');
     setActiveTab('admin');
     setActivePage('admin');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openSellerPage = (subTab?: string) => {
     pushRoute(subTab && subTab !== 'dashboard' ? `/penjual/${subTab}` : '/penjual');
     setActiveTab((subTab as any) || 'dashboard');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const openAuthPage = () => {
@@ -565,11 +590,24 @@ function CustomerAndAdminPortal() {
       setReturnPageAfterAuth(activePage);
     }
     setActivePage('auth');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
+  };
+
+  const handleLogout = () => {
+    void logoutRemote().catch(() => undefined);
+    setCurrentUser(null);
+    setIsAccountMenuOpen(false);
+    setIsMobileNavOpen(false);
+    if (activePage === 'pesanan' || activePage === 'history') {
+      setActivePage('etalase');
+    }
+    setRecentToast('Anda telah keluar dari akun.');
+    window.setTimeout(() => setRecentToast(null), 2500);
   };
 
   const handleSuccessLogin = (user: UserAccount) => {
     setCurrentUser(user);
+    void refreshRemoteData();
     setOrders((prev) =>
       prev.map((o) => ({
         ...o,
@@ -923,7 +961,7 @@ function CustomerAndAdminPortal() {
                   type="button"
                   onClick={() => {
                     const el = document.getElementById('beranda');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    if (el) scrollToElement(el);
                     else openLandingPage();
                   }}
                   className="text-[#8da249] font-bold underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
@@ -1177,15 +1215,7 @@ function CustomerAndAdminPortal() {
                     <div className="pt-1 border-t border-stone-100">
                       <button
                         type="button"
-                        onClick={() => {
-                          setCurrentUser(null);
-                          setIsAccountMenuOpen(false);
-                          if (activePage === 'pesanan' || activePage === 'history') {
-                            setActivePage('etalase');
-                          }
-                          setRecentToast('Anda telah keluar dari akun.');
-                          window.setTimeout(() => setRecentToast(null), 2500);
-                        }}
+                        onClick={handleLogout}
                         className="w-full px-4 py-2.5 text-left text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors cursor-pointer"
                       >
                         <LogOut className="w-4 h-4 shrink-0" />
@@ -1242,7 +1272,7 @@ function CustomerAndAdminPortal() {
                       onClick={() => {
                         setIsMobileNavOpen(false);
                         const el = document.getElementById('beranda');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        if (el) scrollToElement(el);
                         else openLandingPage();
                       }}
                       className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold bg-[#8da249]/15 text-[#8da249] transition-colors cursor-pointer"
@@ -1410,10 +1440,7 @@ function CustomerAndAdminPortal() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsMobileNavOpen(false);
-                      setCurrentUser(null);
-                    }}
+                    onClick={handleLogout}
                     className="w-full h-9 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                   >
                     <LogOut className="w-3.5 h-3.5" />
@@ -1491,7 +1518,7 @@ function CustomerAndAdminPortal() {
             onOrderCreated={handleOrderCreated}
             onGoToPesanan={() => {
               setActivePage('pesanan');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              scrollToTop();
             }}
           />
         </main>
@@ -2187,7 +2214,7 @@ function CustomerAndAdminPortal() {
                 onOpenEtalase={openEtalasePage}
                 onOpenPartnerForm={() => {
                   const el = document.getElementById('gabung-mitra');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  if (el) scrollToElement(el);
                 }}
               />
 
@@ -2990,6 +3017,7 @@ const SellerPortalContent: React.FC = () => {
     addProduct,
   } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const sellerScrollRef = useSmoothScrollArea<HTMLElement>([activeTab]);
 
   return (
     <div className="flex h-screen w-full bg-white text-[#2e434f] overflow-hidden">
@@ -3007,7 +3035,10 @@ const SellerPortalContent: React.FC = () => {
         <SellerHeader onMobileMenuToggle={() => setMobileMenuOpen(true)} />
 
         {/* Scrollable Content View */}
-        <main className="flex-1 overflow-y-auto pb-20 lg:pb-8 focus:outline-none">
+        <main
+          ref={sellerScrollRef}
+          className="flex-1 overflow-y-auto pb-20 lg:pb-8 focus:outline-none"
+        >
           {activeTab === 'dashboard' && <SellerDashboardView />}
           {activeTab === 'products' && <ProductManagementView />}
           {activeTab === 'orders' && <OrderManagementView />}

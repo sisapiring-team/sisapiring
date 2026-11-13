@@ -10,6 +10,7 @@ import {
   ArrowUp,
   Store,
 } from 'lucide-react';
+import { scrollToElement, scrollToTop } from '../lib/smoothScroll';
 
 export interface FooterProps {
   onNavigateHome?: () => void;
@@ -28,17 +29,13 @@ export const Footer: React.FC<FooterProps> = ({
   onNavigateChat,
   extraPaddingBottom = false,
 }) => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleSectionClick = (sectionId: string) => {
     if (onNavigateSection) {
       onNavigateSection(sectionId);
     } else {
       const el = document.getElementById(sectionId);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+        scrollToElement(el);
       } else {
         scrollToTop();
       }

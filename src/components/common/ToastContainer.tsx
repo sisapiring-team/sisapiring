@@ -15,11 +15,11 @@ export const ToastContainer: React.FC = () => {
         let bgClass = 'bg-white';
 
         if (toast.type === 'success') {
-          icon = <CheckCircle2 className="w-5 h-5 text-[#16382C] shrink-0 mt-0.5" />;
-          borderClass = 'border-[#16382C]/20';
+          icon = <CheckCircle2 className="w-5 h-5 text-[#1F281A] shrink-0 mt-0.5" />;
+          borderClass = 'border-[#1F281A]/20';
         } else if (toast.type === 'error' || toast.type === 'warning') {
-          icon = <AlertCircle className="w-5 h-5 text-[#EE4D2D] shrink-0 mt-0.5" />;
-          borderClass = 'border-[#EE4D2D]/20';
+          icon = <AlertCircle className="w-5 h-5 text-[#f89254] shrink-0 mt-0.5" />;
+          borderClass = 'border-[#f89254]/20';
         }
 
         return (
@@ -29,7 +29,7 @@ export const ToastContainer: React.FC = () => {
           >
             {icon}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#292929] leading-tight">{toast.title}</p>
+              <p className="text-sm font-semibold text-[#2e434f] leading-tight">{toast.title}</p>
               <p className="text-xs text-[#666666] mt-1 leading-relaxed">{toast.message}</p>
             </div>
             <button

@@ -45,7 +45,7 @@ export const VerificationBadgeModal: React.FC<VerificationBadgeModalProps> = ({
           <div
             className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
               isVerified
-                ? 'bg-[#16382C] text-[#FFD230]'
+                ? 'bg-[#1F281A] text-[#fbe1b5]'
                 : isPending
                 ? 'bg-amber-100 text-amber-800'
                 : 'bg-rose-100 text-rose-800'
@@ -78,11 +78,11 @@ export const VerificationBadgeModal: React.FC<VerificationBadgeModalProps> = ({
                 {isVerified ? 'Resmi' : isPending ? 'Dalam Tinjauan' : 'Ditolak'}
               </span>
             </div>
-            <h3 className="text-base font-bold text-[#16382C] leading-snug mt-0.5">
+            <h3 className="text-base font-bold text-[#1F281A] leading-snug mt-0.5">
               {sellerProfile.businessName}
             </h3>
             <p className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
-              <MapPin className="w-3 h-3 text-[#EE4D2D]" />
+              <MapPin className="w-3 h-3 text-[#f89254]" />
               <span>Kec. {sellerProfile.district}, Kota Bandung</span>
             </p>
           </div>
@@ -90,10 +90,10 @@ export const VerificationBadgeModal: React.FC<VerificationBadgeModalProps> = ({
 
         {/* Verification Details */}
         <div className="py-4 space-y-3.5 text-xs">
-          <div className="bg-[#FAF9F6] p-3.5 rounded-xl border border-neutral-200 space-y-2">
+          <div className="bg-white p-3.5 rounded-xl border border-neutral-200 space-y-2">
             <div className="flex justify-between items-center text-neutral-600">
               <span>Status Kurasi:</span>
-              <span className="font-bold text-[#16382C]">
+              <span className="font-bold text-[#1F281A]">
                 {isVerified
                   ? 'Terverifikasi Resmi Mitra UMKM'
                   : isPending
@@ -145,7 +145,7 @@ export const VerificationBadgeModal: React.FC<VerificationBadgeModalProps> = ({
               onClose();
               setActiveTab('registration');
             }}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#16382C] hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1F281A] hover:underline"
           >
             <span>Buka Berkas Pendaftaran</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -154,7 +154,7 @@ export const VerificationBadgeModal: React.FC<VerificationBadgeModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-[#16382C] text-white text-xs font-bold rounded-xl hover:bg-[#214F3F] transition-colors"
+            className="px-4 py-2 bg-[#1F281A] text-white text-xs font-bold rounded-xl hover:bg-[#2D3A26] transition-colors"
           >
             Tutup
           </button>

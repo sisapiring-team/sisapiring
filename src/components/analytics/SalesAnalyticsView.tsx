@@ -52,7 +52,7 @@ export const SalesAnalyticsView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
+          <h1 className="text-xl md:text-2xl font-bold text-[#1F281A] tracking-tight">
             Statistik Penjualan & Dampak Pangan
           </h1>
           <p className="text-xs text-neutral-500 mt-1">
@@ -66,7 +66,7 @@ export const SalesAnalyticsView: React.FC = () => {
             <button
               onClick={() => setPeriod('week')}
               className={`px-3 py-1 rounded-lg transition-colors ${
-                period === 'week' ? 'bg-[#16382C] text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
+                period === 'week' ? 'bg-[#1F281A] text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               7 Hari
@@ -74,7 +74,7 @@ export const SalesAnalyticsView: React.FC = () => {
             <button
               onClick={() => setPeriod('month')}
               className={`px-3 py-1 rounded-lg transition-colors ${
-                period === 'month' ? 'bg-[#16382C] text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
+                period === 'month' ? 'bg-[#1F281A] text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               Bulan Ini
@@ -82,7 +82,7 @@ export const SalesAnalyticsView: React.FC = () => {
             <button
               onClick={() => setPeriod('year')}
               className={`px-3 py-1 rounded-lg transition-colors ${
-                period === 'year' ? 'bg-[#16382C] text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
+                period === 'year' ? 'bg-[#1F281A] text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               Tahun 2026
@@ -108,7 +108,7 @@ export const SalesAnalyticsView: React.FC = () => {
             <span className="text-xs font-semibold">Total Omzet Rescue</span>
             <TrendingUp className="w-4 h-4 text-emerald-700" />
           </div>
-          <p className="text-2xl md:text-3xl font-bold font-mono text-[#16382C]">
+          <p className="text-2xl md:text-3xl font-bold font-mono text-[#1F281A]">
             {formatRupiah(totalSales)}
           </p>
           <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
@@ -121,7 +121,7 @@ export const SalesAnalyticsView: React.FC = () => {
         <div className="bg-white rounded-2xl p-5 border border-neutral-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
             <span className="text-xs font-semibold">Transaksi Berhasil</span>
-            <ShoppingBag className="w-4 h-4 text-[#EE4D2D]" />
+            <ShoppingBag className="w-4 h-4 text-[#f89254]" />
           </div>
           <p className="text-2xl md:text-3xl font-bold font-mono text-neutral-900">
             {totalTransactions}
@@ -145,9 +145,9 @@ export const SalesAnalyticsView: React.FC = () => {
         <div className="bg-white rounded-2xl p-5 border border-neutral-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-neutral-500">
             <span className="text-xs font-semibold">Pencegahan Emisi Karbon</span>
-            <Award className="w-4 h-4 text-[#FFD230]" />
+            <Award className="w-4 h-4 text-[#fbe1b5]" />
           </div>
-          <p className="text-2xl md:text-3xl font-bold font-mono text-[#16382C]">
+          <p className="text-2xl md:text-3xl font-bold font-mono text-[#1F281A]">
             {calculateCO2Saved(totalPortions)}
           </p>
           <p className="text-[11px] text-neutral-500">Dihindari dari TPA Sarimukti</p>
@@ -158,14 +158,14 @@ export const SalesAnalyticsView: React.FC = () => {
       <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-[#16382C]">Tren Penjualan Sisa Piring Mingguan</h3>
+            <h3 className="text-sm font-bold text-[#1F281A]">Tren Penjualan Sisa Piring Mingguan</h3>
             <p className="text-xs text-neutral-500">
               Puncak transaksi penjemputan warga biasanya terjadi pada akhir pekan (Jumat–Minggu)
             </p>
           </div>
           <div className="text-right text-xs">
             <span className="text-neutral-400">Rata-rata Harian:</span>{' '}
-            <strong className="font-mono text-[#16382C]">Rp 264 rb</strong>
+            <strong className="font-mono text-[#1F281A]">Rp 264 rb</strong>
           </div>
         </div>
 
@@ -182,7 +182,7 @@ export const SalesAnalyticsView: React.FC = () => {
                   <div className="w-full max-w-[48px] bg-neutral-100 rounded-t-xl overflow-hidden flex items-end h-36">
                     <div
                       style={{ height: `${heightPct}%` }}
-                      className="w-full bg-[#16382C] group-hover:bg-[#EE4D2D] transition-all rounded-t-lg"
+                      className="w-full bg-[#1F281A] group-hover:bg-[#f89254] transition-all rounded-t-lg"
                     />
                   </div>
                   <span className="text-xs font-semibold text-neutral-700">{d.day}</span>
@@ -198,7 +198,7 @@ export const SalesAnalyticsView: React.FC = () => {
       <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-[#16382C]">Produk Paling Banyak Terselamatkan</h3>
+            <h3 className="text-sm font-bold text-[#1F281A]">Produk Paling Banyak Terselamatkan</h3>
             <p className="text-xs text-neutral-500">
               Peringkat menu sisa piring yang paling diminati oleh warga Kota Bandung
             </p>
@@ -241,7 +241,7 @@ export const SalesAnalyticsView: React.FC = () => {
                   <td className="py-3 px-4 text-right font-mono text-neutral-400 line-through">
                     {formatRupiah(p.originalPrice)}
                   </td>
-                  <td className="py-3 px-4 text-right font-mono font-bold text-[#16382C]">
+                  <td className="py-3 px-4 text-right font-mono font-bold text-[#1F281A]">
                     {p.discountedPrice === 0 ? 'Bebas Bayar' : formatRupiah(p.discountedPrice)}
                   </td>
                   <td className="py-3 px-4 text-center">

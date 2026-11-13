@@ -117,7 +117,7 @@ export const DisputesRefundTab: React.FC<DisputesRefundTabProps> = ({
                 </div>
                 <div className="flex justify-between text-[11px]">
                   <span className="text-neutral-500">Nominal Transaksi:</span>
-                  <span className="font-mono font-bold text-[#16382C]">
+                  <span className="font-mono font-bold text-[#1F281A]">
                     {formatRupiah(dispute.amountPaid)}
                   </span>
                 </div>
@@ -131,7 +131,7 @@ export const DisputesRefundTab: React.FC<DisputesRefundTabProps> = ({
                   <button
                     type="button"
                     onClick={() => onSelectDispute(dispute)}
-                    className="flex-1 py-2 text-xs font-bold rounded-xl bg-[#EE4D2D] hover:bg-[#D73C1C] text-white transition-colors shadow-xs cursor-pointer"
+                    className="flex-1 py-2 text-xs font-bold rounded-xl bg-[#f89254] hover:bg-[#e57d3d] text-white transition-colors shadow-xs cursor-pointer"
                   >
                     Eksekusi Solusi & Refund
                   </button>

@@ -7,6 +7,7 @@ import {
   Star,
   ShieldAlert,
   CheckCircle2,
+  MessageSquare,
   MessageSquarePlus,
   Plus,
   Minus,
@@ -39,6 +40,7 @@ interface StoreCatalogPageProps {
   onAddComplaint: (
     complaint: Omit<ComplaintReport, 'id' | 'ticketCode' | 'createdAt' | 'status'>
   ) => void;
+  onChatStore?: (merchantName: string) => void;
 }
 
 const REVIEW_TAG_OPTIONS = [
@@ -77,6 +79,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
   onOpenDetail,
   onAddReview,
   onAddComplaint,
+  onChatStore,
 }) => {
   const [activeTab, setActiveTab] = useState<'katalog' | 'ulasan'>(initialTab);
   const [showReviewForm, setShowReviewForm] = useState<boolean>(false);
@@ -187,7 +190,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] pb-24">
+    <div className="min-h-screen bg-white pb-24">
       {/* STORE BANNER & HEADER */}
       <section className="bg-white border-b border-stone-200/90">
         {/* Top Cover Strip */}
@@ -217,7 +220,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/10 text-[#16382C] text-[11px] font-semibold inline-flex items-center gap-1">
+                <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/10 text-[#1F281A] text-[11px] font-semibold inline-flex items-center gap-1">
                   <Store className="w-3 h-3" />
                   <span>Mitra UMKM Terverifikasi</span>
                 </span>
@@ -235,33 +238,50 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-stone-600 pt-0.5">
                 <span className="inline-flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#16382C] shrink-0" />
+                  <MapPin className="w-3.5 h-3.5 text-[#1F281A] shrink-0" />
                   <span>{primaryStoreItem.address}</span>
                 </span>
-                <span className="inline-flex items-center gap-1 text-[#16382C] font-semibold">
+                <span className="inline-flex items-center gap-1 text-[#1F281A] font-semibold">
                   <Clock className="w-3.5 h-3.5 shrink-0" />
                   <span>Jam Ambil: {primaryStoreItem.pickupWindow}</span>
                 </span>
               </div>
             </div>
 
-            {/* Store Rating & Rescued Stats Box */}
-            <div className="flex items-center gap-3 sm:gap-4 bg-[#FAF9F6] border border-stone-200/90 rounded-2xl p-3.5 sm:px-5 shrink-0 self-start">
-              <div className="text-center pr-3 sm:pr-4 border-r border-stone-200">
-                <div className="flex items-center justify-center gap-1 text-base sm:text-lg font-bold text-stone-900 font-mono-tabular">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  <span>{averageRating}</span>
+            {/* Store Rating, Rescued Stats & Chat Action */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 self-start">
+              <div className="flex items-center gap-3 sm:gap-4 bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:px-5 shrink-0">
+                <div className="text-center pr-3 sm:pr-4 border-r border-stone-200">
+                  <div className="flex items-center justify-center gap-1 text-base sm:text-lg font-bold text-stone-900 font-mono-tabular">
+                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    <span>{averageRating}</span>
+                  </div>
+                  <p className="text-[11px] text-stone-500">
+                    {storeReviews.length} Ulasan
+                  </p>
                 </div>
-                <p className="text-[11px] text-stone-500">
-                  {storeReviews.length} Ulasan
-                </p>
+                <div className="text-center">
+                  <p className="text-base sm:text-lg font-bold text-[#1F281A] font-mono-tabular">
+                    {primaryStoreItem.rescuedTotalCount}+
+                  </p>
+                  <p className="text-[11px] text-stone-500">Paket Terselamatkan</p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-base sm:text-lg font-bold text-[#16382C] font-mono-tabular">
-                  {primaryStoreItem.rescuedTotalCount}+
-                </p>
-                <p className="text-[11px] text-stone-500">Paket Terselamatkan</p>
-              </div>
+
+              {onChatStore && (
+                <button
+                  type="button"
+                  onClick={() => onChatStore(merchantName)}
+                  className="h-14 px-4 sm:px-5 rounded-2xl bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-bold inline-flex items-center gap-2.5 transition-all shadow-xs hover:shadow-md cursor-pointer shrink-0"
+                  title={`Chat langsung dengan ${merchantName}`}
+                >
+                  <MessageSquare className="w-4 h-4 text-amber-300" />
+                  <div className="text-left">
+                    <span className="block leading-tight">Chat Penjual</span>
+                    <span className="block text-[10px] text-emerald-200 font-normal">Tanya ketersediaan</span>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 
@@ -273,7 +293,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                 onClick={() => setActiveTab('katalog')}
                 className={`h-10 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                   activeTab === 'katalog'
-                    ? 'bg-[#16382C] text-white'
+                    ? 'bg-[#1F281A] text-white'
                     : 'bg-stone-100 text-stone-700 hover:bg-stone-200/70'
                 }`}
               >
@@ -284,7 +304,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                 onClick={() => setActiveTab('ulasan')}
                 className={`h-10 px-4 rounded-xl text-xs sm:text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
                   activeTab === 'ulasan'
-                    ? 'bg-[#16382C] text-white'
+                    ? 'bg-[#1F281A] text-white'
                     : 'bg-stone-100 text-stone-700 hover:bg-stone-200/70'
                 }`}
               >
@@ -341,11 +361,11 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                           fallbackTitle={item.title}
                           className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.03]"
                         />
-                        <div className="absolute top-0 right-0 bg-[#FFE97A] text-[#EC3814] font-mono-tabular font-bold text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded-bl-md">
+                        <div className="absolute top-0 right-0 bg-[#fbe1b5] text-[#e57d3d] font-mono-tabular font-bold text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded-bl-md">
                           -{item.discountPercent}%
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-2 pt-4 pb-1.5 flex items-center justify-between text-[10px] text-white">
-                          <span className="font-semibold bg-[#16382C]/90 px-1.5 py-0.5 rounded-xs">
+                          <span className="font-semibold bg-[#1F281A]/90 px-1.5 py-0.5 rounded-xs">
                             Sisa {item.remainingStock}
                           </span>
                           <span className="truncate ml-1">
@@ -361,7 +381,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
 
                         <div className="pt-1 flex items-center justify-between gap-1.5">
                           <div className="min-w-0">
-                            <div className="text-[#16382C] font-bold font-mono-tabular leading-none truncate">
+                            <div className="text-[#1F281A] font-bold font-mono-tabular leading-none truncate">
                               <span className="text-[11px] font-normal mr-0.5">
                                 Rp
                               </span>
@@ -379,23 +399,23 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                             className="shrink-0"
                           >
                             {inCartQty > 0 ? (
-                              <div className="flex items-center border border-[#16382C] bg-emerald-950/5 rounded-md h-6">
+                              <div className="flex items-center border border-[#1F281A] bg-emerald-950/5 rounded-md h-6">
                                 <button
                                   type="button"
                                   onClick={() => onUpdateCartQty(item.id, -1)}
-                                  className="w-5 h-full flex items-center justify-center text-[#16382C] cursor-pointer"
+                                  className="w-5 h-full flex items-center justify-center text-[#1F281A] cursor-pointer"
                                   aria-label="Kurangi"
                                 >
                                   <Minus className="w-2.5 h-2.5" />
                                 </button>
-                                <span className="px-1 text-[10px] font-bold font-mono-tabular text-[#16382C]">
+                                <span className="px-1 text-[10px] font-bold font-mono-tabular text-[#1F281A]">
                                   {inCartQty}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => onUpdateCartQty(item.id, 1)}
                                   disabled={inCartQty >= item.remainingStock}
-                                  className="w-5 h-full flex items-center justify-center text-[#16382C] disabled:opacity-40 cursor-pointer"
+                                  className="w-5 h-full flex items-center justify-center text-[#1F281A] disabled:opacity-40 cursor-pointer"
                                   aria-label="Tambah"
                                 >
                                   <Plus className="w-2.5 h-2.5" />
@@ -405,7 +425,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                               <button
                                 type="button"
                                 onClick={() => onAddToCart(item, 1)}
-                                className="h-6 px-2 bg-[#16382C] hover:bg-emerald-900 text-white text-[10px] font-semibold rounded-md flex items-center gap-0.5 transition-colors cursor-pointer"
+                                className="h-6 px-2 bg-[#1F281A] hover:bg-emerald-900 text-white text-[10px] font-semibold rounded-md flex items-center gap-0.5 transition-colors cursor-pointer"
                               >
                                 <Plus className="w-2.5 h-2.5" />
                                 <span>Beli</span>
@@ -433,7 +453,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('ulasan')}
-                className="h-10 px-4 rounded-xl border border-[#16382C] text-[#16382C] hover:bg-emerald-950/5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer"
+                className="h-10 px-4 rounded-xl border border-[#1F281A] text-[#1F281A] hover:bg-emerald-950/5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer"
               >
                 Lihat {storeReviews.length} Ulasan Pembeli
               </button>
@@ -445,7 +465,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
             {/* Top Rating Summary + Action Buttons */}
             <div className="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#16382C] text-white flex flex-col items-center justify-center shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#1F281A] text-white flex flex-col items-center justify-center shrink-0">
                   <span className="text-xl sm:text-2xl font-bold font-mono-tabular">
                     {averageRating}
                   </span>
@@ -481,7 +501,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                     setShowReviewForm((prev) => !prev);
                     setShowComplaintForm(false);
                   }}
-                  className="h-10 px-4 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="h-10 px-4 rounded-xl bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <MessageSquarePlus className="w-4 h-4" />
                   <span>Beri Rating & Ulasan</span>
@@ -502,7 +522,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
 
             {/* Feedback Banner after Submitting Review or Complaint */}
             {reviewSuccess && (
-              <div className="p-4 rounded-2xl bg-emerald-950/10 border border-[#16382C]/30 text-[#16382C] text-xs sm:text-sm font-medium flex items-center gap-2.5">
+              <div className="p-4 rounded-2xl bg-emerald-950/10 border border-[#1F281A]/30 text-[#1F281A] text-xs sm:text-sm font-medium flex items-center gap-2.5">
                 <CheckCircle2 className="w-5 h-5 shrink-0" />
                 <span>
                   Terima kasih! Rating dan ulasan Anda telah ditambahkan ke halaman toko{' '}
@@ -581,8 +601,8 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                           onClick={() => toggleReviewTag(tag)}
                           className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
                             active
-                              ? 'bg-[#16382C] text-white border-[#16382C]'
-                              : 'bg-[#FAF9F6] text-stone-700 border-stone-300 hover:border-stone-400'
+                              ? 'bg-[#1F281A] text-white border-[#1F281A]'
+                              : 'bg-white text-stone-700 border-stone-300 hover:border-stone-400'
                           }`}
                         >
                           {tag}
@@ -605,7 +625,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     placeholder="Ceritakan kesegaran makanan, kesesuaian deskripsi, dan keramahan pelayanan UMKM..."
-                    className="w-full p-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white"
+                    className="w-full p-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white"
                   />
                 </div>
 
@@ -623,7 +643,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="h-10 px-5 rounded-xl bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer"
+                    className="h-10 px-5 rounded-xl bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold cursor-pointer"
                   >
                     Kirim Ulasan
                   </button>
@@ -673,7 +693,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                         e.target.value as ComplaintReport['category']
                       )
                     }
-                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-red-600 cursor-pointer"
+                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-red-600 cursor-pointer"
                   >
                     {COMPLAINT_CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -696,14 +716,14 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                     value={complaintDescription}
                     onChange={(e) => setComplaintDescription(e.target.value)}
                     placeholder="Contoh: Isi paket kurang dari yang tertulis di deskripsi atau kondisi kemasan rusak saat diterima..."
-                    className="w-full p-3 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white"
+                    className="w-full p-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="store-complaint-file"
-                    className="flex items-center justify-between gap-3 border border-dashed border-stone-300 hover:border-red-500 bg-[#FAF9F6] rounded-xl px-3.5 py-2.5 cursor-pointer transition-colors"
+                    className="flex items-center justify-between gap-3 border border-dashed border-stone-300 hover:border-red-500 bg-white rounded-xl px-3.5 py-2.5 cursor-pointer transition-colors"
                   >
                     <span className="text-xs text-stone-600 truncate">
                       {complaintFileName
@@ -831,7 +851,7 @@ export const StoreCatalogPage: React.FC<StoreCatalogPageProps> = ({
                         {rev.tags.map((t) => (
                           <span
                             key={t}
-                            className="px-2 py-0.5 rounded-md bg-emerald-950/8 text-[#16382C] text-[10px] font-semibold"
+                            className="px-2 py-0.5 rounded-md bg-emerald-950/8 text-[#1F281A] text-[10px] font-semibold"
                           >
                             ✓ {t}
                           </span>

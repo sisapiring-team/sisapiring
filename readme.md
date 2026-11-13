@@ -5,7 +5,7 @@
   <h3>🍃 Save Food. Reduce Waste. Create Impact.</h3>
 
   <p align="center">
-    Platform digital B2C (Mobile-First) yang mengubah <b>makanan surplus UMKM</b> menjadi <b>peluang ekonomis</b> dan <b>aksi nyata penyelamatan lingkungan</b>.
+    Platform digital B2C (Mobile-First) yang mengubah <b>makanan sisa piring UMKM</b> menjadi <b>peluang ekonomis</b> dan <b>aksi nyata penyelamatan lingkungan</b>.
   </p>
 
   <!-- Badges untuk estetika dan kesan profesional -->
@@ -40,7 +40,7 @@
 
 Kami merancang SisaPiring dengan alur yang sangat singkat agar UMKM dan pembeli tidak repot:
 
-1. 🏪 **UMKM Upload (Checklist Aman):** UMKM mengisi *Food Safety Checklist* dan mengunggah makanan surplus dengan skema diskon bertingkat (50%, 70%, hingga 100% donasi). Data masuk ke database.
+1. 🏪 **UMKM Upload (Checklist Aman):** UMKM mengisi *Food Safety Checklist* dan mengunggah makanan sisa piring dengan skema diskon bertingkat (50%, 70%, hingga 100% donasi). Data masuk ke database.
 2. ⏳ **Race Against Time:** Sistem (Backend) menjalankan *countdown timer* berdasarkan batas waktu aman. Pembeli berebut memesan, dan sistem otomatis melakukan *Stock Locking*.
 3. 📦 **QR Pick-Up:** Pembeli datang langsung ke lokasi sebelum toko tutup. UMKM memindai QR Code pembeli untuk verifikasi serah terima.
 4. 🌍 **Impact Tracked:** Transaksi (Data *Completed*) dikirim ke *Impact Dashboard* untuk dikonversi menjadi data estimasi gas metana yang berhasil dicegah hari ini!
@@ -133,7 +133,7 @@ Jika juri atau pengembang ingin menjalankan SisaPiring di *local environment*, i
 Gunakan kredensial berikut untuk mencoba fitur aplikasi tanpa perlu mendaftar:
 
 - **Akun UMKM (Seller):** `seller@sisapiring.com` | Pass: `SisaPiring123`
-  *(Bisa untuk tes upload menu surplus, checklist keamanan, dan scan QR).*
+  *(Bisa untuk tes upload menu sisa piring, checklist keamanan, dan scan QR).*
 - **Akun Pembeli (Buyer):** `buyer@sisapiring.com` | Pass: `SisaPiring123`
   *(Bisa untuk tes lihat hitung mundur, pesan makanan, dan cek Impact Dashboard).*
 

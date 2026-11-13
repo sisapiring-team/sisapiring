@@ -91,7 +91,7 @@ export const UmkmVerificationModal: React.FC<UmkmVerificationModalProps> = ({
           <button
             type="button"
             onClick={() => onApprove(umkm)}
-            className="px-5 py-2 text-xs font-bold rounded-xl bg-[#16382C] hover:bg-[#214F3F] text-white transition-colors cursor-pointer"
+            className="px-5 py-2 text-xs font-bold rounded-xl bg-[#1F281A] hover:bg-[#2D3A26] text-white transition-colors cursor-pointer"
           >
             Setujui Menjadi Mitra Resmi
           </button>

@@ -35,7 +35,7 @@ export const SettingsView: React.FC = () => {
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
+        <h1 className="text-xl md:text-2xl font-bold text-[#1F281A] tracking-tight">
           Pengaturan Toko & Operasional
         </h1>
         <p className="text-xs text-neutral-500 mt-1">
@@ -47,7 +47,7 @@ export const SettingsView: React.FC = () => {
         {/* Notifications Setting */}
         <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-4">
           <div className="flex items-center gap-2.5 pb-3 border-b border-neutral-100">
-            <Bell className="w-5 h-5 text-[#16382C]" />
+            <Bell className="w-5 h-5 text-[#1F281A]" />
             <h3 className="text-sm font-bold text-neutral-800">Notifikasi & Peringatan Masuk</h3>
           </div>
 
@@ -63,7 +63,7 @@ export const SettingsView: React.FC = () => {
                 type="button"
                 onClick={() => setWhatsappAlerts(!whatsappAlerts)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  whatsappAlerts ? 'bg-[#16382C]' : 'bg-neutral-300'
+                  whatsappAlerts ? 'bg-[#1F281A]' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -85,7 +85,7 @@ export const SettingsView: React.FC = () => {
                 type="button"
                 onClick={() => setAudioChime(!audioChime)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  audioChime ? 'bg-[#16382C]' : 'bg-neutral-300'
+                  audioChime ? 'bg-[#1F281A]' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -101,7 +101,7 @@ export const SettingsView: React.FC = () => {
         {/* Automation Settings */}
         <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-4">
           <div className="flex items-center gap-2.5 pb-3 border-b border-neutral-100">
-            <Sparkles className="w-5 h-5 text-[#EE4D2D]" />
+            <Sparkles className="w-5 h-5 text-[#f89254]" />
             <h3 className="text-sm font-bold text-neutral-800">Otomatisasi Sisa Piring Rescue</h3>
           </div>
 
@@ -117,7 +117,7 @@ export const SettingsView: React.FC = () => {
                 type="button"
                 onClick={() => setAutoDiscountSuggestion(!autoDiscountSuggestion)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  autoDiscountSuggestion ? 'bg-[#16382C]' : 'bg-neutral-300'
+                  autoDiscountSuggestion ? 'bg-[#1F281A]' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -139,7 +139,7 @@ export const SettingsView: React.FC = () => {
                 type="button"
                 onClick={() => setAutoCloseWhenSoldOut(!autoCloseWhenSoldOut)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  autoCloseWhenSoldOut ? 'bg-[#16382C]' : 'bg-neutral-300'
+                  autoCloseWhenSoldOut ? 'bg-[#1F281A]' : 'bg-neutral-300'
                 }`}
               >
                 <span
@@ -179,7 +179,7 @@ export const SettingsView: React.FC = () => {
           <button
             type="button"
             onClick={handleSavePreferences}
-            className="px-5 py-2.5 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+            className="px-5 py-2.5 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
           >
             Simpan Preferensi Pengaturan
           </button>

@@ -70,11 +70,11 @@ export const FoodSafetyModal: React.FC<FoodSafetyModalProps> = ({ isOpen, onClos
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 pb-4 border-b border-neutral-100">
-          <div className="w-10 h-10 rounded-xl bg-[#16382C] text-[#FFD230] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#1F281A] text-[#fbe1b5] flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#16382C]">
+            <h3 className="text-base font-bold text-[#1F281A]">
               Deklarasi & Protokol Keamanan Pangan (Food Safety)
             </h3>
             <p className="text-xs text-neutral-500">
@@ -84,7 +84,7 @@ export const FoodSafetyModal: React.FC<FoodSafetyModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Compliance Status Banner */}
-        <div className="my-4 p-4 rounded-xl bg-[#FAF9F6] border border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="my-4 p-4 rounded-xl bg-white border border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
             <div>
@@ -112,7 +112,7 @@ export const FoodSafetyModal: React.FC<FoodSafetyModalProps> = ({ isOpen, onClos
                 key={idx}
                 className="p-3 rounded-xl border border-neutral-100 bg-white hover:bg-neutral-50/70 transition-colors flex items-start gap-3"
               >
-                <span className="w-5 h-5 rounded-full bg-[#16382C] text-white font-mono text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-[#1F281A] text-white font-mono text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">
                   {idx + 1}
                 </span>
                 <div>
@@ -144,7 +144,7 @@ export const FoodSafetyModal: React.FC<FoodSafetyModalProps> = ({ isOpen, onClos
                 onClose();
                 setIsAddProductModalOpen(true);
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
             >
               <span>Tambah Produk Terdeklarasi</span>
               <ArrowRight className="w-3.5 h-3.5" />

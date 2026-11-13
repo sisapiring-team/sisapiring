@@ -128,14 +128,14 @@ export const ProductCurationTab: React.FC<ProductCurationTabProps> = ({
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="font-bold font-mono text-[#16382C] text-xs">
+                        <span className="font-bold font-mono text-[#1F281A] text-xs">
                           {formatRupiah(item.rescuePrice)}
                         </span>
                         <span className="line-through text-neutral-400 font-mono text-[11px]">
                           {formatRupiah(item.originalPrice)}
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-[#EE4D2D]">
+                      <span className="text-[10px] font-bold text-[#f89254]">
                         Diskon {item.discountPercent}% OFF
                       </span>
                     </td>

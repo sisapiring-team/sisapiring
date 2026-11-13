@@ -126,7 +126,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
   };
 
   const visibleCulinaryCategories = useMemo(
-    () => (showAllCategories ? CULINARY_CATEGORIES : CULINARY_CATEGORIES.slice(0, 6)),
+    () => (showAllCategories ? CULINARY_CATEGORIES : CULINARY_CATEGORIES.slice(0, 3)),
     [showAllCategories]
   );
 
@@ -224,7 +224,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] pb-24">
+    <div className="min-h-screen bg-white pb-24">
       {/* FULL-WIDTH SLIDING BANNER DISPLAY (Moves Left & Right Above Search Bar & Filter) */}
       <div className="relative w-full overflow-hidden bg-stone-900 border-b border-stone-200/80">
         <div
@@ -257,7 +257,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     <button
                       type="button"
                       onClick={() => handleBannerAction(banner.actionType)}
-                      className="px-4 py-2 bg-[#16382C] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer"
+                      className="px-4 py-2 bg-[#8DA249] hover:bg-[#7b8e3d] text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer shadow-md shadow-[#8DA249]/30"
                     >
                       {banner.ctaLabel}
                     </button>
@@ -296,7 +296,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
               aria-label={`Slide banner ${idx + 1}`}
               className={`h-1.5 rounded-full transition-all cursor-pointer ${
                 activeBannerIdx === idx
-                  ? 'w-6 bg-amber-300'
+                  ? 'w-6 bg-[#8DA249]'
                   : 'w-1.5 bg-white/60 hover:bg-white'
               }`}
             />
@@ -305,7 +305,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
       </div>
 
       {/* SEARCH + PRICE FILTER & CIRCULAR CULINARY CATEGORY SELECTOR */}
-      <section className="bg-white border-b border-stone-200/90 pt-4 pb-5 sm:pt-5 sm:pb-6">
+      <section className="bg-[#F4F6EC] border-b border-[#8DA249]/20 pt-4 pb-5 sm:pt-5 sm:pb-6">
         <div className="max-w-5xl mx-auto px-3.5 sm:px-6 space-y-4 sm:space-y-5">
           {/* Row 1: Search Input + Price Filter Side-by-Side */}
           <div className="relative">
@@ -319,7 +319,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari Martabak, Bakso, Croissant, atau toko di Bandung..."
                   aria-label="Cari makanan di etalase Bandung"
-                  className="w-full h-11 sm:h-12 pl-10 sm:pl-11 pr-14 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                  className="w-full h-11 sm:h-12 pl-10 sm:pl-11 pr-14 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-[#8DA249] focus:bg-white transition-colors"
                 />
                 {searchQuery && (
                   <button
@@ -341,8 +341,8 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                   aria-label="Filter Harga Maksimal"
                   className={`h-11 sm:h-12 px-3 sm:px-4 rounded-xl border text-xs sm:text-sm font-medium inline-flex items-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap cursor-pointer ${
                     maxPrice < 60000
-                      ? 'bg-[#16382C] text-white border-[#16382C]'
-                      : 'bg-[#FAF9F6] text-stone-800 border-stone-300 hover:bg-stone-100'
+                      ? 'bg-[#8DA249] text-white border-[#8DA249]'
+                      : 'bg-white text-stone-800 border-stone-300 hover:bg-stone-100'
                   }`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -382,7 +382,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                           }}
                           className={`min-h-[36px] px-2.5 py-1.5 text-xs rounded-lg border text-center transition-colors cursor-pointer ${
                             maxPrice === opt.value
-                              ? 'bg-[#16382C] text-white border-[#16382C] font-semibold'
+                              ? 'bg-[#1F281A] text-white border-[#1F281A] font-semibold'
                               : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
                           }`}
                         >
@@ -431,7 +431,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedCategory('Semua')}
-                  className="text-xs font-semibold text-[#00880C] hover:underline cursor-pointer"
+                  className="text-xs font-semibold text-[#8DA249] hover:underline cursor-pointer"
                 >
                   Lihat Semua Kuliner
                 </button>
@@ -454,10 +454,10 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     className="group flex flex-col items-center text-center focus:outline-none cursor-pointer"
                   >
                     <div
-                      className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-stone-100 transition-all duration-150 ${
+                      className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white transition-all duration-150 ${
                         isSelected
-                          ? 'ring-3 ring-[#00880C] ring-offset-2 scale-[1.03] shadow-sm'
-                          : 'border border-stone-200/80 group-hover:scale-[1.03] group-hover:shadow-xs'
+                          ? 'ring-3 ring-[#8DA249] ring-offset-2 scale-[1.03] shadow-sm'
+                          : 'border border-[#8DA249]/20 group-hover:scale-[1.03] group-hover:shadow-xs'
                       }`}
                     >
                       <ResilientImage
@@ -470,8 +470,8 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     <span
                       className={`mt-2 text-xs sm:text-sm leading-tight transition-colors ${
                         isSelected
-                          ? 'font-bold text-[#00880C]'
-                          : 'font-medium text-stone-800 group-hover:text-stone-950'
+                          ? 'font-bold text-[#8DA249]'
+                          : 'font-medium text-stone-800 group-hover:text-[#1F281A]'
                       }`}
                     >
                       {cat.label}
@@ -485,7 +485,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
             <button
               type="button"
               onClick={() => setShowAllCategories((prev) => !prev)}
-              className="w-full min-h-[40px] py-2.5 px-4 bg-[#E7F7EC] hover:bg-[#D5F0DD] text-[#00880C] text-xs sm:text-sm font-semibold rounded-full transition-colors cursor-pointer"
+              className="w-full min-h-[40px] py-2.5 px-4 bg-[#8da249]/15 hover:bg-[#8da249]/25 text-[#1F281A] border border-[#8da249]/30 text-xs sm:text-sm font-semibold rounded-full transition-colors cursor-pointer"
             >
               {showAllCategories
                 ? 'Sembunyikan sebagian kuliner'
@@ -550,7 +550,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-[#16382C] underline ml-1 cursor-pointer"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[#1F281A] underline ml-1 cursor-pointer"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Reset</span>
@@ -643,13 +643,13 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     />
 
                     {/* Top-Right Discount Tag (-60%) like Marketplace Reference */}
-                    <div className="absolute top-0 right-0 bg-[#FFE97A] text-[#EC3814] font-mono-tabular font-bold text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded-bl-md">
+                    <div className="absolute top-0 right-0 bg-[#fbe1b5] text-[#e57d3d] font-mono-tabular font-bold text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded-bl-md">
                       -{item.discountPercent}%
                     </div>
 
                     {/* Bottom-Left Compact Stock & Pickup Time Strip */}
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-2 pt-4 pb-1.5 flex items-center justify-between text-[10px] text-white">
-                      <span className="font-semibold bg-[#16382C]/90 px-1.5 py-0.5 rounded-xs">
+                      <span className="font-semibold bg-[#1F281A]/90 px-1.5 py-0.5 rounded-xs">
                         Sisa {item.remainingStock}
                       </span>
                       <span className="truncate ml-1 drop-shadow-xs">
@@ -668,7 +668,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                     {/* Bottom Price + Quick Add (No Location on Card) */}
                     <div className="pt-1 flex items-center justify-between gap-1.5">
                       <div className="min-w-0">
-                        <div className="text-[#16382C] font-bold font-mono-tabular leading-none truncate">
+                        <div className="text-[#1F281A] font-bold font-mono-tabular leading-none truncate">
                           <span className="text-[11px] font-normal mr-0.5">Rp</span>
                           <span className="text-sm sm:text-base">
                             {formatNominal(item.rescuePrice)}
@@ -685,23 +685,23 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                         className="shrink-0"
                       >
                         {inCartQty > 0 ? (
-                          <div className="flex items-center border border-[#16382C] bg-emerald-950/5 rounded-md h-6">
+                          <div className="flex items-center border border-[#1F281A] bg-emerald-950/5 rounded-md h-6">
                             <button
                               type="button"
                               onClick={() => onUpdateCartQty(item.id, -1)}
-                              className="w-5 h-full flex items-center justify-center text-[#16382C] cursor-pointer"
+                              className="w-5 h-full flex items-center justify-center text-[#1F281A] cursor-pointer"
                               aria-label="Kurangi"
                             >
                               <Minus className="w-2.5 h-2.5" />
                             </button>
-                            <span className="px-1 text-[10px] font-bold font-mono-tabular text-[#16382C]">
+                            <span className="px-1 text-[10px] font-bold font-mono-tabular text-[#1F281A]">
                               {inCartQty}
                             </span>
                             <button
                               type="button"
                               onClick={() => onUpdateCartQty(item.id, 1)}
                               disabled={inCartQty >= item.remainingStock}
-                              className="w-5 h-full flex items-center justify-center text-[#16382C] disabled:opacity-40 cursor-pointer"
+                              className="w-5 h-full flex items-center justify-center text-[#1F281A] disabled:opacity-40 cursor-pointer"
                               aria-label="Tambah"
                             >
                               <Plus className="w-2.5 h-2.5" />
@@ -712,7 +712,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                             type="button"
                             onClick={() => onAddToCart(item, 1)}
                             aria-label={`Tambah ${item.title} ke kantong`}
-                            className="h-6 px-2 bg-[#16382C] hover:bg-emerald-900 text-white text-[10px] font-semibold rounded-md flex items-center gap-0.5 transition-colors cursor-pointer"
+                            className="h-6 px-2 bg-[#1F281A] hover:bg-emerald-900 text-white text-[10px] font-semibold rounded-md flex items-center gap-0.5 transition-colors cursor-pointer"
                           >
                             <Plus className="w-2.5 h-2.5" />
                             <span>Beli</span>
@@ -776,7 +776,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                             fallbackTitle={item.title}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute top-0 right-0 bg-[#FFE97A] text-[#EC3814] font-mono-tabular font-bold text-[10px] px-1.5 py-0.5 rounded-bl-md">
+                          <div className="absolute top-0 right-0 bg-[#fbe1b5] text-[#e57d3d] font-mono-tabular font-bold text-[10px] px-1.5 py-0.5 rounded-bl-md">
                             -{item.discountPercent}%
                           </div>
                         </div>
@@ -787,7 +787,7 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                           </h3>
 
                           <div className="space-y-1">
-                            <div className="text-[#16382C] font-bold font-mono-tabular leading-none">
+                            <div className="text-[#1F281A] font-bold font-mono-tabular leading-none">
                               <span className="text-[11px] font-normal mr-0.5">Rp</span>
                               <span className="text-sm">{formatNominal(item.rescuePrice)}</span>
                             </div>
@@ -798,14 +798,14 @@ export const MarketplaceDisplayPage: React.FC<MarketplaceDisplayPageProps> = ({
                               </span>
                               <div onClick={(e) => e.stopPropagation()}>
                                 {inCartQty > 0 ? (
-                                  <span className="text-[10px] font-bold text-[#16382C] font-mono-tabular">
+                                  <span className="text-[10px] font-bold text-[#1F281A] font-mono-tabular">
                                     {inCartQty}x di Kantong
                                   </span>
                                 ) : (
                                   <button
                                     type="button"
                                     onClick={() => onAddToCart(item, 1)}
-                                    className="h-6 px-2 bg-[#16382C] hover:bg-emerald-900 text-white text-[10px] font-semibold rounded-md cursor-pointer"
+                                    className="h-6 px-2 bg-[#1F281A] hover:bg-emerald-900 text-white text-[10px] font-semibold rounded-md cursor-pointer"
                                   >
                                     + Beli
                                   </button>

@@ -20,6 +20,11 @@ import {
 
 export type AdminTab =
   | 'overview'
+  | 'stores'
+  | 'products'
+  | 'orders'
+  | 'complaints'
+  | 'users'
   | 'seller-governance'
   | 'product-curation'
   | 'order-escrow'

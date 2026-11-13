@@ -37,14 +37,14 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <div className="flex items-start gap-4">
           <div
             className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-              isDestructive ? 'bg-[#EE4D2D]/10 text-[#EE4D2D]' : 'bg-[#FFD230]/20 text-[#16382C]'
+              isDestructive ? 'bg-[#f89254]/10 text-[#f89254]' : 'bg-[#fbe1b5]/20 text-[#1F281A]'
             }`}
           >
             <AlertTriangle className="w-6 h-6" />
           </div>
 
           <div className="flex-1 min-w-0 pr-4">
-            <h3 className="text-base font-bold text-[#292929] leading-snug">{title}</h3>
+            <h3 className="text-base font-bold text-[#2e434f] leading-snug">{title}</h3>
             <p className="text-sm text-[#666666] mt-1.5 leading-relaxed">{message}</p>
           </div>
         </div>
@@ -62,8 +62,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onClick={onConfirm}
             className={`px-4 py-2 text-sm font-semibold text-white rounded-xl transition-colors shadow-xs ${
               isDestructive
-                ? 'bg-[#EE4D2D] hover:bg-[#D73C1C]'
-                : 'bg-[#16382C] hover:bg-[#214F3F]'
+                ? 'bg-[#f89254] hover:bg-[#e57d3d]'
+                : 'bg-[#1F281A] hover:bg-[#2D3A26]'
             }`}
           >
             {confirmLabel}

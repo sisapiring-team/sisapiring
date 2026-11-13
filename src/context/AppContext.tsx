@@ -16,6 +16,7 @@ import {
   verifyOrderRemote,
 } from '../lib/api';
 import { Order, OrderStatus, SellerProfile, SisaPiringProduct, VerificationStatus } from '../types/seller';
+import { parseRoute } from '../utils/navigation';
 
 export type ActiveTab =
   | 'dashboard'
@@ -82,7 +83,61 @@ const STORAGE_KEY_PRODUCTS = 'sisapiring_products_v2';
 const STORAGE_KEY_ORDERS = 'sisapiring_orders_v2';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('marketplace');
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
+    if (typeof window !== 'undefined') {
+      const route = parseRoute(window.location.pathname);
+      if (route.page === 'admin') return 'admin';
+      if (route.page === 'penjual') {
+        const validSellerTabs: ActiveTab[] = [
+          'dashboard',
+          'products',
+          'orders',
+          'rescue_deals',
+          'qr_pickup',
+          'analytics',
+          'profile',
+          'settings',
+          'registration',
+        ];
+        return validSellerTabs.includes(route.sellerTab as ActiveTab)
+          ? (route.sellerTab as ActiveTab)
+          : 'dashboard';
+      }
+    }
+    return 'marketplace';
+  });
+
+  // Listen to popstate for browser Back/Forward between portals
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseRoute(window.location.pathname);
+      if (route.page === 'admin') {
+        setActiveTab('admin');
+      } else if (route.page === 'penjual') {
+        const validSellerTabs: ActiveTab[] = [
+          'dashboard',
+          'products',
+          'orders',
+          'rescue_deals',
+          'qr_pickup',
+          'analytics',
+          'profile',
+          'settings',
+          'registration',
+        ];
+        setActiveTab(
+          validSellerTabs.includes(route.sellerTab as ActiveTab)
+            ? (route.sellerTab as ActiveTab)
+            : 'dashboard'
+        );
+      } else {
+        setActiveTab('marketplace');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const [ordersFilterStatus, setOrdersFilterStatus] = useState<'all' | OrderStatus>('all');
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);

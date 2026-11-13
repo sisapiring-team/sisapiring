@@ -68,7 +68,7 @@ export const ReviewsModerationTab: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-[#16382C] text-white flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-full bg-[#1F281A] text-white flex items-center justify-center font-bold text-xs">
                   {rev.buyer[0]}
                 </div>
                 <div>

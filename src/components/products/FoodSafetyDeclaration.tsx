@@ -50,15 +50,15 @@ export const FoodSafetyDeclaration: React.FC<FoodSafetyDeclarationProps> = ({
   };
 
   return (
-    <div className="bg-[#FAF9F6] rounded-2xl p-5 border border-neutral-200 space-y-4">
+    <div className="bg-white rounded-2xl p-5 border border-neutral-200 space-y-4">
       {/* Header */}
       <div className="flex items-start justify-between gap-3 pb-3 border-b border-neutral-200">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#16382C] text-[#FFD230] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-[#1F281A] text-[#fbe1b5] flex items-center justify-center shrink-0">
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-[#16382C] leading-snug">
+            <h4 className="text-sm font-bold text-[#1F281A] leading-snug">
               Deklarasi Standar Keamanan Pangan (Food Safety)
             </h4>
             <p className="text-xs text-neutral-500">
@@ -70,7 +70,7 @@ export const FoodSafetyDeclaration: React.FC<FoodSafetyDeclarationProps> = ({
         <button
           type="button"
           onClick={() => setCheckAll(!allChecked)}
-          className="text-xs font-semibold text-[#16382C] hover:underline shrink-0"
+          className="text-xs font-semibold text-[#1F281A] hover:underline shrink-0"
         >
           {allChecked ? 'Batal Centang Semua' : 'Centang Semua'}
         </button>
@@ -87,7 +87,7 @@ export const FoodSafetyDeclaration: React.FC<FoodSafetyDeclarationProps> = ({
             value={productionTime}
             onChange={(e) => onChangeProductionTime(e.target.value)}
             placeholder="Hari ini, 08:00 WIB"
-            className="w-full px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+            className="w-full px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
           />
         </div>
 
@@ -100,7 +100,7 @@ export const FoodSafetyDeclaration: React.FC<FoodSafetyDeclarationProps> = ({
             value={safeConsumptionDeadline}
             onChange={(e) => onChangeSafeDeadline(e.target.value)}
             placeholder="Hari ini, 23:00 WIB"
-            className="w-full px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+            className="w-full px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
           />
         </div>
 
@@ -111,7 +111,7 @@ export const FoodSafetyDeclaration: React.FC<FoodSafetyDeclarationProps> = ({
           <select
             value={storageInstruction}
             onChange={(e) => onChangeStorageInstruction(e.target.value as StorageInstruction)}
-            className="w-full px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+            className="w-full px-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
           >
             <option value="Suhu Ruang (Kering & Sejuk)">Suhu Ruang (Kering & Sejuk)</option>
             <option value="Lemari Pendingin (Chiller 2-6°C)">Lemari Pendingin (Chiller 2-6°C)</option>

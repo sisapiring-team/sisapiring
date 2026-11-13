@@ -129,7 +129,7 @@ export const AddUserAccountModal: React.FC<AddUserAccountModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-bold bg-[#16382C] hover:bg-[#214F3F] text-white rounded-xl shadow-xs cursor-pointer"
+              className="px-4 py-2 text-xs font-bold bg-[#1F281A] hover:bg-[#2D3A26] text-white rounded-xl shadow-xs cursor-pointer"
             >
               Simpan Akun
             </button>

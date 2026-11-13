@@ -22,7 +22,7 @@ export const AdminTopInfoBar: React.FC<AdminTopInfoBarProps> = ({
   macroStats,
   onMobileMenuToggle,
 }) => {
-  const tabTitles: Record<AdminTab, { title: string; subtitle: string }> = {
+  const tabTitles: Partial<Record<AdminTab, { title: string; subtitle: string }>> = {
     overview: {
       title: 'Ringkasan Ekosistem & Dampak Makro',
       subtitle: 'Analisis metrik makro pencegahan sampah pangan Kota Bandung',
@@ -91,8 +91,8 @@ export const AdminTopInfoBar: React.FC<AdminTopInfoBarProps> = ({
         {/* Right Side: Dense Real-time Operational Intelligence Bar */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 shrink-0 text-xs">
           {/* 1. Operating Window Info Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FAF9F6] border border-neutral-200 rounded-xl text-neutral-700">
-            <Clock className="w-3.5 h-3.5 text-[#EE4D2D] shrink-0" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 rounded-xl text-neutral-700">
+            <Clock className="w-3.5 h-3.5 text-[#f89254] shrink-0" />
             <span className="font-semibold text-[11px]">
               Sesi Ambil: <strong className="font-mono text-neutral-900">17:00 - 21:30 WIB</strong>
             </span>
@@ -142,3 +142,4 @@ export const AdminTopInfoBar: React.FC<AdminTopInfoBarProps> = ({
     </header>
   );
 };
+

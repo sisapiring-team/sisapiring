@@ -122,7 +122,7 @@ class DatabaseSeeder extends Seeder
                 'verification_notes' => 'Dapur katering higienis tersertifikasi Halal & Dinkes',
                 'operating_hours' => '09:00 - 20:30 WIB',
                 'pickup_window' => '17:00 - 20:15 WIB',
-                'store_bio' => 'Penyedia prasmanan dan nasi kotak khas Sunda dan Nusantara. Surplus event harian kami selamatkan dengan kemasan tertutup rapat higienis.',
+                'store_bio' => 'Penyedia prasmanan dan nasi kotak khas Sunda dan Nusantara. Sisa porsi event harian kami selamatkan dengan kemasan tertutup rapat higienis.',
                 'is_open_today' => true,
                 'rating' => 4.82,
                 'total_rescued_count' => 96,

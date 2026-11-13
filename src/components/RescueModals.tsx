@@ -12,6 +12,7 @@ import {
   Lock,
   Store,
   Star,
+  MessageSquare,
 } from 'lucide-react';
 import { SisaPiringItem, formatRupiah } from '../data/sisaPiringCatalog';
 import { ResilientImage } from './ResilientImage';
@@ -42,6 +43,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   onAddToCart: (item: SisaPiringItem, qty: number) => void;
   onOpenStore?: (merchantName: string) => void;
+  onChatStore?: (merchantName: string) => void;
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -49,6 +51,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
   onAddToCart,
   onOpenStore,
+  onChatStore,
 }) => {
   const [quantity, setQuantity] = useState<number>(1);
 
@@ -134,9 +137,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               {/* Store Information Card + Button to View Store Catalog & Reviews */}
-              <div className="mb-4 p-3.5 rounded-xl bg-[#FAF9F6] border border-stone-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="mb-4 p-3.5 rounded-xl bg-white border border-stone-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-950/10 text-[#16382C] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center shrink-0 mt-0.5">
                     <Store className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
@@ -163,7 +166,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       onClose();
                       onOpenStore(targetMerchant);
                     }}
-                    className="h-9 px-3.5 rounded-lg bg-[#16382C] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="h-9 px-3.5 rounded-lg bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     <Store className="w-3.5 h-3.5" />
                     <span>Lihat Katalog Toko</span>
@@ -244,6 +247,21 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <Plus className="w-4 h-4" />
             </button>
           </div>
+
+          {onChatStore && (
+            <button
+              type="button"
+              onClick={() => {
+                onChatStore(item.merchantName);
+                onClose();
+              }}
+              className="h-12 px-3.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+              title={`Chat penjual ${item.merchantName}`}
+            >
+              <MessageSquare className="w-4 h-4 text-emerald-800" />
+              <span className="hidden sm:inline">Tanya Penjual</span>
+            </button>
+          )}
 
           <button
             type="button"
@@ -344,7 +362,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] pb-24">
+    <div className="min-h-screen bg-white pb-24">
       {/* Page Header Bar */}
       <section className="bg-white border-b border-stone-200/90 py-4 sm:py-5">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
@@ -419,13 +437,13 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
               {confirmedOrder.items.map(({ item, quantity }) => (
                 <div
                   key={item.id}
-                  className="p-4 bg-[#FAF9F6] border border-stone-200 rounded-xl text-xs space-y-1.5"
+                  className="p-4 bg-white border border-stone-200 rounded-xl text-xs space-y-1.5"
                 >
                   <div className="flex justify-between font-semibold text-stone-900 gap-2 text-sm">
                     <span>
                       {quantity}x {item.title}
                     </span>
-                    <span className="font-mono-tabular shrink-0 text-[#EE4D2D]">
+                    <span className="font-mono-tabular shrink-0 text-[#f89254]">
                       {formatRupiah(item.rescuePrice * quantity)}
                     </span>
                   </div>
@@ -448,7 +466,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
               </div>
               <div className="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-200">
                 <span>Total Tebus Hidangan</span>
-                <span className="font-mono-tabular text-[#EE4D2D]">
+                <span className="font-mono-tabular text-[#f89254]">
                   {formatRupiah(confirmedOrder.totalPaid)}
                 </span>
               </div>
@@ -462,7 +480,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                     setConfirmedOrder(null);
                     onGoToPesanan();
                   }}
-                  className="flex-1 h-12 px-4 bg-[#EE4D2D] hover:bg-[#D73211] text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                  className="flex-1 h-12 px-4 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
                 >
                   Lihat di Menu Pesanan
                 </button>
@@ -473,7 +491,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                   setConfirmedOrder(null);
                   onBackToEtalase();
                 }}
-                className="flex-1 h-12 px-4 bg-[#16382C] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
+                className="flex-1 h-12 px-4 bg-[#1F281A] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
               >
                 Kembali ke Menu Utama
               </button>
@@ -496,7 +514,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
             <button
               type="button"
               onClick={onBackToEtalase}
-              className="min-h-[44px] px-6 py-2.5 bg-[#16382C] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
+              className="min-h-[44px] px-6 py-2.5 bg-[#1F281A] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
             >
               Jelajahi Etalase Makanan
             </button>
@@ -527,7 +545,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                           {item.title}
                         </h3>
                         <div className="flex items-baseline gap-2 mt-1.5">
-                          <span className="text-sm sm:text-base font-bold text-[#EE4D2D] font-mono-tabular">
+                          <span className="text-sm sm:text-base font-bold text-[#f89254] font-mono-tabular">
                             {formatRupiah(item.rescuePrice * quantity)}
                           </span>
                           <span className="text-[11px] text-stone-400 line-through font-mono-tabular">
@@ -537,7 +555,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                       </div>
 
                       <div className="flex items-center justify-between mt-3 pt-2 border-t border-stone-100">
-                        <div className="flex items-center border border-stone-200 rounded-lg h-8 sm:h-9 bg-[#FAF9F6]">
+                        <div className="flex items-center border border-stone-200 rounded-lg h-8 sm:h-9 bg-white">
                           <button
                             type="button"
                             onClick={() => onUpdateQty(item.id, -1)}
@@ -580,7 +598,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
               {/* "Mohon Login" Overlay Covering the Data Pengambil Card when Not Logged In */}
               {!currentUser && (
                 <div className="absolute inset-0 z-10 bg-white/85 backdrop-blur-[3px] flex flex-col items-center justify-center p-6 text-center space-y-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-[#16382C]/10 text-[#16382C] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-[#1F281A]/10 text-[#1F281A] flex items-center justify-center">
                     <Lock className="w-6 h-6" />
                   </div>
                   <div className="space-y-1 max-w-xs">
@@ -594,7 +612,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                   <button
                     type="button"
                     onClick={onNavigateToAuth}
-                    className="min-h-[44px] px-6 py-2.5 bg-[#16382C] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
+                    className="min-h-[44px] px-6 py-2.5 bg-[#1F281A] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
                   >
                     Login / Register Sekarang
                   </button>
@@ -623,7 +641,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Contoh: Budi Santoso"
-                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white"
+                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white"
                   />
                 </div>
 
@@ -640,14 +658,14 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     placeholder="Contoh: 081234567890"
-                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-[#FAF9F6] border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular"
+                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular"
                   />
                 </div>
 
                 {currentUser?.defaultAddress && (
-                  <div className="p-3 bg-[#FAF9F6] border border-stone-200/80 rounded-xl text-xs space-y-0.5">
+                  <div className="p-3 bg-white border border-stone-200/80 rounded-xl text-xs space-y-0.5">
                     <span className="font-semibold text-stone-800 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-[#16382C]" />
+                      <MapPin className="w-3.5 h-3.5 text-[#1F281A]" />
                       Alamat Default Anda:
                     </span>
                     <p className="text-stone-600 leading-relaxed pl-4">
@@ -712,7 +730,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
                   </div>
                   <div className="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-200">
                     <span>Total Bayar</span>
-                    <span className="font-mono-tabular text-[#EE4D2D]">
+                    <span className="font-mono-tabular text-[#f89254]">
                       {formatRupiah(totalRescuePrice)}
                     </span>
                   </div>
@@ -720,7 +738,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full h-12 px-4 bg-[#EE4D2D] hover:bg-[#D73211] text-white text-xs sm:text-sm font-semibold rounded-xl active:scale-[0.99] transition-all cursor-pointer whitespace-nowrap"
+                  className="w-full h-12 px-4 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs sm:text-sm font-semibold rounded-xl active:scale-[0.99] transition-all cursor-pointer whitespace-nowrap"
                 >
                   Konfirmasi & Terbitkan Tiket Ambil
                 </button>

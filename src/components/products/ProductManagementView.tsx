@@ -82,7 +82,7 @@ export const ProductManagementView: React.FC = () => {
       {/* Top Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
+          <h1 className="text-xl md:text-2xl font-bold text-[#1F281A] tracking-tight">
             Katalog Produk Sisa Piring
           </h1>
           <p className="text-xs text-neutral-500 mt-1">
@@ -93,7 +93,7 @@ export const ProductManagementView: React.FC = () => {
         <button
           type="button"
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Produk Sisa Piring</span>
@@ -107,41 +107,37 @@ export const ProductManagementView: React.FC = () => {
           <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-xl overflow-x-auto">
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'all'
-                  ? 'bg-white text-[#16382C] shadow-xs'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'all'
+                  ? 'bg-white text-[#1F281A] shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Semua ({products.length})
             </button>
             <button
               onClick={() => setActiveTab('active')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'active'
-                  ? 'bg-white text-[#16382C] shadow-xs'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'active'
+                  ? 'bg-white text-[#1F281A] shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Aktif ({products.filter((p) => p.isActive && p.stock > 0).length})
             </button>
             <button
               onClick={() => setActiveTab('critical')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'critical'
-                  ? 'bg-white text-[#EE4D2D] shadow-xs'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'critical'
+                  ? 'bg-white text-[#f89254] shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Rescue Prioritas ({products.filter((p) => p.stock > 0 && p.discountPercentage >= 70).length})
             </button>
             <button
               onClick={() => setActiveTab('inactive')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                activeTab === 'inactive'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${activeTab === 'inactive'
                   ? 'bg-white text-neutral-800 shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
-              }`}
+                }`}
             >
               Habis / Nonaktif ({products.filter((p) => !p.isActive || p.stock === 0).length})
             </button>
@@ -156,14 +152,14 @@ export const ProductManagementView: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari nama produk..."
-                className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
               />
             </div>
 
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#16382C]"
+              className="px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1F281A]"
             >
               <option value="all">Semua Kategori</option>
               <option value="Bakery & Roti">Bakery & Roti</option>
@@ -191,7 +187,7 @@ export const ProductManagementView: React.FC = () => {
           <button
             type="button"
             onClick={handleOpenAdd}
-            className="px-4 py-2 bg-[#16382C] text-white text-xs font-semibold rounded-xl hover:bg-[#214F3F] transition-colors"
+            className="px-4 py-2 bg-[#1F281A] text-white text-xs font-semibold rounded-xl hover:bg-[#2D3A26] transition-colors"
           >
             Terbitkan Produk Baru
           </button>
@@ -249,20 +245,19 @@ export const ProductManagementView: React.FC = () => {
                       {/* Discount Percentage */}
                       <td className="py-3.5 px-4 text-center">
                         <span
-                          className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
-                            p.discountPercentage === 100
-                              ? 'bg-[#16382C] text-[#FFD230]'
+                          className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${p.discountPercentage === 100
+                              ? 'bg-[#1F281A] text-[#fbe1b5]'
                               : isCritical
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
                         >
                           {p.discountPercentage === 100 ? 'Donasi 100%' : `${p.discountPercentage}% OFF`}
                         </span>
                       </td>
 
                       {/* Final Price */}
-                      <td className="py-3.5 px-4 text-right font-mono font-bold text-[#16382C] text-sm">
+                      <td className="py-3.5 px-4 text-right font-mono font-bold text-[#1F281A] text-sm">
                         {p.discountedPrice === 0 ? 'Bebas Bayar' : formatRupiah(p.discountedPrice)}
                       </td>
 
@@ -294,7 +289,7 @@ export const ProductManagementView: React.FC = () => {
                       <td className="py-3.5 px-4">
                         <div className="text-[11px] space-y-0.5">
                           <div className="flex items-center gap-1 text-neutral-700">
-                            <Clock className="w-3 h-3 text-[#EE4D2D] shrink-0" />
+                            <Clock className="w-3 h-3 text-[#f89254] shrink-0" />
                             <span className="font-semibold">{p.safeConsumptionDeadline}</span>
                           </div>
                           <p className="text-neutral-500">
@@ -319,14 +314,12 @@ export const ProductManagementView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => toggleProductStatus(p.id)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            p.isActive && p.stock > 0 ? 'bg-[#16382C]' : 'bg-neutral-300'
-                          }`}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${p.isActive && p.stock > 0 ? 'bg-[#1F281A]' : 'bg-neutral-300'
+                            }`}
                         >
                           <span
-                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                              p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
-                            }`}
+                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
+                              }`}
                           />
                         </button>
                       </td>
@@ -379,18 +372,17 @@ export const ProductManagementView: React.FC = () => {
                         {p.category}
                       </span>
                       <span
-                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                          p.discountPercentage === 100
-                            ? 'bg-[#16382C] text-[#FFD230]'
-                            : 'bg-[#EE4D2D]/10 text-[#EE4D2D]'
-                        }`}
+                        className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${p.discountPercentage === 100
+                            ? 'bg-[#1F281A] text-[#fbe1b5]'
+                            : 'bg-[#f89254]/10 text-[#f89254]'
+                          }`}
                       >
                         {p.discountPercentage === 100 ? 'Donasi 100%' : `${p.discountPercentage}% OFF`}
                       </span>
                     </div>
                     <h4 className="text-sm font-bold text-neutral-800 line-clamp-1 mt-0.5">{p.name}</h4>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-sm font-bold font-mono text-[#16382C]">
+                      <span className="text-sm font-bold font-mono text-[#1F281A]">
                         {p.discountedPrice === 0 ? 'Bebas Bayar' : formatRupiah(p.discountedPrice)}
                       </span>
                       <span className="text-xs font-mono text-neutral-400 line-through">
@@ -402,7 +394,7 @@ export const ProductManagementView: React.FC = () => {
 
                 <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-600">
                   <div className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-[#EE4D2D]" />
+                    <Clock className="w-3.5 h-3.5 text-[#f89254]" />
                     <span>Aman s/d: {p.safeConsumptionDeadline}</span>
                   </div>
 
@@ -431,14 +423,12 @@ export const ProductManagementView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => toggleProductStatus(p.id)}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        p.isActive && p.stock > 0 ? 'bg-[#16382C]' : 'bg-neutral-300'
-                      }`}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${p.isActive && p.stock > 0 ? 'bg-[#1F281A]' : 'bg-neutral-300'
+                        }`}
                     >
                       <span
-                        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                          p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
-                        }`}
+                        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${p.isActive && p.stock > 0 ? 'translate-x-4' : 'translate-x-0.5'
+                          }`}
                       />
                     </button>
                     <span className="text-[11px] text-neutral-500">

@@ -1,273 +1,340 @@
-import React, { useState } from 'react';
-import {
-  Sparkles,
-  Percent,
-  Clock,
-  TrendingDown,
-  CheckCircle2,
-  AlertCircle,
-  HelpCircle,
-  Zap,
-  HeartHandshake,
-} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Clock, Sparkles, Check, Undo2 } from 'lucide-react';
 import { calculateRecommendedDiscount } from '../../utils/discountEngine';
 import { formatRupiah } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
+import { SisaPiringProduct } from '../../types/seller';
+
+/* Halaman diskon: kalimat pendek, tombol besar, dan harga akhir yang
+   terlihat langsung. Tidak ada istilah teknis ("algoritma", "AI"). */
+
+const INK = '#2C434F';
+const SOFT = '#4E5F68';
+const MUTE = '#6B7C83';
+const FAINT = '#AEBBBF';
+const ORANGE = '#F0935D';
+const CREAM = '#FBE1B5';
+const GREEN = '#4C7A34';
+
+const CARD =
+  'rounded-[22px] bg-white shadow-[0_1px_2px_rgba(44,67,79,0.05),0_14px_34px_-18px_rgba(44,67,79,0.28)]';
+
+const TIERS = [50, 70, 90, 100] as const;
+
+/** "19.30" / "19:30" → jam tersisa dari sekarang. Null kalau tidak terbaca. */
+function hoursLeft(deadline: string): number | null {
+  const m = /^(\d{1,2})[.:](\d{2})/.exec(deadline?.trim() ?? '');
+  if (!m) return null;
+  const target = new Date();
+  target.setHours(Number(m[1]), Number(m[2]), 0, 0);
+  const diff = (target.getTime() - Date.now()) / 3600000;
+  return diff <= 0 ? 0 : Math.round(diff * 10) / 10;
+}
+
+const priceAt = (p: SisaPiringProduct, tier: number) =>
+  Math.round((p.originalPrice * (100 - tier)) / 100 / 500) * 500;
+
+const toneOf = (h: number | null) =>
+  h === null ? MUTE : h <= 1.5 ? '#C25B37' : h <= 3 ? '#B9782F' : GREEN;
+
+const urgencyOf = (h: number | null) =>
+  h === null ? 'Waktu belum diisi' : h <= 1.5 ? 'Mepet' : h <= 3 ? 'Saatnya cek' : 'Masih longgar';
 
 export const RescueDealsView: React.FC = () => {
-  const { products, applyDiscount, showToast } = useApp();
+  const { products, sellerProfile, applyDiscount, showToast } = useApp();
 
-  // Simulation test state
-  const [simHours, setSimHours] = useState<number>(2.5);
-  const [simStock, setSimStock] = useState<number>(6);
+  const [simHours, setSimHours] = useState(2.5);
+  const [simStock, setSimStock] = useState(6);
 
-  const simRecommendation = calculateRecommendedDiscount(simHours, simStock, 'Bakery');
+  const sim = useMemo(
+    () => calculateRecommendedDiscount(simHours, simStock, 'Bakery'),
+    [simHours, simStock]
+  );
 
-  const handleApplyBatchRecommended = () => {
-    let appliedCount = 0;
-    products.forEach((p) => {
-      if (p.isActive && p.stock > 0) {
-        // Calculate recommended discount based on mock hours remaining (e.g., 2.5 hours)
-        const rec = calculateRecommendedDiscount(2.5, p.stock, p.category);
-        if (p.discountPercentage !== rec.recommendedDiscount) {
-          applyDiscount(p.id, rec.recommendedDiscount);
-          appliedCount++;
-        }
-      }
-    });
+  const rows = useMemo(
+    () =>
+      products
+        .filter((p) => p.isActive && p.stock > 0)
+        .map((p) => {
+          const left = hoursLeft(p.safeConsumptionDeadline);
+          const rec = calculateRecommendedDiscount(left ?? 6, p.stock, p.category);
+          return { p, left, rec, ok: p.discountPercentage === rec.recommendedDiscount };
+        })
+        .sort((a, b) => (a.left ?? 99) - (b.left ?? 99)),
+    [products]
+  );
 
-    if (appliedCount > 0) {
-      showToast(
-        'Diskon Rekomendasi Diterapkan!',
-        `Berhasil menyelaraskan ${appliedCount} produk dengan rekomendasi sistem penyelamatan pangan.`,
-        'success'
-      );
-    } else {
-      showToast(
-        'Sudah Optimal',
-        'Seluruh produk sisa piring Anda sudah menggunakan diskon optimal yang direkomendasikan.',
-        'info'
-      );
+  const needAction = rows.filter((r) => !r.ok).length;
+
+  const apply = (p: SisaPiringProduct, tier: number) => {
+    applyDiscount(p.id, tier);
+    showToast(
+      'Diskon dipasang',
+      `${p.name} → ${tier === 100 ? 'donasi (gratis)' : `${tier}%`} · pembeli bayar ${formatRupiah(
+        priceAt(p, tier)
+      )}`,
+      'success'
+    );
+  };
+
+  const applyAll = () => {
+    if (!needAction) {
+      showToast('Sudah pas', 'Semua produk sudah memakai saran tertinggi.', 'info');
+      return;
     }
+    rows.filter((r) => !r.ok).forEach((r) => applyDiscount(r.p.id, r.rec.recommendedDiscount));
+    showToast(
+      'Selesai',
+      `${needAction} produk disesuaikan dengan saran tertinggi.`,
+      'success'
+    );
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl md:text-2xl font-bold text-[#16382C] tracking-tight">
-              Rescue Deals & Diskon Pintar
+    <div className="min-h-full bg-[#ECEFEC] px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+      <div className="mx-auto max-w-[1000px] space-y-5">
+        {/* judul + aksi massal */}
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 px-1">
+          <div className="min-w-0">
+            <h1 className="text-[22px] font-bold leading-none tracking-tight" style={{ color: INK }}>
+              Diskon penyelamatan
             </h1>
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#16382C] bg-[#FFD230] px-2.5 py-0.5 rounded-full">
-              <Sparkles className="w-3.5 h-3.5 text-[#16382C]" />
-              Algoritma Otomatis
-            </span>
-          </div>
-          <p className="text-xs text-neutral-500 mt-1">
-            Optimalkan penyelamatan sisa piring makanan Kota Bandung sebelum batas aman kedaluwarsa dengan diskon bertingkat (50%, 70%, 90%, 100% Donasi).
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleApplyBatchRecommended}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs shrink-0"
-        >
-          <Zap className="w-4 h-4" />
-          <span>Terapkan Semua Rekomendasi</span>
-        </button>
-      </div>
-
-      {/* Logic Explanation & Interactive Simulator Banner */}
-      <div className="bg-white rounded-2xl p-5 md:p-6 border border-neutral-200 shadow-xs space-y-5">
-        <div className="flex items-start justify-between gap-4 border-b border-neutral-100 pb-4">
-          <div className="space-y-1">
-            <h3 className="text-sm font-bold text-[#16382C] flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#EE4D2D]" />
-              <span>Prinsip Algoritma Rekomendasi Diskon SisaPiring</span>
-            </h3>
-            <p className="text-xs text-neutral-600 leading-relaxed max-w-2xl">
-              Sistem menghitung parameter: <strong>(1) Sisa jam sebelum batas aman konsumsi</strong>,{' '}
-              <strong>(2) Jumlah porsi stok tersisa</strong>, dan <strong>(3) Jam penjemputan warga Bandung</strong>.{' '}
-              Mitra tetap memegang kendali penuh atas harga final.
+            <p className="mt-2 max-w-[46ch] text-[13px]" style={{ color: MUTE }}>
+              Makin sedikit waktunya, makin besar diskon. Kamu yang memilih; saran cuma contoh harga
+              yang paling cepat habis.
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={applyAll}
+            title={needAction ? 'Hanya menaikkan diskon, stok dan produk tidak dihapus' : 'Tidak ada yang perlu diubah'}
+            className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-3 text-[13px] font-bold transition-opacity hover:opacity-95"
+            style={{ background: ORANGE, color: INK }}
+          >
+            <Sparkles className="h-4 w-4" />
+            {needAction ? `Naikkan ${needAction} diskon ke saran` : 'Semua sudah sesuai saran'}
+          </button>
         </div>
 
-        {/* Interactive Algorithm Sandbox */}
-        <div className="bg-[#FAF9F6] rounded-xl p-4 border border-neutral-200 grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs font-semibold text-neutral-700">
-              <span>Simulasi Sisa Waktu Aman:</span>
-              <span className="font-mono text-[#EE4D2D]">{simHours.toFixed(1)} Jam</span>
-            </div>
-            <input
-              type="range"
-              min="0.5"
-              max="12"
-              step="0.5"
-              value={simHours}
-              onChange={(e) => setSimHours(parseFloat(e.target.value))}
-              className="w-full accent-[#16382C]"
-            />
-            <span className="text-[10px] text-neutral-400 block">
-              Dari 30 menit (kritis) hingga 12 jam (leluasa)
+        {/* status singkat */}
+        <div className={`${CARD} flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4`}>
+          <span className="flex items-center gap-2.5 text-[13px] font-semibold" style={{ color: INK }}>
+            <span
+              className="grid h-7 w-7 shrink-0 place-items-center rounded-full"
+              style={{ background: needAction ? 'rgba(240,147,93,0.16)' : '#EAEEDA' }}
+            >
+              {needAction ? (
+                <Clock className="h-4 w-4" style={{ color: '#C25B37' }} />
+              ) : (
+                <Check className="h-4 w-4" style={{ color: '#6B8127' }} />
+              )}
             </span>
-          </div>
+            {needAction
+              ? `${needAction} dari ${rows.length} produk belum memakai saran tertinggi`
+              : rows.length
+                ? 'Semua produk sudah memakai saran tertinggi'
+                : 'Belum ada produk yang aktif hari ini'}
+          </span>
+          <span className="text-[12px]" style={{ color: FAINT }}>
+            Diurutkan dari yang paling mepet · jam ambil {sellerProfile.pickupWindow}
+          </span>
+        </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs font-semibold text-neutral-700">
-              <span>Simulasi Sisa Stok:</span>
-              <span className="font-mono text-[#16382C]">{simStock} Porsi</span>
-            </div>
-            <input
-              type="range"
-              min="1"
-              max="20"
-              step="1"
-              value={simStock}
-              onChange={(e) => setSimStock(parseInt(e.target.value))}
-              className="w-full accent-[#16382C]"
-            />
-            <span className="text-[10px] text-neutral-400 block">
-              Volume porsi yang perlu diselamatkan
-            </span>
-          </div>
-
-          <div className="bg-white rounded-xl p-3 border border-neutral-200 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-neutral-500 uppercase">
-                Hasil Rekomendasi:
-              </span>
-              <span
-                className={`text-xs font-bold font-mono px-2 py-0.5 rounded ${
-                  simRecommendation.recommendedDiscount === 100
-                    ? 'bg-[#16382C] text-[#FFD230]'
-                    : simRecommendation.recommendedDiscount === 90
-                    ? 'bg-rose-100 text-rose-800'
-                    : 'bg-amber-100 text-amber-800'
-                }`}
-              >
-                {simRecommendation.recommendedDiscount === 100
-                  ? 'Donasi 100%'
-                  : `${simRecommendation.recommendedDiscount}% OFF`}
-              </span>
-            </div>
-            <p className="text-[11px] text-neutral-700 mt-1 leading-snug">
-              {simRecommendation.reason}
+        {/* kotak coba-coba */}
+        <section className={`${CARD} p-5`} aria-label="Coba hitung diskon">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-[15px] font-bold" style={{ color: INK }}>
+              Coba hitung dulu
+            </h2>
+            <p className="text-[12px]" style={{ color: MUTE }}>
+              Geser saja — tidak ada yang berubah di etalase.
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Product List with Rescue Deals Controls */}
-      <div className="space-y-3.5">
-        <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider">
-          Pengaturan Diskon per Produk ({products.length} Produk)
-        </h3>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            <label className="block">
+              <span className="flex items-center justify-between text-[12px] font-semibold" style={{ color: SOFT }}>
+                Sisa waktu sampai habis
+                <span className="font-mono tabular-nums" style={{ color: toneOf(simHours) }}>
+                  {simHours.toFixed(1)} jam
+                </span>
+              </span>
+              <input
+                type="range"
+                min={0.5}
+                max={12}
+                step={0.5}
+                value={simHours}
+                onChange={(e) => setSimHours(parseFloat(e.target.value))}
+                aria-label="Sisa waktu sampai habis, dalam jam"
+                className="mt-2.5 w-full"
+                style={{ accentColor: ORANGE }}
+              />
+            </label>
 
-        <div className="grid grid-cols-1 gap-3.5">
-          {products.map((p) => {
-            // Simulated remaining hours for demo calculation
-            const rec = calculateRecommendedDiscount(3.5, p.stock, p.category);
-            const isMatchingRecommendation = p.discountPercentage === rec.recommendedDiscount;
+            <label className="block">
+              <span className="flex items-center justify-between text-[12px] font-semibold" style={{ color: SOFT }}>
+                Sisa porsi
+                <span className="font-mono tabular-nums" style={{ color: INK }}>
+                  {simStock} porsi
+                </span>
+              </span>
+              <input
+                type="range"
+                min={1}
+                max={20}
+                step={1}
+                value={simStock}
+                onChange={(e) => setSimStock(parseInt(e.target.value, 10))}
+                aria-label="Sisa porsi"
+                className="mt-2.5 w-full"
+                style={{ accentColor: INK }}
+              />
+            </label>
+          </div>
 
-            return (
-              <div
-                key={p.id}
-                className="bg-white rounded-2xl p-4 md:p-5 border border-neutral-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:border-neutral-300 transition-all"
-              >
-                {/* Product info */}
-                <div className="flex items-start gap-3.5 min-w-0">
+          <div
+            className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl px-4 py-3"
+            style={{ background: '#F7F8F3' }}
+          >
+            <span className="text-[12px]" style={{ color: MUTE }}>
+              Saran
+            </span>
+            <span
+              className="rounded-full px-3 py-1 text-[13px] font-bold"
+              style={sim.recommendedDiscount === 100 ? { background: INK, color: CREAM } : { background: 'rgba(240,147,93,0.2)', color: '#B4551F' }}
+            >
+              {sim.recommendedDiscount === 100 ? 'Gratis (donasi)' : `Diskon ${sim.recommendedDiscount}%`}
+            </span>
+            <p className="min-w-[16ch] flex-1 text-[12px]" style={{ color: SOFT }}>
+              {sim.reason}
+            </p>
+          </div>
+        </section>
+
+        {/* daftar produk */}
+        {rows.length === 0 ? (
+          <div className={`${CARD} px-5 py-12 text-center`}>
+            <p className="text-[15px] font-bold" style={{ color: INK }}>
+              Belum ada produk yang bisa diselamatkan
+            </p>
+            <p className="mt-1.5 text-[13px]" style={{ color: MUTE }}>
+              Aktifkan produk di halaman Produk, lalu balik lagi ke sini.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {rows.map(({ p, left, rec, ok }) => (
+              <article key={p.id} className={`${CARD} p-4 sm:p-5`}>
+                <div className="flex items-start gap-3.5">
                   <img
                     src={p.image}
-                    alt={p.name}
-                    className="w-16 h-16 rounded-xl object-cover border border-neutral-200 shrink-0"
+                    alt=""
                     referrerPolicy="no-referrer"
+                    className="h-14 w-14 shrink-0 rounded-[14px] object-cover"
                   />
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
-                        {p.category}
-                      </span>
-                      <span className="text-neutral-300">·</span>
-                      <span className="text-[11px] text-neutral-500 font-mono">Stok: {p.stock} porsi</span>
-                    </div>
-                    <h4 className="text-sm font-bold text-neutral-900 truncate" title={p.name}>
+                  <div className="min-w-0 flex-1">
+                    <h2
+                      className="break-words text-[15px] font-bold leading-snug"
+                      style={{ color: INK }}
+                      title={p.name}
+                    >
                       {p.name}
-                    </h4>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="font-mono text-neutral-400 line-through">
-                        {formatRupiah(p.originalPrice)}
+                    </h2>
+                    <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px]" style={{ color: MUTE }}>
+                      <span>{p.stock} porsi</span>
+                      <span aria-hidden="true">·</span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5" style={{ color: toneOf(left) }} />
+                        <span className="font-semibold" style={{ color: toneOf(left) }}>
+                          {urgencyOf(left)}
+                        </span>
+                        {left !== null && <span className="font-mono tabular-nums">({left} jam)</span>}
                       </span>
-                      <span className="font-mono font-bold text-[#16382C]">
-                        {p.discountedPrice === 0 ? 'Bebas Bayar (Donasi)' : formatRupiah(p.discountedPrice)}
-                      </span>
-                      <span className="text-[11px] text-neutral-400">
-                        (Batas Aman: {p.safeConsumptionDeadline})
-                      </span>
-                    </div>
+                      <span aria-hidden="true">·</span>
+                      <span>habis {p.safeConsumptionDeadline}</span>
+                    </p>
                   </div>
-                </div>
-
-                {/* Right: Recommendation + Manual Selector */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-neutral-100">
-                  {/* Recommendation pill */}
-                  <div className="bg-neutral-50 rounded-xl p-2.5 border border-neutral-200 max-w-xs text-xs">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-neutral-800 text-[11px]">Saran AI Rescue:</span>
-                      <span className="font-mono font-bold text-[#EE4D2D]">
-                        {rec.recommendedDiscount === 100 ? 'Donasi 100%' : `${rec.recommendedDiscount}% OFF`}
-                      </span>
-                    </div>
-                    {!isMatchingRecommendation && (
-                      <button
-                        type="button"
-                        onClick={() => applyDiscount(p.id, rec.recommendedDiscount)}
-                        className="mt-1.5 w-full py-1 bg-[#16382C] text-white text-[11px] font-semibold rounded-lg hover:bg-[#214F3F] transition-colors"
-                      >
-                        Pakai Saran ({rec.recommendedDiscount}%)
-                      </button>
-                    )}
-                    {isMatchingRecommendation && (
-                      <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-medium mt-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Diskon rekomendasi aktif
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Manual 4 Tier Buttons: 50%, 70%, 90%, 100% */}
-                  <div>
-                    <span className="block text-[10px] text-neutral-400 font-semibold uppercase mb-1">
-                      Pilihan Manual Mitra:
+                  <span className="shrink-0 pl-3 text-right">
+                    <span className="block text-[10px] uppercase tracking-[0.12em]" style={{ color: FAINT }}>
+                      Harga biasa
                     </span>
-                    <div className="flex items-center gap-1.5">
-                      {([50, 70, 90, 100] as const).map((tier) => (
-                        <button
-                          key={tier}
-                          type="button"
-                          onClick={() => applyDiscount(p.id, tier)}
-                          className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
-                            p.discountPercentage === tier
-                              ? tier === 100
-                                ? 'bg-[#16382C] text-[#FFD230] border-[#16382C] shadow-xs'
-                                : 'bg-[#EE4D2D] text-white border-[#EE4D2D] shadow-xs'
-                              : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50'
-                          }`}
-                        >
-                          {tier === 100 ? 'Donasi' : `${tier}%`}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                    <span className="mt-0.5 block font-mono text-[12px] line-through" style={{ color: FAINT }}>
+                      {formatRupiah(p.originalPrice)}
+                    </span>
+                    <span className="mt-1.5 block text-[10px] uppercase tracking-[0.12em]" style={{ color: MUTE }}>
+                      Sekarang
+                    </span>
+                    <span className="block font-mono text-[15px] font-bold" style={{ color: INK }}>
+                      {p.discountedPrice === 0 ? 'Gratis' : formatRupiah(p.discountedPrice)}
+                    </span>
+                  </span>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+
+                <div className="mt-4 border-t border-[#EFF1EB] pt-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[12px] font-semibold" style={{ color: SOFT }}>
+                      Harga yang dibayar pembeli
+                    </p>
+                    {!ok && (
+                      <span className="text-[11px]" style={{ color: MUTE }}>
+                        Saran: {rec.recommendedDiscount === 100 ? 'gratis' : `${rec.recommendedDiscount}%`}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-2.5 grid grid-cols-4 gap-2" role="group" aria-label={`Diskon untuk ${p.name}`}>
+                    {TIERS.map((t) => {
+                      const selected = p.discountPercentage === t;
+                      const suggested = !ok && rec.recommendedDiscount === t;
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => apply(p, t)}
+                          aria-pressed={selected}
+                          className="flex flex-col items-center gap-0.5 rounded-2xl px-2 py-2.5 transition-colors"
+                          style={
+                            selected
+                              ? { background: INK, color: '#fff' }
+                              : suggested
+                                ? { background: 'rgba(240,147,93,0.14)', color: '#B4551F', boxShadow: `inset 0 0 0 1.5px ${ORANGE}` }
+                                : { background: '#F3F5F0', color: SOFT }
+                          }
+                        >
+                          <span className="text-[13px] font-bold">
+                            {t === 100 ? 'Gratis' : `${t}%`}
+                          </span>
+                          <span className="font-mono text-[10px] tabular-nums opacity-80">
+                            {formatRupiah(priceAt(p, t))}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <p className="mt-2.5 text-[12px]" style={{ color: MUTE }}>
+                    {ok ? (
+                      <span className="inline-flex items-center gap-1.5" style={{ color: '#6B8127' }}>
+                        <Check className="h-3.5 w-3.5" />
+                        Sudah sesuai saran tertinggi
+                      </span>
+                    ) : (
+                      rec.reason
+                    )}
+                  </p>
+                </div>
+              </article>
+            ))}
+
+            <p className="flex items-start gap-2 px-1 text-[12px]" style={{ color: FAINT }}>
+              <Undo2 className="mt-px h-3.5 w-3.5 shrink-0" />
+              Pilih “Gratis” hanya untuk porsi yang benar-benar tidak laku — produk tetap tercatat
+              sebagai penyelamatan.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

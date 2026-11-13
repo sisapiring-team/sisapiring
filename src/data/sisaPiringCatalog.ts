@@ -499,7 +499,7 @@ export const SISA_PIRING_CATALOG: SisaPiringItem[] = [
     ],
     sisaPiringReason:
       'Sayuran hidroponik Lembang dan buah peras dingin disiapkan setiap pagi. Demi menjaga kerenyahan daun selada, stok sore dijual hemat 60%.',
-    dietaryNotes: 'Halal · Rendah Kalori · Tanpa Gula Tambahan',
+    dietaryNotes: 'Halal · Sehat Alami · Tanpa Gula Tambahan',
     storageTip: 'Simpan pada suhu dingin 4°C dan tuang saus dressing sesaat sebelum dikonsumsi.',
     tags: ['Diskon ≥ 60%', 'Bebas Pengawet', 'Favorit Warga'],
   },
@@ -636,10 +636,10 @@ export interface ComplaintReport {
   itemName: string;
   reporterName: string;
   category:
-    | 'Makanan Tidak Sesuai Deskripsi'
-    | 'Kualitas / Kesegaran Kurang Baik'
-    | 'Porsi Tidak Sesuai Ketentuan'
-    | 'Kendala Saat Pengambilan di Toko';
+  | 'Makanan Tidak Sesuai Deskripsi'
+  | 'Kualitas / Kesegaran Kurang Baik'
+  | 'Porsi Tidak Sesuai Ketentuan'
+  | 'Kendala Saat Pengambilan di Toko';
   description: string;
   evidenceFileName?: string;
   createdAt: string;

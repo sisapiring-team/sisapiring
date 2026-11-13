@@ -49,6 +49,7 @@ export const AdminMobileDrawer: React.FC<AdminMobileDrawerProps> = ({
             onClose();
           }}
           macroStats={macroStats}
+          expanded={true}
           onSwitchToPublicEtalase={() => {
             onSwitchToPublicEtalase();
             onClose();
@@ -62,3 +63,4 @@ export const AdminMobileDrawer: React.FC<AdminMobileDrawerProps> = ({
     </div>
   );
 };
+

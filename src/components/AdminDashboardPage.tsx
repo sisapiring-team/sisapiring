@@ -25,7 +25,7 @@ import { useApp } from '../context/AppContext';
 import { AdminTab, AdminMacroStats } from './admin/types';
 import { AdminSidebar } from './admin/AdminSidebar';
 import { AdminMobileDrawer } from './admin/AdminMobileDrawer';
-import { AdminTopInfoBar } from './admin/AdminTopInfoBar';
+import { AdminFloatingNavbar } from './admin/AdminFloatingNavbar';
 
 // Modular Admin Tab Views
 import { OverviewTab } from './admin/tabs/OverviewTab';
@@ -140,7 +140,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     window.setTimeout(() => setAdminToast(null), 3500);
   };
 
-  // Macro Metrics (Bandung Aggregates)
+  // Macro Metrics (Bandung Aggregates - Dynamic LCA Calculation)
   const macroStats: AdminMacroStats = useMemo(() => {
     const period = MACRO_IMPACT_BY_PERIOD['30d'];
     const totalOrdersCount = orders.length + transactions.length;
@@ -148,6 +148,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
       (acc, o) => acc + o.items.reduce((sum, item) => sum + item.quantity, 0),
       period.totalPortionsRescued
     );
+
+    // Algorithmic Derivation based on LCA & Bappenas Standards:
+    // 1 portion = 0.45 kg food waste prevented
+    // 1 kg food waste = 2.5 kg CO2e methane prevented from TPA Sarimukti
+    // 1 kg food waste = 800 L virtual water footprint saved
+    const dynamicWasteKg = Math.round(totalRescuedPortions * 0.45 * 10) / 10;
+    const dynamicCo2Kg = Math.round(dynamicWasteKg * 2.5 * 10) / 10;
+    const dynamicWaterLiters = Math.round(dynamicWasteKg * 800);
+
     const activeProductsCount = catalogItems.filter(
       (item) => (productMonitoring[item.id]?.monitoringStatus ?? 'Aktif & Aman') === 'Aktif & Aman'
     ).length;
@@ -162,7 +171,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
       .reduce((acc, t) => acc + t.totalPaid, 0);
 
     return {
-      period,
+      period: {
+        ...period,
+        totalPortionsRescued: totalRescuedPortions,
+        foodWastePreventedKg: dynamicWasteKg,
+        co2EmissionsSavedKg: dynamicCo2Kg,
+        waterSavedLiters: dynamicWaterLiters,
+      },
       totalOrdersCount,
       totalRescuedPortions,
       activeProductsCount,
@@ -268,14 +283,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   };
 
   return (
-    <div className="flex h-screen w-full bg-[#FAF9F6] text-neutral-900 overflow-hidden font-sans">
+    <div className="min-h-screen w-full bg-white text-neutral-900 font-sans relative overflow-x-hidden selection:bg-[#8da249]/30 selection:text-neutral-900">
       {/* Toast Feedback */}
       {adminToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#16382C] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-500/30 animate-in fade-in slide-in-from-bottom-4">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[#1F281A] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-[#8da249]/30 animate-in fade-in slide-in-from-bottom-4">
+          <CheckCircle2 className="w-5 h-5 text-[#8da249] shrink-0" />
           <div>
             <h5 className="font-bold text-xs">{adminToast.title}</h5>
-            <p className="text-[11px] text-emerald-200">{adminToast.message}</p>
+            <p className="text-[11px] text-white/80">{adminToast.message}</p>
           </div>
           <button
             type="button"
@@ -287,8 +302,17 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
       )}
 
-      {/* 1. Desktop Left Sidebar (Navigation Moved Here!) */}
-      <div className="hidden lg:flex shrink-0 h-full">
+      {/* 1. TOP FLOATING NAVBAR (RESTORED MATCHING REFERENCE DESIGN) */}
+      <AdminFloatingNavbar
+        macroStats={macroStats}
+        onMobileMenuToggle={() => setMobileSidebarOpen(true)}
+        onSwitchToPublicEtalase={onSwitchToPublicEtalase}
+        onSwitchToSellerPortal={onSwitchToSellerPortal}
+        onSelectTab={setActiveTab}
+      />
+
+      {/* 2. DESKTOP FLOATING LEFT SIDEBAR (TWO SEPARATE CAPSULES) */}
+      <div className="hidden lg:block">
         <AdminSidebar
           activeTab={activeTab}
           onTabChange={handleTabChange}
@@ -298,7 +322,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         />
       </div>
 
-      {/* 2. Mobile Drawer Navigation */}
+      {/* 3. MOBILE DRAWER NAVIGATION */}
       <AdminMobileDrawer
         isOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
@@ -309,17 +333,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         onSwitchToSellerPortal={onSwitchToSellerPortal}
       />
 
-      {/* 3. Main Workspace Viewport */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        {/* Top Header (Full of Information Only!) */}
-        <AdminTopInfoBar
-          activeTab={activeTab}
-          macroStats={macroStats}
-          onMobileMenuToggle={() => setMobileSidebarOpen(true)}
-        />
-
-        {/* Scrollable Tab Workspace */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* 4. MAIN SCROLLABLE CONTENT AREA (Full-width, flush with sidebar & right edge) */}
+      <main className="pt-20 sm:pt-24 px-4 lg:pl-[84px] xl:pl-[96px] lg:pr-4 pb-12 w-full relative z-10 space-y-6">
           {activeTab === 'overview' && (
             <OverviewTab
               macroStats={macroStats}
@@ -422,7 +437,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
             />
           )}
         </main>
-      </div>
 
       {/* 4. Interactive Dialog Modals */}
       <UmkmVerificationModal

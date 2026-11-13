@@ -1,30 +1,70 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   UtensilsCrossed,
   ShoppingBag,
   TrendingUp,
   Leaf,
   Clock,
-  AlertTriangle,
   ArrowRight,
   Plus,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
   QrCode,
   MapPin,
-  HeartHandshake,
-  ArrowUpRight,
+  Calendar,
+  ChevronRight,
+  ChevronDown,
   PackageCheck,
   FileCheck,
   Layers,
-  ChevronRight,
-  Store,
-  Calendar,
 } from 'lucide-react';
-import { OrderStatus, SisaPiringProduct } from '../../types/seller';
 import { formatRupiah, calculateCO2Saved } from '../../utils/formatters';
 import { useApp } from '../../context/AppContext';
+
+/* ------------------------------------------------------------------
+   Palette (see colour sheet):
+   asparagus      #8DA249   success / positive delta
+   faded orange   #F0935D   action
+   navajo white   #FBE1B5   highlight
+   limed spruce   #2C434F   structure
+   Text stays inside those four hues + neutrals. Cards carry shadow,
+   never a stroke, and each block has one label instead of a subtitle.
+------------------------------------------------------------------- */
+
+const C = {
+  ink: '#2C434F',
+  inkSoft: '#5C7079',
+  mute: '#8FA0A6',
+  faint: '#B9C6CA',
+  orange: '#F0935D',
+  green: '#8DA249',
+  cream: '#FBE1B5',
+  canvas: '#FFFFFF',
+  surface: '#F4F6F1',
+};
+
+const ORDER_VIEW: Record<string, { label: string; tone: string; cta: string }> = {
+  waiting_confirmation: { label: 'Perlu dikonfirmasi', tone: C.orange, cta: 'Konfirmasi' },
+  confirmed: { label: 'Sedang disiapkan', tone: C.green, cta: 'Siap ambil' },
+  ready_for_pickup: { label: 'Menunggu pembeli', tone: C.green, cta: 'Verifikasi' },
+  completed: { label: 'Selesai', tone: C.mute, cta: '' },
+  cancelled: { label: 'Dibatalkan', tone: C.mute, cta: '' },
+};
+
+const ORDER_PRIORITY: Record<string, number> = {
+  waiting_confirmation: 0,
+  confirmed: 1,
+  ready_for_pickup: 2,
+  completed: 3,
+  cancelled: 4,
+};
+
+const clockOf = (iso: string) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ''
+    : `${String(d.getHours()).padStart(2, '0')}.${String(d.getMinutes()).padStart(2, '0')}`;
+};
 
 export const SellerDashboardView: React.FC = () => {
   const {
@@ -41,52 +81,66 @@ export const SellerDashboardView: React.FC = () => {
     showToast,
   } = useApp();
 
-  // Time filter for revenue chart
   const [revenuePeriod, setRevenuePeriod] = useState<'7d' | '30d' | '90d'>('7d');
   const [activeChartPoint, setActiveChartPoint] = useState<{
     date: string;
     revenue: number;
     ordersCount: number;
   } | null>(null);
+  const [performanceTab, setPerformanceTab] = useState<
+    'best_selling' | 'low_stock' | 'expiring_soon'
+  >('best_selling');
 
-  // Performance tab: 'best_selling' | 'low_stock' | 'expiring_soon'
-  const [performanceTab, setPerformanceTab] = useState<'best_selling' | 'low_stock' | 'expiring_soon'>(
-    'best_selling'
-  );
-
-  // Calculate dynamic greeting based on WIB current hour
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 11) return 'Selamat Pagi';
-    if (hour < 15) return 'Selamat Siang';
-    if (hour < 18) return 'Selamat Sore';
-    return 'Selamat Malam';
+    if (hour < 11) return 'Pagi';
+    if (hour < 15) return 'Siang';
+    if (hour < 18) return 'Sore';
+    return 'Malam';
   };
 
-  // Metrics calculation from actual application state
-  const totalProductsCount = products.length;
-  const activeProducts = products.filter((p) => p.isActive && p.stock > 0);
-  const activeProductsCount = activeProducts.length;
+  /* ---- derived state ------------------------------------------- */
+  const metrics = useMemo(() => {
+    const waiting = orders.filter((o) => o.status === 'waiting_confirmation');
+    const confirmed = orders.filter((o) => o.status === 'confirmed');
+    const ready = orders.filter((o) => o.status === 'ready_for_pickup');
+    const completed = orders.filter((o) => o.status === 'completed');
 
-  const waitingOrders = orders.filter((o) => o.status === 'waiting_confirmation');
-  const confirmedOrders = orders.filter((o) => o.status === 'confirmed');
-  const readyOrders = orders.filter((o) => o.status === 'ready_for_pickup');
-  const completedOrders = orders.filter((o) => o.status === 'completed');
+    const revenue = completed.reduce((acc, o) => acc + o.totalPayment, 0);
+    const portions = products.reduce((acc, p) => acc + p.portionsRescuedCount, 0);
+    const donated = products
+      .filter((p) => p.discountPercentage === 100)
+      .reduce((acc, p) => acc + p.portionsRescuedCount, 0);
 
-  const totalRevenue = completedOrders.reduce((acc, o) => acc + o.totalPayment, 0);
-  const totalPortionsRescued = products.reduce((acc, p) => acc + p.portionsRescuedCount, 0);
+    return {
+      waiting,
+      confirmed,
+      ready,
+      completed,
+      revenue,
+      portions,
+      donated,
+      lowStock: products.filter((p) => p.isActive && p.stock <= 3),
+      critical: products.filter((p) => p.isActive && p.stock > 0 && p.discountPercentage >= 70),
+      best: [...products].sort((a, b) => b.portionsRescuedCount - a.portionsRescuedCount),
+    };
+  }, [orders, products]);
 
-  // Donated count (products with 100% discount rescued)
-  const donatedCount = products
-    .filter((p) => p.discountPercentage === 100)
-    .reduce((acc, p) => acc + p.portionsRescuedCount, 0);
+  const queue = useMemo(
+    () =>
+      [...orders]
+        .sort(
+          (a, b) =>
+            (ORDER_PRIORITY[a.status] ?? 9) - (ORDER_PRIORITY[b.status] ?? 9) ||
+            new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
+        )
+        .slice(0, 4),
+    [orders]
+  );
 
-  // Filtered lists for performance
-  const bestSellingProducts = [...products].sort((a, b) => b.portionsRescuedCount - a.portionsRescuedCount);
-  const lowStockProducts = products.filter((p) => p.isActive && p.stock <= 3);
-  const expiringProducts = products.filter((p) => p.isActive && p.stock > 0 && p.discountPercentage >= 70);
+  const monthlyTarget = 250;
+  const targetPct = Math.min(100, Math.round((metrics.portions / monthlyTarget) * 100));
 
-  // Revenue chart dataset per period (Solid colors only)
   const chartDatasets: Record<
     '7d' | '30d' | '90d',
     { date: string; shortDate: string; revenue: number; ordersCount: number }[]
@@ -98,7 +152,12 @@ export const SellerDashboardView: React.FC = () => {
       { date: '07 Nov 2026', shortDate: 'Sab', revenue: 390000, ordersCount: 15 },
       { date: '08 Nov 2026', shortDate: 'Min', revenue: 420000, ordersCount: 17 },
       { date: '09 Nov 2026', shortDate: 'Sen', revenue: 210000, ordersCount: 8 },
-      { date: '10 Nov 2026 (Hari Ini)', shortDate: 'Sel', revenue: totalRevenue > 0 ? totalRevenue : 340000, ordersCount: completedOrders.length > 0 ? completedOrders.length : 12 },
+      {
+        date: '10 Nov 2026',
+        shortDate: 'Sel',
+        revenue: metrics.revenue > 0 ? metrics.revenue : 340000,
+        ordersCount: metrics.completed.length > 0 ? metrics.completed.length : 12,
+      },
     ],
     '30d': [
       { date: 'Minggu 1', shortDate: 'M1', revenue: 1250000, ordersCount: 42 },
@@ -109,764 +168,667 @@ export const SellerDashboardView: React.FC = () => {
     '90d': [
       { date: 'September 2026', shortDate: 'Sep', revenue: 5400000, ordersCount: 210 },
       { date: 'Oktober 2026', shortDate: 'Okt', revenue: 6850000, ordersCount: 265 },
-      { date: 'November 2026 (Berjalan)', shortDate: 'Nov', revenue: 7420000, ordersCount: 290 },
+      { date: 'November 2026', shortDate: 'Nov', revenue: 7420000, ordersCount: 290 },
     ],
   };
 
-  const currentChartData = chartDatasets[revenuePeriod];
-  const maxChartRevenue = Math.max(...currentChartData.map((d) => d.revenue));
+  const chart = chartDatasets[revenuePeriod];
+  const maxRevenue = Math.max(...chart.map((d) => d.revenue));
 
-  // Recent Activity Feed based on live orders and product data
-  const recentActivities = [
-    ...(waitingOrders.length > 0
+  /* ---- activity log (title only, whole row is the link) --------- */
+  const activities = [
+    ...(metrics.waiting.length > 0
       ? [
-          {
-            id: 'act-1',
-            type: 'incoming_order',
-            title: `Pesanan Baru ${waitingOrders[0].id}`,
-            desc: `${waitingOrders[0].customerName} memesan ${waitingOrders[0].items.length} menu sisa piring`,
-            time: waitingOrders[0].orderDate,
-            actionLabel: 'Konfirmasi Pesanan',
-            onClick: () => navigateToOrdersWithFilter('waiting_confirmation'),
-          },
-        ]
+        {
+          id: 'act-1',
+          time: clockOf(metrics.waiting[0].orderDate),
+          text: `Pesanan ${metrics.waiting[0].id} · ${metrics.waiting[0].customerName}`,
+          onClick: () => navigateToOrdersWithFilter('waiting_confirmation'),
+        },
+      ]
       : []),
     {
       id: 'act-2',
-      type: 'pickup_verified',
-      title: 'Verifikasi Pengambilan Sukses',
-      desc: 'Pesanan SP-BDG-2026-074 selesai diserahkan ke pelanggan',
-      time: 'Hari ini, 15:20 WIB',
-      actionLabel: 'Buka Riwayat',
+      time: '15.20',
+      text: 'Pengambilan terverifikasi · SP-BDG-074',
       onClick: () => navigateToOrdersWithFilter('completed'),
     },
     {
       id: 'act-3',
-      type: 'deal_alert',
-      title: 'Diskon Otomatis Tersedia',
-      desc: 'Nasi Kuning Parahyangan mendekati batas aman (tersisa 2.5 jam)',
-      time: 'Hari ini, 14:45 WIB',
-      actionLabel: 'Atur Rescue Deals',
+      time: '14.45',
+      text: 'Diskon otomatis naik · Nasi Kuning Parahyangan',
       onClick: () => setActiveTab('rescue_deals'),
     },
     {
       id: 'act-4',
-      type: 'product_published',
-      title: 'Deklarasi Pangan Terverifikasi',
-      desc: 'Paket Artisan Butter Croissant dinyatakan 5/5 aman konsumsi',
-      time: 'Hari ini, 07:30 WIB',
-      actionLabel: 'Cek Produk',
+      time: '07.30',
+      text: 'Deklarasi pangan disetujui · Artisan Butter Croissant',
       onClick: () => setActiveTab('products'),
     },
   ];
 
   return (
-    <div className="p-3.5 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
-      {/* 1. SELLER WELCOME SECTION */}
-      <section className="bg-white rounded-2xl p-4 sm:p-6 border border-neutral-200 shadow-xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          {/* Left: Greeting, Business Name, Location */}
-          <div className="space-y-1.5 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold text-neutral-500">
-                {getGreeting()}, <strong className="text-neutral-800">{sellerProfile.ownerName}</strong>
-              </span>
-
-              {/* Interactive Mitra Resmi Bandung Verification Badge */}
-              <button
-                type="button"
-                onClick={() => setIsVerificationModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#16382C] text-[#FFD230] hover:bg-[#214F3F] transition-colors cursor-pointer group shadow-xs shrink-0"
-                title="Klik untuk melihat sertifikat & legalitas usaha"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-[#FFD230]" />
-                <span>Mitra Resmi Bandung</span>
-                <span className="text-[10px] bg-white/20 px-1 rounded text-white group-hover:bg-white/30">
-                  Lihat Info
-                </span>
-              </button>
+    <div className="min-h-full bg-[#ECEFEC] px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+      <div className="mx-auto max-w-[1280px] space-y-5">
+        {/* 1 · TOP BAR ------------------------------------------------ */}
+        <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 rounded-[22px] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(44,67,79,0.05),0_14px_34px_-18px_rgba(44,67,79,0.28)]">
+          <div className="flex min-w-0 items-center gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ background: C.ink }}>
+              <UtensilsCrossed className="h-5 w-5" style={{ color: C.cream }} />
             </div>
-
-            <h1 className="text-xl sm:text-2xl font-bold text-[#16382C] tracking-tight truncate">
-              {sellerProfile.businessName}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-y-1 gap-x-2 text-xs text-neutral-500">
-              <span className="flex items-center gap-1 text-neutral-700">
-                <MapPin className="w-3.5 h-3.5 text-[#EE4D2D] shrink-0" />
-                <span>{sellerProfile.businessAddress}</span>
-              </span>
-              <span>·</span>
-              <span className="text-neutral-600">Kec. {sellerProfile.district}, Kota Bandung (WIB)</span>
-              <span>·</span>
-              <span className="text-neutral-600">Jadwal Ambil: {sellerProfile.pickupWindow}</span>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: C.mute }}>
+                {getGreeting()}, {sellerProfile.ownerName}
+              </p>
+              <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                <h1
+                  className="max-w-[240px] truncate text-[17px] font-semibold tracking-tight sm:max-w-none"
+                  style={{ color: C.ink }}
+                  title={sellerProfile.businessName}
+                >
+                  {sellerProfile.businessName}
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => setIsVerificationModalOpen(true)}
+                  title="Sertifikat & legalitas usaha"
+                  className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#EEF1E7] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors hover:bg-[#E3E8D6]"
+                  style={{ color: '#6B8127' }}
+                >
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Mitra Resmi
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Right: Operating Status Switch & Quick Scan */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-neutral-100">
-            {/* Operating Status Toggle */}
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
               onClick={() => {
-                const nextState = !sellerProfile.isOpenToday;
-                updateSellerProfile({ isOpenToday: nextState });
+                const next = !sellerProfile.isOpenToday;
+                updateSellerProfile({ isOpenToday: next });
                 showToast(
-                  nextState ? 'Toko Beroperasi' : 'Toko Ditutup Sementara',
-                  nextState
-                    ? 'Etalase aktif menerima pesanan penjemputan warga Bandung.'
+                  next ? 'Toko beroperasi' : 'Toko ditutup sementara',
+                  next
+                    ? 'Etalase aktif menerima pesanan penjemputan.'
                     : 'Pesanan penjemputan dijeda sementara.',
                   'info'
                 );
               }}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border transition-colors ${
-                sellerProfile.isOpenToday
-                  ? 'bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
-                  : 'bg-neutral-100 text-neutral-700 border-neutral-200 hover:bg-neutral-200'
-              }`}
+              className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold transition-colors"
+              style={{
+                background: sellerProfile.isOpenToday ? '#EEF1E7' : '#F1F2F0',
+                color: sellerProfile.isOpenToday ? '#6B8127' : C.mute,
+              }}
             >
               <span
-                className={`w-2.5 h-2.5 rounded-full ${
-                  sellerProfile.isOpenToday ? 'bg-emerald-600' : 'bg-neutral-400'
-                }`}
+                className="h-2 w-2 rounded-full"
+                style={{ background: sellerProfile.isOpenToday ? C.green : C.faint }}
               />
-              <span>{sellerProfile.isOpenToday ? 'Buka (Menerima Pengambilan)' : 'Tutup Sementara'}</span>
+              {sellerProfile.isOpenToday ? 'Buka' : 'Tutup'}
             </button>
 
-            {/* Quick QR Pickup */}
             <button
               type="button"
               onClick={() => setActiveTab('qr_pickup')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#16382C] hover:bg-[#214F3F] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ background: C.ink }}
             >
-              <QrCode className="w-4 h-4 text-[#FFD230]" />
-              <span>Verifikasi QR</span>
+              <QrCode className="h-4 w-4" style={{ color: C.cream }} />
+              Verifikasi QR
             </button>
 
-            {/* Add Sisa Piring */}
             <button
               type="button"
               onClick={() => setIsAddProductModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#EE4D2D] hover:bg-[#D73C1C] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-opacity hover:opacity-90"
+              style={{ background: C.orange, color: C.ink }}
             >
-              <Plus className="w-4 h-4" />
-              <span>Tambah Sisa Piring</span>
+              <Plus className="h-4 w-4" />
+              Tambah Sisa Piring
             </button>
           </div>
-        </div>
-      </section>
+        </header>
 
-      {/* 2. INTERACTIVE QUICK ACTIONS SECTION */}
-      <section className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200 shadow-xs space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-            Aksi Cepat Merchant (Quick Actions)
-          </h2>
-          <span className="text-[11px] text-neutral-400">Pintasan Kerja Utama</span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
-          {/* Action 1: Tambah Sisa Piring Baru */}
-          <button
-            type="button"
-            onClick={() => setIsAddProductModalOpen(true)}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#EE4D2D] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
-              <Plus className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="font-bold text-xs text-neutral-900 leading-tight">Tambah Sisa Piring</p>
-              <p className="text-[10px] text-neutral-500 mt-0.5">Input batch makanan baru</p>
-            </div>
-          </button>
-
-          {/* Action 2: Kelola Produk */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('products')}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#16382C] text-[#FFD230] flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
-              <UtensilsCrossed className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="font-bold text-xs text-neutral-900 leading-tight">Kelola Produk</p>
-              <p className="text-[10px] text-neutral-500 mt-0.5">{products.length} menu terdaftar</p>
-            </div>
-          </button>
-
-          {/* Action 3: Pesanan Masuk */}
-          <button
-            type="button"
-            onClick={() => navigateToOrdersWithFilter('waiting_confirmation')}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group relative"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#EE4D2D] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
-              <ShoppingBag className="w-4 h-4" />
-            </div>
-            {waitingOrders.length > 0 && (
-              <span className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-[#EE4D2D] text-white px-1.5 py-0.2 rounded-full">
-                {waitingOrders.length}
-              </span>
-            )}
-            <div>
-              <p className="font-bold text-xs text-neutral-900 leading-tight">Pesanan Masuk</p>
-              <p className="text-[10px] text-neutral-500 mt-0.5">
-                {waitingOrders.length > 0 ? `${waitingOrders.length} perlu konfirmasi` : 'Semua tertangani'}
-              </p>
-            </div>
-          </button>
-
-          {/* Action 4: Verifikasi Pengambilan */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('qr_pickup')}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#16382C] text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
-              <QrCode className="w-4 h-4 text-[#FFD230]" />
-            </div>
-            <div>
-              <p className="font-bold text-xs text-neutral-900 leading-tight">Verifikasi Ambil</p>
-              <p className="text-[10px] text-neutral-500 mt-0.5">Scan QR / PIN kasir</p>
-            </div>
-          </button>
-
-          {/* Action 5: Deklarasi Keamanan Pangan */}
-          <button
-            type="button"
-            onClick={() => setIsFoodSafetyModalOpen(true)}
-            className="p-3 bg-[#FAF9F6] hover:bg-neutral-100 rounded-xl border border-neutral-200 transition-all text-left flex flex-col justify-between group col-span-2 sm:col-span-1"
-          >
-            <div className="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-105 transition-transform">
-              <FileCheck className="w-4 h-4 text-[#FFD230]" />
-            </div>
-            <div>
-              <p className="font-bold text-xs text-neutral-900 leading-tight">Keamanan Pangan</p>
-              <p className="text-[10px] text-neutral-500 mt-0.5">5/5 standar terpenuhi</p>
-            </div>
-          </button>
-        </div>
-      </section>
-
-      {/* 3. ORDER ANALYTICS (CLICKABLE TO ORDERS VIEW) */}
-      <section className="space-y-2.5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-            Status Alur Pesanan (Order Pipeline)
-          </h2>
-          <span className="text-[11px] text-neutral-500">Klik kartu untuk filter langsung</span>
+        {/* meta strip ------------------------------------------------ */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-2 text-[11px]" style={{ color: C.mute }}>
+          <span className="inline-flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5" />
+            {sellerProfile.businessAddress} · Kec. {sellerProfile.district}, Bandung
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5" />
+            Ambil {sellerProfile.pickupWindow}
+          </span>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Card 1: Total Orders */}
-          <div
-            onClick={() => navigateToOrdersWithFilter('all')}
-            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-[#16382C] transition-all cursor-pointer shadow-xs group"
-          >
-            <div className="flex items-center justify-between text-neutral-500 mb-1">
-              <span className="text-xs font-semibold">Semua Pesanan</span>
-              <ShoppingBag className="w-4 h-4 text-neutral-400 group-hover:text-[#16382C]" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-mono font-bold text-neutral-900">
-                {orders.length}
-              </span>
-              <span className="text-[11px] text-neutral-400">transaksi</span>
-            </div>
-            <p className="text-[10px] text-neutral-500 mt-1 flex items-center gap-1 group-hover:text-[#16382C]">
-              <span>Buka daftar lengkap</span>
-              <ChevronRight className="w-3 h-3" />
-            </p>
-          </div>
-
-          {/* Card 2: Waiting for Confirmation */}
-          <div
-            onClick={() => navigateToOrdersWithFilter('waiting_confirmation')}
-            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-[#EE4D2D] transition-all cursor-pointer shadow-xs group"
-          >
-            <div className="flex items-center justify-between text-neutral-500 mb-1">
-              <span className="text-xs font-semibold">Menunggu Konfirmasi</span>
-              <Clock className="w-4 h-4 text-[#EE4D2D]" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-mono font-bold text-[#EE4D2D]">
-                {waitingOrders.length}
-              </span>
-              <span className="text-[11px] text-neutral-500 font-semibold">antrean</span>
-            </div>
-            <p className="text-[10px] text-[#EE4D2D] mt-1 flex items-center gap-1 font-semibold">
-              <span>{waitingOrders.length > 0 ? 'Perlu tindakan staf' : 'Tidak ada antrean'}</span>
-              <ChevronRight className="w-3 h-3" />
-            </p>
-          </div>
-
-          {/* Card 3: Ready for Pickup */}
-          <div
-            onClick={() => navigateToOrdersWithFilter('ready_for_pickup')}
-            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-emerald-600 transition-all cursor-pointer shadow-xs group"
-          >
-            <div className="flex items-center justify-between text-neutral-500 mb-1">
-              <span className="text-xs font-semibold">Siap Diambil</span>
-              <PackageCheck className="w-4 h-4 text-emerald-700" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-mono font-bold text-emerald-800">
-                {readyOrders.length}
-              </span>
-              <span className="text-[11px] text-neutral-500 font-semibold">paket</span>
-            </div>
-            <p className="text-[10px] text-emerald-700 mt-1 flex items-center gap-1 font-semibold">
-              <span>Menunggu kedatangan pembeli</span>
-              <ChevronRight className="w-3 h-3" />
-            </p>
-          </div>
-
-          {/* Card 4: Completed */}
-          <div
-            onClick={() => navigateToOrdersWithFilter('completed')}
-            className="bg-white p-4 rounded-2xl border border-neutral-200 hover:border-neutral-400 transition-all cursor-pointer shadow-xs group"
-          >
-            <div className="flex items-center justify-between text-neutral-500 mb-1">
-              <span className="text-xs font-semibold">Pesanan Selesai</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-mono font-bold text-[#16382C]">
-                {completedOrders.length}
-              </span>
-              <span className="text-[11px] text-neutral-500">sukses</span>
-            </div>
-            <p className="text-[10px] text-neutral-500 mt-1 flex items-center gap-1 group-hover:text-neutral-800">
-              <span>Terverifikasi via QR / PIN</span>
-              <ChevronRight className="w-3 h-3" />
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. REVENUE & FOOD RESCUE ANALYTICS (INTERACTIVE CHART) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* A. Revenue Analytics (8 cols on lg) */}
-        <div className="lg:col-span-7 bg-white rounded-2xl p-4 sm:p-6 border border-neutral-200 shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-[#16382C]" />
-                <h3 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                  Analisis Pendapatan Penjualan Sisa Piring
-                </h3>
-              </div>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-[#16382C]">
-                  {formatRupiah(totalRevenue > 0 ? totalRevenue : 340000)}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-xs text-emerald-700 font-semibold">
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                  <span>+18.4% vs periode lalu</span>
-                </span>
-              </div>
-            </div>
-
-            {/* Time Filter Tabs (Solid colors) */}
-            <div className="flex items-center bg-neutral-100 p-1 rounded-xl self-start sm:self-center">
-              {(['7d', '30d', '90d'] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => {
-                    setRevenuePeriod(p);
-                    setActiveChartPoint(null);
-                  }}
-                  className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
-                    revenuePeriod === p
-                      ? 'bg-[#16382C] text-white shadow-xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                >
-                  {p === '7d' ? '7 Hari' : p === '30d' ? '30 Hari' : '90 Hari'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactive Tooltip Card */}
-          <div className="h-10 flex items-center justify-between px-3 bg-[#FAF9F6] rounded-xl border border-neutral-200 text-xs">
-            {activeChartPoint ? (
-              <>
-                <span className="font-semibold text-neutral-700">{activeChartPoint.date}</span>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono font-bold text-[#16382C]">
-                    {formatRupiah(activeChartPoint.revenue)}
-                  </span>
-                  <span className="text-neutral-400">·</span>
-                  <span className="text-neutral-600 font-mono font-medium">
-                    {activeChartPoint.ordersCount} pesanan selesai
-                  </span>
-                </div>
-              </>
-            ) : (
-              <span className="text-neutral-500 text-[11px]">
-                Arahkan kursor atau sentuh pilar grafik untuk melihat tanggal, omzet, dan jumlah pesanan.
-              </span>
-            )}
-          </div>
-
-          {/* Solid SVG Bar Visualization (NO GRADIENTS) */}
-          <div className="pt-2">
-            <div className="h-44 flex items-end justify-between gap-2 sm:gap-4 px-2">
-              {currentChartData.map((item, idx) => {
-                const heightPct = Math.max(15, Math.round((item.revenue / maxChartRevenue) * 100));
-                const isSelected = activeChartPoint?.date === item.date;
-
-                return (
-                  <div
-                    key={idx}
-                    onMouseEnter={() =>
-                      setActiveChartPoint({
-                        date: item.date,
-                        revenue: item.revenue,
-                        ordersCount: item.ordersCount,
-                      })
-                    }
-                    onClick={() =>
-                      setActiveChartPoint({
-                        date: item.date,
-                        revenue: item.revenue,
-                        ordersCount: item.ordersCount,
-                      })
-                    }
-                    className="flex-1 flex flex-col items-center gap-2 cursor-pointer group"
-                  >
-                    <div className="w-full max-w-[44px] bg-neutral-100 rounded-t-lg overflow-hidden flex items-end h-32">
-                      <div
-                        style={{ height: `${heightPct}%` }}
-                        className={`w-full transition-all rounded-t-md ${
-                          isSelected
-                            ? 'bg-[#EE4D2D]'
-                            : 'bg-[#16382C] group-hover:bg-[#214F3F]'
-                        }`}
-                      />
-                    </div>
-                    <span
-                      className={`text-[11px] font-mono font-semibold truncate ${
-                        isSelected ? 'text-[#EE4D2D] font-bold' : 'text-neutral-600'
-                      }`}
-                    >
-                      {item.shortDate}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* B. Food Rescue Impact Analytics (5 cols on lg) */}
-        <div className="lg:col-span-5 bg-white rounded-2xl p-4 sm:p-6 border border-neutral-200 shadow-xs space-y-4 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <div className="flex items-center gap-2">
-                <Leaf className="w-4 h-4 text-emerald-700" />
-                <h3 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                  Dampak Penyelamatan Pangan
-                </h3>
-              </div>
-              <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
-                Kota Bandung
-              </span>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {/* Total Portions Rescued */}
-              <div className="p-3 bg-[#FAF9F6] rounded-xl border border-neutral-200 flex items-center justify-between">
-                <div>
-                  <span className="text-[11px] text-neutral-500 block">Total Porsi Diselamatkan</span>
-                  <span className="text-2xl font-bold font-mono text-[#16382C]">
-                    {totalPortionsRescued} <span className="text-xs text-neutral-600 font-sans">porsi</span>
-                  </span>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-                  <Leaf className="w-5 h-5" />
-                </div>
-              </div>
-
-              {/* Total Sisa Piring Sold vs Donated */}
-              <div className="grid grid-cols-2 gap-2.5 text-xs">
-                <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
-                  <span className="text-[11px] text-neutral-500 block">Produk Terjual</span>
-                  <span className="text-lg font-bold font-mono text-neutral-900">
-                    {totalPortionsRescued - donatedCount} <span className="text-[10px]">porsi</span>
-                  </span>
-                  <span className="text-[10px] text-neutral-400 block mt-0.5">Diskon 50% - 90%</span>
-                </div>
-
-                <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200">
-                  <span className="text-[11px] text-neutral-500 block">Produk Didonasikan</span>
-                  <span className="text-lg font-bold font-mono text-[#16382C]">
-                    {donatedCount} <span className="text-[10px]">porsi</span>
-                  </span>
-                  <span className="text-[10px] text-[#16382C] font-semibold block mt-0.5">
-                    100% Bebas Bayar
-                  </span>
-                </div>
-              </div>
-
-              {/* Carbon Emissions Prevented */}
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between text-xs text-emerald-950">
-                <div>
-                  <span className="text-[11px] text-emerald-800 font-semibold block">
-                    Pencegahan Emisi Gas Metana
-                  </span>
-                  <span className="font-mono font-extrabold text-base text-emerald-900">
-                    {calculateCO2Saved(totalPortionsRescued)}
-                  </span>
-                </div>
-                <span className="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-1 rounded-md font-semibold">
-                  TPA Sarimukti
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
-            <span className="text-neutral-500">Target Bulanan UMKM:</span>
-            <span className="font-mono font-bold text-[#16382C]">250 Porsi (92% Tercapai)</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 5. PRODUCT PERFORMANCE & RECENT ACTIVITY GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* D. Product Performance (7 cols on lg) */}
-        <div className="lg:col-span-7 bg-white rounded-2xl p-4 sm:p-6 border border-neutral-200 shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                Performa Produk Sisa Piring
-              </h3>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Pantau menu terlaris, stok menipis, dan produk yang mendekati batas aman
-              </p>
-            </div>
-
-            {/* Performance Segmented Tabs */}
-            <div className="flex items-center bg-neutral-100 p-1 rounded-xl self-start sm:self-center overflow-x-auto max-w-full">
+        {/* 2 · PIPELINE STRIP ---------------------------------------- */}
+        <section data-slot="pipeline">
+          <div className="grid grid-cols-2 overflow-hidden rounded-[22px] bg-white shadow-[0_1px_2px_rgba(44,67,79,0.05),0_14px_34px_-18px_rgba(44,67,79,0.28)] sm:grid-cols-4">
+            {[
+              { k: 'Semua pesanan', v: orders.length, c: C.ink, f: 'all' as const, Icon: Layers },
+              { k: 'Perlu dikonfirmasi', v: metrics.waiting.length, c: C.orange, f: 'waiting_confirmation' as const, Icon: Clock },
+              { k: 'Siap diambil', v: metrics.ready.length, c: C.green, f: 'ready_for_pickup' as const, Icon: PackageCheck },
+              { k: 'Selesai', v: metrics.completed.length, c: C.ink, f: 'completed' as const, Icon: CheckCircle2 },
+            ].map((s, i) => (
               <button
+                key={s.k}
                 type="button"
-                onClick={() => setPerformanceTab('best_selling')}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                  performanceTab === 'best_selling'
-                    ? 'bg-white text-[#16382C] shadow-xs'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
+                onClick={() => navigateToOrdersWithFilter(s.f)}
+                className={`group flex items-center gap-3.5 px-5 py-5 text-left transition-colors hover:bg-[#F7F8F4] ${i > 0 ? 'border-l border-[#EDEFEA]' : ''
+                  } ${i > 1 ? 'border-t border-[#EDEFEA] sm:border-t-0' : ''}`}
               >
-                Terlaris
+                <s.Icon className="h-4 w-4 shrink-0" style={{ color: s.c }} />
+                <div className="min-w-0">
+                  <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: C.mute }}>
+                    {s.k}
+                  </p>
+                  <p className="font-mono text-[28px] font-bold leading-tight tracking-tight" style={{ color: s.c }}>
+                    {s.v}
+                  </p>
+                </div>
               </button>
-              <button
-                type="button"
-                onClick={() => setPerformanceTab('low_stock')}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                  performanceTab === 'low_stock'
-                    ? 'bg-white text-amber-900 shadow-xs'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                Stok Menipis ({lowStockProducts.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setPerformanceTab('expiring_soon')}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                  performanceTab === 'expiring_soon'
-                    ? 'bg-white text-[#EE4D2D] shadow-xs'
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                Kritis Waktu ({expiringProducts.length})
-              </button>
-            </div>
-          </div>
-
-          {/* Product Items List */}
-          <div className="space-y-2.5 divide-y divide-neutral-100 text-xs">
-            {performanceTab === 'best_selling' &&
-              bestSellingProducts.slice(0, 4).map((p, idx) => (
-                <div
-                  key={p.id}
-                  className="pt-2.5 first:pt-0 flex items-center justify-between gap-3 hover:bg-neutral-50/70 p-2 rounded-xl transition-colors"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="w-5 text-center font-mono font-bold text-neutral-400 text-xs">
-                      #{idx + 1}
-                    </span>
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      className="w-10 h-10 rounded-xl object-cover border border-neutral-200 shrink-0"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="min-w-0">
-                      <p className="font-bold text-neutral-900 truncate" title={p.name}>
-                        {p.name}
-                      </p>
-                      <p className="text-[11px] text-neutral-500">
-                        {p.category} · Stok: {p.stock} porsi
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="text-right shrink-0">
-                    <span className="font-mono font-bold text-[#16382C] block">
-                      {p.portionsRescuedCount} porsi
-                    </span>
-                    <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.2 rounded">
-                      Terselamatkan
-                    </span>
-                  </div>
-                </div>
-              ))}
-
-            {performanceTab === 'low_stock' &&
-              (lowStockProducts.length === 0 ? (
-                <div className="py-6 text-center text-xs text-neutral-400">
-                  Semua stok sisa piring saat ini dalam kondisi aman (&gt; 3 porsi).
-                </div>
-              ) : (
-                lowStockProducts.map((p) => (
-                  <div
-                    key={p.id}
-                    className="pt-2.5 first:pt-0 flex items-center justify-between gap-3 hover:bg-neutral-50/70 p-2 rounded-xl transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        className="w-10 h-10 rounded-xl object-cover border border-neutral-200 shrink-0"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="min-w-0">
-                        <p className="font-bold text-neutral-900 truncate">{p.name}</p>
-                        <p className="text-[11px] text-amber-800 font-medium">
-                          Sisa {p.stock} porsi di etalase
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => updateStock(p.id, 2)}
-                        className="px-2.5 py-1 bg-[#16382C] text-white text-[11px] font-semibold rounded-lg hover:bg-[#214F3F]"
-                      >
-                        + Tambah 2
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ))}
-
-            {performanceTab === 'expiring_soon' &&
-              (expiringProducts.length === 0 ? (
-                <div className="py-6 text-center text-xs text-neutral-400">
-                  Tidak ada produk dengan batas waktu mendesak saat ini.
-                </div>
-              ) : (
-                expiringProducts.map((p) => (
-                  <div
-                    key={p.id}
-                    className="pt-2.5 first:pt-0 flex items-center justify-between gap-3 hover:bg-neutral-50/70 p-2 rounded-xl transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        className="w-10 h-10 rounded-xl object-cover border border-neutral-200 shrink-0"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="min-w-0">
-                        <p className="font-bold text-neutral-900 truncate">{p.name}</p>
-                        <p className="text-[11px] text-[#EE4D2D] font-medium flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>Aman s/d {p.safeConsumptionDeadline}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="font-mono font-bold text-xs bg-[#EE4D2D]/10 text-[#EE4D2D] px-2 py-0.5 rounded">
-                        {p.discountPercentage}% OFF
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('rescue_deals')}
-                        className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-[11px] font-semibold rounded-lg"
-                      >
-                        Atur Diskon
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ))}
-          </div>
-
-          <div className="pt-2 border-t border-neutral-100 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setActiveTab('products')}
-              className="text-xs font-semibold text-[#16382C] hover:underline flex items-center gap-1"
-            >
-              <span>Buka Seluruh Etalase Produk ({products.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* E. Recent Activity Section (5 cols on lg) */}
-        <div className="lg:col-span-5 bg-white rounded-2xl p-4 sm:p-6 border border-neutral-200 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-            <div>
-              <h3 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                Aktivitas Terkini (Recent Activity)
-              </h3>
-              <p className="text-xs text-neutral-500 mt-0.5">Log peristiwa bisnis dan pesanan harian</p>
-            </div>
-            <span className="text-[11px] font-mono text-neutral-400">Hari ini</span>
-          </div>
-
-          <div className="space-y-3 text-xs">
-            {recentActivities.map((act) => (
-              <div
-                key={act.id}
-                className="p-3 bg-[#FAF9F6] rounded-xl border border-neutral-200 hover:border-neutral-300 transition-colors space-y-2"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-bold text-neutral-900 leading-tight">{act.title}</p>
-                    <p className="text-[11px] text-neutral-600 mt-0.5">{act.desc}</p>
-                  </div>
-                  <span className="text-[10px] text-neutral-400 font-mono shrink-0">{act.time}</span>
-                </div>
-
-                <div className="flex justify-end pt-1">
-                  <button
-                    type="button"
-                    onClick={act.onClick}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#16382C] hover:text-[#EE4D2D] transition-colors"
-                  >
-                    <span>{act.actionLabel}</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
             ))}
           </div>
+        </section>
 
-          <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-[11px] text-neutral-500 flex items-center justify-between">
-            <span>Sinkronisasi Otomatis WIB</span>
-            <span className="font-mono font-semibold text-emerald-800">● Realtime Terhubung</span>
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
+          <div className="space-y-5 xl:col-span-7">
+            {/* 3 · QUEUE --------------------------------------------- */}
+            <section data-slot="queue">
+              <div className="space-y-2.5">
+                <div className="flex items-end justify-between px-1">
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.ink }}>
+                    Antrean <span style={{ color: C.mute }}>({orders.length})</span>
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => navigateToOrdersWithFilter('all')}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors hover:text-[#F0935D]"
+                    style={{ color: C.mute }}
+                  >
+                    Semua pesanan
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                {queue.map((o) => {
+                  const view = ORDER_VIEW[o.status] ?? { label: o.status, tone: C.mute, cta: '' };
+                  return (
+                    <div
+                      key={o.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => navigateToOrdersWithFilter(o.status)}
+                      onKeyDown={(e) => e.key === 'Enter' && navigateToOrdersWithFilter(o.status)}
+                      className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-[22px] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(44,67,79,0.05),0_14px_34px_-18px_rgba(44,67,79,0.28)] transition-shadow hover:shadow-[0_1px_2px_rgba(44,67,79,0.06),0_18px_40px_-16px_rgba(44,67,79,0.34)]"
+                    >
+                      <div className="flex min-w-0 items-center gap-4">
+                        <div className="shrink-0">
+                          <p className="font-mono text-[13px] font-bold leading-tight" style={{ color: C.ink }}>
+                            {o.id}
+                          </p>
+                          <p
+                            className="mt-0.5 font-mono text-[11px] font-semibold"
+                            style={{ color: view.cta ? C.orange : C.mute }}
+                          >
+                            {clockOf(o.orderDate)}
+                          </p>
+                        </div>
+
+                        <div className="hidden h-10 w-px shrink-0 bg-[#EDEFEA] sm:block" />
+
+                        <div className="min-w-0">
+                          <p className="truncate text-[11px] uppercase tracking-[0.14em]" style={{ color: C.mute }}>
+                            {view.label}
+                          </p>
+                          <p className="mt-1 truncate text-sm font-semibold" style={{ color: C.ink }}>
+                            {o.customerName}
+                          </p>
+                          <p className="mt-0.5 truncate text-[11px]" style={{ color: C.mute }}>
+                            {o.items.length} menu · ambil {sellerProfile.pickupWindow}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-[10px] uppercase tracking-[0.14em]" style={{ color: C.mute }}>
+                            Total
+                          </p>
+                          <p className="font-mono text-base font-bold" style={{ color: C.ink }}>
+                            {formatRupiah(o.totalPayment)}
+                          </p>
+                        </div>
+
+                        {view.cta ? (
+                          <span
+                            className="rounded-full px-4 py-2 text-[11px] font-bold"
+                            style={{ background: C.cream, color: C.ink }}
+                          >
+                            {view.cta}
+                          </span>
+                        ) : (
+                          <span className="hidden text-[11px] font-semibold sm:block" style={{ color: C.faint }}>
+                            {o.status === 'completed' ? 'Terverifikasi' : '—'}
+                          </span>
+                        )}
+                        <ChevronRight className="h-4 w-4" style={{ color: C.faint }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* 4 · REVENUE ------------------------------------------- */}
+            <section data-slot="revenue">
+              <div className="rounded-[22px] bg-white px-5 pb-5 pt-4 shadow-[0_1px_2px_rgba(44,67,79,0.05),0_14px_34px_-18px_rgba(44,67,79,0.28)] sm:px-6">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.ink }}>
+                      <TrendingUp className="h-4 w-4" style={{ color: C.green }} />
+                      Pendapatan
+                    </p>
+                    <div className="mt-2 flex items-baseline gap-3">
+                      <span className="font-mono text-[30px] font-bold leading-none tracking-tight" style={{ color: C.ink }}>
+                        {formatRupiah(metrics.revenue > 0 ? metrics.revenue : 340000)}
+                      </span>
+                      <span
+                        className="rounded-full px-2.5 py-1 text-[11px] font-bold"
+                        style={{ background: '#EEF1E7', color: '#6B8127' }}
+                      >
+                        +18,4%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center rounded-full bg-[#F1F2EE] p-1">
+                    {(['7d', '30d', '90d'] as const).map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => {
+                          setRevenuePeriod(p);
+                          setActiveChartPoint(null);
+                        }}
+                        className="rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition-colors"
+                        style={
+                          revenuePeriod === p
+                            ? { background: C.ink, color: '#fff' }
+                            : { color: C.mute }
+                        }
+                      >
+                        {p === '7d' ? '7 hari' : p === '30d' ? '30 hari' : '90 hari'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-5 flex h-40 items-end justify-between gap-3 sm:gap-5">
+                  {chart.map((item) => {
+                    const h = Math.max(14, Math.round((item.revenue / maxRevenue) * 100));
+                    const on = activeChartPoint?.date === item.date;
+                    return (
+                      <div
+                        key={item.date}
+                        onMouseEnter={() => setActiveChartPoint(item)}
+                        onMouseLeave={() => setActiveChartPoint(null)}
+                        onClick={() => setActiveChartPoint(item)}
+                        className="flex h-full flex-1 cursor-pointer flex-col justify-end gap-2.5"
+                      >
+                        <div className="flex justify-center">
+                          <span
+                            className="whitespace-nowrap font-mono text-[10px] font-semibold tabular-nums transition-opacity"
+                            style={{ color: on ? C.orange : C.faint, opacity: on || revenuePeriod === '7d' ? 1 : 0 }}
+                          >
+                            {item.ordersCount}
+                          </span>
+                        </div>
+                        <div className="flex min-h-0 flex-1 items-end">
+                          <div
+                            className="mx-auto w-full max-w-[34px] rounded-[7px_7px_3px_3px] transition-all duration-200"
+                            style={{ height: `${h}%`, background: on ? C.orange : C.ink }}
+                          />
+                        </div>
+                        <span
+                          className="text-center text-[10px] font-semibold uppercase tracking-[0.1em]"
+                          style={{ color: on ? C.orange : C.mute }}
+                        >
+                          {item.shortDate}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between text-[11px]" style={{ color: C.mute }}>
+                  {activeChartPoint ? (
+                    <>
+                      <span className="font-semibold" style={{ color: C.ink }}>
+                        {activeChartPoint.date}
+                      </span>
+                      <span className="font-mono tabular-nums">
+                        {formatRupiah(activeChartPoint.revenue)} · {activeChartPoint.ordersCount} pesanan
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Total periode terpilih</span>
+                      <span className="font-mono tabular-nums">
+                        {formatRupiah(chart.reduce((a, d) => a + d.revenue, 0))} ·{' '}
+                        {chart.reduce((a, d) => a + d.ordersCount, 0)} pesanan
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
+
+          <div className="space-y-5 xl:col-span-5">
+            {/* 5 · IMPACT -------------------------------------------- */}
+            <section data-slot="impact">
+              <div
+                className="rounded-[22px] p-5 text-white shadow-[0_1px_2px_rgba(44,67,79,0.08),0_18px_40px_-18px_rgba(44,67,79,0.5)] sm:p-6"
+                style={{ background: C.ink }}
+              >
+                <div className="flex items-start justify-between">
+                  <p className="text-[10px] uppercase tracking-[0.22em]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                    Dampak
+                  </p>
+                  <span
+                    className="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                    style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+                  >
+                    Kota Bandung
+                  </span>
+                </div>
+
+                <div className="mt-4 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      Porsi diselamatkan
+                    </p>
+                    <p className="font-mono text-[40px] font-bold leading-none tracking-tight">
+                      {metrics.portions}
+                    </p>
+                  </div>
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ background: 'rgba(141,162,73,0.22)' }}>
+                    <Leaf className="h-5 w-5" style={{ color: C.cream }} />
+                  </div>
+                </div>
+
+                {/* target meter */}
+                <div className="mt-6">
+                  <div className="flex items-center justify-between text-[11px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    <span>Target {monthlyTarget} porsi / bulan</span>
+                    <span className="font-mono font-bold" style={{ color: C.cream }}>
+                      {targetPct}%
+                    </span>
+                  </div>
+                  <div className="relative mt-2.5 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${targetPct}%`, background: C.green }} />
+                    <div
+                      className="absolute top-1/2 h-[11px] w-[11px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                      style={{ left: `${targetPct}%`, background: C.cream }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 grid grid-cols-2 gap-2.5">
+                  {[
+                    { k: 'Terjual', v: `${metrics.portions - metrics.donated}`, s: 'porsi' },
+                    { k: 'Didonasikan', v: `${metrics.donated}`, s: 'porsi' },
+                    { k: 'Metana dicegah', v: calculateCO2Saved(metrics.portions), s: 'TPA Sarimukti' },
+                    { k: 'Pesanan selesai', v: `${metrics.completed.length}`, s: 'transaksi' },
+                  ].map((t) => (
+                    <div key={t.k} className="rounded-[14px] px-3.5 py-3" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <p className="text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                        {t.k}
+                      </p>
+                      <p className="mt-1 font-mono text-[17px] font-bold leading-tight">{t.v}</p>
+                      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        {t.s}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('products')}
+                  className="mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-opacity hover:opacity-90"
+                  style={{ background: C.orange, color: C.ink }}
+                >
+                  <ArrowRight className="h-4 w-4" />
+                  Cek etalase produk
+                </button>
+              </div>
+            </section>
+
+            {/* 6 · PRODUCTS ------------------------------------------ */}
+            <section data-slot="products">
+              <div className="rounded-[22px] bg-white p-5 shadow-[0_1px_2px_rgba(44,67,79,0.05),0_14px_34px_-18px_rgba(44,67,79,0.28)]">
+                <div className="flex items-center rounded-full bg-[#F1F2EE] p-1">
+                  {(
+                    [
+                      { k: 'Terlaris', t: 'best_selling' as const, n: 0 },
+                      { k: 'Stok', t: 'low_stock' as const, n: metrics.lowStock.length },
+                      { k: 'Kritis', t: 'expiring_soon' as const, n: metrics.critical.length },
+                    ]
+                  ).map((tb) => {
+                    const on = performanceTab === tb.t;
+                    return (
+                      <button
+                        key={tb.t}
+                        type="button"
+                        onClick={() => setPerformanceTab(tb.t)}
+                        className="flex-1 rounded-full px-2 py-1.5 text-[11px] font-semibold transition-colors"
+                        style={
+                          on
+                            ? { background: tb.t === 'expiring_soon' ? C.orange : C.ink, color: tb.t === 'expiring_soon' ? C.ink : '#fff' }
+                            : { color: C.mute }
+                        }
+                      >
+                        {tb.k}
+                        {tb.n > 0 && (
+                          <span className="ml-1 font-mono tabular-nums" style={{ color: on ? 'inherit' : C.orange }}>
+                            {tb.n}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 space-y-1">
+                  {performanceTab === 'best_selling' &&
+                    (metrics.best.length === 0 ? (
+                      <p className="py-8 text-center text-xs" style={{ color: C.faint }}>
+                        Belum ada produk.
+                      </p>
+                    ) : (
+                      metrics.best.slice(0, 4).map((p, i) => (
+                        <div
+                          key={p.id}
+                          className="flex items-center gap-3.5 rounded-[14px] px-2 py-2 transition-colors hover:bg-[#F7F8F4]"
+                        >
+                          <span className="w-4 shrink-0 text-center font-mono text-[11px] font-bold" style={{ color: C.faint }}>
+                            {i + 1}
+                          </span>
+                          <img
+                            src={p.image}
+                            alt={p.name}
+                            referrerPolicy="no-referrer"
+                            className="h-10 w-10 shrink-0 rounded-[10px] object-cover"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[13px] font-semibold" style={{ color: C.ink }}>
+                              {p.name}
+                            </p>
+                            <p className="truncate text-[11px]" style={{ color: C.mute }}>
+                              {p.category} · stok {p.stock}
+                            </p>
+                          </div>
+                          <p className="shrink-0 font-mono text-[13px] font-bold" style={{ color: C.green }}>
+                            {p.portionsRescuedCount}
+                          </p>
+                        </div>
+                      ))
+                    ))}
+
+                  {performanceTab === 'low_stock' &&
+                    (metrics.lowStock.length === 0 ? (
+                      <p className="py-8 text-center text-xs" style={{ color: C.faint }}>
+                        Semua stok aman.
+                      </p>
+                    ) : (
+                      metrics.lowStock.map((p) => (
+                        <div
+                          key={p.id}
+                          className="flex items-center gap-3.5 rounded-[14px] px-2 py-2 transition-colors hover:bg-[#F7F8F4]"
+                        >
+                          <img
+                            src={p.image}
+                            alt={p.name}
+                            referrerPolicy="no-referrer"
+                            className="h-10 w-10 shrink-0 rounded-[10px] object-cover"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[13px] font-semibold" style={{ color: C.ink }}>
+                              {p.name}
+                            </p>
+                            <p className="truncate text-[11px]" style={{ color: C.mute }}>
+                              {p.category}
+                            </p>
+                          </div>
+                          <span className="shrink-0 font-mono text-[13px] font-bold" style={{ color: C.orange }}>
+                            {p.stock}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateStock(p.id, 2)}
+                            title="Tambah 2 porsi"
+                            className="shrink-0 rounded-full bg-[#F1F2EE] px-3 py-1.5 text-[11px] font-bold transition-colors hover:bg-[#E7EAE2]"
+                            style={{ color: C.ink }}
+                          >
+                            +2
+                          </button>
+                        </div>
+                      ))
+                    ))}
+
+                  {performanceTab === 'expiring_soon' &&
+                    (metrics.critical.length === 0 ? (
+                      <p className="py-8 text-center text-xs" style={{ color: C.faint }}>
+                        Tidak ada yang mendekati batas aman.
+                      </p>
+                    ) : (
+                      metrics.critical.map((p) => (
+                        <div
+                          key={p.id}
+                          className="flex items-center gap-3.5 rounded-[14px] px-2 py-2 transition-colors hover:bg-[#F7F8F4]"
+                        >
+                          <img
+                            src={p.image}
+                            alt={p.name}
+                            referrerPolicy="no-referrer"
+                            className="h-10 w-10 shrink-0 rounded-[10px] object-cover"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[13px] font-semibold" style={{ color: C.ink }}>
+                              {p.name}
+                            </p>
+                            <p className="flex items-center gap-1 truncate text-[11px] font-semibold" style={{ color: C.orange }}>
+                              <Clock className="h-3 w-3" />
+                              s/d {p.safeConsumptionDeadline}
+                            </p>
+                          </div>
+                          <span
+                            className="shrink-0 rounded-full px-2 py-1 font-mono text-[10px] font-bold"
+                            style={{ background: C.cream, color: C.ink }}
+                          >
+                            {p.discountPercentage}%
+                          </span>
+                        </div>
+                      ))
+                    ))}
+                </div>
+              </div>
+            </section>
+
+            {/* 7 · LOG ----------------------------------------------- */}
+            <section data-slot="log">
+              <div className="rounded-[22px] bg-white p-5 shadow-[0_1px_2px_rgba(44,67,79,0.05),0_14px_34px_-18px_rgba(44,67,79,0.28)]">
+                <div className="flex items-center justify-between px-2">
+                  <h2 className="text-[10px] uppercase tracking-[0.22em]" style={{ color: C.mute }}>
+                    Aktivitas
+                  </h2>
+                  <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em]" style={{ color: C.green }}>
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: C.green }} />
+                    Hari ini
+                  </span>
+                </div>
+
+                <div className="mt-2 divide-y divide-[#EEF0EB]">
+                  {activities.map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={a.onClick}
+                      className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 py-3 text-left transition-colors hover:bg-[#F7F8F4]"
+                    >
+                      <span className="font-mono text-[11px] font-semibold tabular-nums" style={{ color: C.faint }}>
+                        {a.time}
+                      </span>
+                      <span className="truncate text-[13px]" style={{ color: C.ink }}>
+                        {a.text}
+                      </span>
+                      <ChevronRight className="h-4 w-4" style={{ color: C.faint }} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        {/* footer links ---------------------------------------------- */}
+        <div data-slot="footer" className="flex flex-wrap items-center justify-between gap-3 px-2 pb-2 text-[11px]">
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              onClick={() => setIsFoodSafetyModalOpen(true)}
+              className="inline-flex items-center gap-1.5 font-semibold transition-colors hover:text-[#F0935D]"
+              style={{ color: C.inkSoft }}
+            >
+              <FileCheck className="h-3.5 w-3.5" style={{ color: C.green }} />
+              Keamanan pangan
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsVerificationModalOpen(true)}
+              className="inline-flex items-center gap-1.5 font-semibold transition-colors hover:text-[#F0935D]"
+              style={{ color: C.inkSoft }}
+            >
+              <ShieldCheck className="h-3.5 w-3.5" style={{ color: C.green }} />
+              Legalitas usaha
+            </button>
+            <button
+              type="button"
+              onClick={() => navigateToOrdersWithFilter('confirmed')}
+              className="inline-flex items-center gap-1.5 font-semibold transition-colors hover:text-[#F0935D]"
+              style={{ color: C.inkSoft }}
+            >
+              <ShoppingBag className="h-3.5 w-3.5" style={{ color: C.green }} />
+              Pesanan sedang disiapkan
+            </button>
+          </div>
+          <span className="font-mono tabular-nums" style={{ color: C.faint }}>
+            WIB
+          </span>
         </div>
       </div>
     </div>

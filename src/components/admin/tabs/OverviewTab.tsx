@@ -1,22 +1,10 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import {
-  Download,
-  ShoppingBag,
-  Leaf,
-  TrendingUp,
-  Droplets,
-  Coins,
-  Receipt,
-  Store,
-  ArrowUpRight,
-  MapPin,
-  Info,
-  ChevronDown,
-  ChevronUp,
+  ArrowUpRight, ChevronDown, Download, Info, Leaf, MapPin,
+  MessageSquare, ShoppingBag, Store, Utensils, ShieldCheck,
 } from 'lucide-react';
-import { formatRupiah } from '../../../data/sisaPiringCatalog';
-import { AdminTab, AdminMacroStats } from '../types';
-import { UmkmVerificationRecord } from '../../../data/adminData';
+import type { AdminTab, AdminMacroStats } from '../types';
+import type { UmkmVerificationRecord } from '../../../data/adminData';
 
 interface OverviewTabProps {
   macroStats: AdminMacroStats;
@@ -26,401 +14,208 @@ interface OverviewTabProps {
   onFilterPendingUmkm: () => void;
 }
 
+const styles = `
+.sp-overview{--sp-ink:#283529;--sp-muted:#737d73;--sp-olive:#789044;--sp-line:#e7ebe3;color:var(--sp-ink);font-family:inherit;display:grid;gap:24px;max-width:1320px;margin:0 auto}
+.sp-overview,.sp-overview *{box-sizing:border-box}
+.sp-overview h2,.sp-overview h3,.sp-overview p{margin:0}
+.sp-overview button{font:inherit;cursor:pointer}
+.sp-overview button:focus-visible{outline:3px solid #789044;outline-offset:4px}
+.sp-hero{position:relative;overflow:hidden;border:1px solid #dce5cc;background:#edf2e4;border-radius:24px;padding:32px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:184px}
+.sp-hero-copy{position:relative;z-index:1}
+.sp-eyebrow{display:flex;align-items:center;flex-wrap:wrap;gap:10px;color:#667950;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.sp-eyebrow-divider{width:1px;height:12px;background:#bac9a9}
+.sp-hero h2{font-family:'Plus Jakarta Sans','Avenir Next',system-ui,sans-serif;font-size:clamp(25px,3vw,34px);line-height:1.2;font-weight:750;letter-spacing:-1.2px}
+.sp-hero p{margin-top:10px;font-size:13px;line-height:1.6;color:#69765d}
+.sp-export{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:9px;flex-shrink:0;background:#2f412a;border:1px solid #2f412a;color:white;padding:13px 18px;border-radius:12px;font-size:12px!important;font-weight:650!important;box-shadow:0 4px 10px #2f412a12;transition:background .18s,transform .18s}
+.sp-export:hover{background:#435936;transform:translateY(-1px)}
+.sp-plate{position:absolute;width:238px;height:238px;right:175px;bottom:-132px;border:1px solid #b6c59b60;border-radius:50%;box-shadow:0 0 0 24px #b6c59b18,0 0 0 48px #b6c59b0c;pointer-events:none}
+.sp-plate svg{position:absolute;left:88px;top:22px;color:#94a971;transform:rotate(-28deg)}
+.sp-workspace{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.sp-panel{border:1px solid var(--sp-line);border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 3px 12px #28352903}
+.sp-panel-head{padding:24px 24px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.sp-panel-title{display:flex;align-items:center;gap:12px}
+.sp-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#f1f4e9;color:#71873f;flex-shrink:0}
+.sp-icon-buyer{background:#fcf2df;color:#b58939}
+.sp-panel h3,.sp-district h3{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.sp-caption{display:block;font-size:11px;line-height:1.5;color:var(--sp-muted);margin-top:4px}
+.sp-text-button{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;border:0;background:none;color:#69823c;font-size:11px!important;font-weight:650!important;padding:7px 0;transition:color .18s}
+.sp-text-button:hover{color:#344b20}
+.sp-rows{padding:0 24px 8px}
+.sp-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-top:1px solid #f0f2ed;min-height:77px}
+.sp-row-title{font-size:12px;font-weight:600;line-height:1.5}
+.sp-row-detail{font-size:11px;color:var(--sp-muted);margin-top:4px;line-height:1.5}
+.sp-row-end{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.sp-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;white-space:nowrap;padding:6px 9px;border-radius:7px;background:#eef4e7;color:#617d38}
+.sp-badge-warn{background:#fff4dd;color:#a27625}
+.sp-badge-danger{background:#fff0ed;color:#b56c56}
+.sp-review-button{background:#f7f0e2;color:#946e2b;border:1px solid #eee0c5;padding:7px 11px;border-radius:8px;font-size:11px!important;font-weight:650!important;transition:background .18s}
+.sp-review-button:hover{background:#f0e3c8}
+.sp-district{background:#fff;border:1px solid var(--sp-line);border-radius:20px;overflow:hidden}
+.sp-district-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:24px 26px 20px}
+.sp-region{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sp-muted);white-space:nowrap}
+.sp-table-scroll{overflow-x:auto}
+.sp-table{width:100%;border-collapse:collapse;text-align:left;font-size:12px;white-space:nowrap}
+.sp-table th{padding:13px 26px;background:#f8faf6;color:#889080;font-size:10px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;border-block:1px solid #edf0e9}
+.sp-table td{padding:18px 26px;border-bottom:1px solid #f0f2ed}
+.sp-table tr:last-child td{border-bottom:0}
+.sp-table tbody tr:hover{background:#fbfcf9}
+.sp-table th:not(:first-child),.sp-table td:not(:first-child){text-align:right}
+.sp-district-name{display:flex;align-items:center;gap:10px;font-weight:600}
+.sp-map-icon{color:#a0af89;flex-shrink:0}
+.sp-number{font-family:'SFMono-Regular',Consolas,monospace;font-variant-numeric:tabular-nums;font-size:12px}
+.sp-portions{color:#678039;font-weight:700}
+.sp-empty{text-align:center!important;color:var(--sp-muted);white-space:normal;padding:30px!important}
+.sp-method{border:1px solid var(--sp-line);border-radius:14px;background:#f8faf6;overflow:hidden}
+.sp-method-toggle{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;padding:16px 20px;background:none;border:0;color:#737f68;text-align:left;font-size:11px!important}
+.sp-method-label{display:flex;align-items:center;gap:9px}
+.sp-method-toggle:hover{background:#f0f4e9}
+.sp-chevron{transition:transform .2s;flex-shrink:0}
+.sp-chevron-open{transform:rotate(180deg)}
+.sp-formulas{border-top:1px solid var(--sp-line);padding:18px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.sp-formula-title{font-size:11px;font-weight:650;margin-bottom:6px;color:#556445}
+.sp-formula-value{font-size:11px;color:var(--sp-muted);line-height:1.6}
+@media(min-width:1100px){.sp-hero{padding:36px 40px}}
+@media(max-width:720px){.sp-workspace{grid-template-columns:1fr}.sp-hero{padding:26px;align-items:flex-start;flex-direction:column;gap:20px}.sp-hero h2{letter-spacing:-.8px}.sp-plate{right:-70px;bottom:-105px}.sp-panel-head{padding:20px}.sp-rows{padding:0 20px 6px}.sp-district-head{padding:20px}.sp-table th,.sp-table td{padding:15px 20px}.sp-formulas{grid-template-columns:1fr;gap:16px}.sp-overview{gap:18px}}
+@media(max-width:380px){.sp-panel-head{gap:8px;padding:18px 16px}.sp-rows{padding-inline:16px}.sp-panel-title{gap:8px}.sp-icon{width:34px;height:34px}.sp-panel h3{font-size:14px}.sp-row{gap:8px}.sp-badge{font-size:9px;padding:5px 7px}.sp-region{display:none}}
+@media(prefers-reduced-motion:reduce){.sp-overview *{transition:none!important}.sp-export:hover{transform:none}}
+`;
+
+interface ActionRowProps {
+  title: string;
+  detail?: string;
+  children: React.ReactNode;
+}
+
+const ActionRow = ({ title, detail, children }: ActionRowProps) => (
+  <div className="sp-row">
+    <div>
+      <div className="sp-row-title">{title}</div>
+      {detail && <div className="sp-row-detail">{detail}</div>}
+    </div>
+    <div className="sp-row-end">{children}</div>
+  </div>
+);
+
 export const OverviewTab: React.FC<OverviewTabProps> = ({
-  macroStats,
-  umkmVerifications,
-  onSelectTab,
-  onExportCSV,
-  onFilterPendingUmkm,
+  macroStats, umkmVerifications, onSelectTab, onExportCSV, onFilterPendingUmkm,
 }) => {
   const [showMethodology, setShowMethodology] = useState(false);
+  const methodologyId = useId();
+  const verifiedCount = umkmVerifications.filter((u) => u.status === 'Verified').length;
+  const districts = macroStats.period.districtStats;
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Welcome & Ecosystem Health Banner */}
-      <div className="bg-[#8DA249] rounded-3xl p-6 border border-[#8DA249] shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-white">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-xs">
-              Kota Bandung • Real-Time
-            </span>
-            <span className="text-xs text-white/80">
-              Periode: {macroStats.period.periodLabel}
-            </span>
+    <div className="sp-overview">
+      <style>{styles}</style>
+      <header className="sp-hero">
+        <div className="sp-hero-copy">
+          <div className="sp-eyebrow">
+            <span>SisaPiring / Admin</span>
+            <span className="sp-eyebrow-divider" aria-hidden="true" />
+            <span>{macroStats.period.periodLabel}</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-white mt-1">
-            Pusat Pengawasan Ekosistem SisaPiring
-          </h2>
-          <p className="text-xs sm:text-sm text-white/90 mt-1 max-w-2xl leading-relaxed">
-            Sinkronisasi menyeluruh antara transaksi konsumen, katalog sisa piring mitra UMKM, dan kepatuhan standar higienitas.
-          </p>
+          <h2>Ringkasan SisaPiring</h2>
+          <p>Pantau mitra, pesanan, dan komplain dalam satu tempat.</p>
         </div>
+        <div className="sp-plate" aria-hidden="true"><Leaf size={48} strokeWidth={1} /></div>
+        <button type="button" className="sp-export" onClick={onExportCSV}>
+          <Download size={16} strokeWidth={1.8} /> Unduh laporan
+        </button>
+      </header>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={onExportCSV}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F281A] hover:bg-[#2D3A26] text-white text-xs font-bold rounded-xl transition-colors shadow-md cursor-pointer"
-          >
-            <Download className="w-4 h-4 text-[#8DA249]" />
-            <span>Ekspor Laporan CSV</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 6 Key Macro Metrics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-semibold">Porsi Diselamatkan</span>
-            <ShoppingBag className="w-4 h-4 text-[#8da249]" />
-          </div>
-          <div className="text-xl font-black font-mono text-[#1F281A]">
-            {macroStats.totalRescuedPortions.toLocaleString('id-ID')}
-          </div>
-          <span className="text-[10px] text-[#8da249] font-semibold block">+12.4% minggu ini</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-semibold">Sampah Pangan Dicegah</span>
-            <Leaf className="w-4 h-4 text-[#8da249]" />
-          </div>
-          <div className="text-xl font-black font-mono text-neutral-900">
-            {macroStats.period.foodWastePreventedKg.toLocaleString('id-ID')} <span className="text-xs">kg</span>
-          </div>
-          <span className="text-[10px] text-neutral-500 block">TPA Sarimukti</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-semibold">Reduksi Gas CO2e</span>
-            <TrendingUp className="w-4 h-4 text-[#8da249]" />
-          </div>
-          <div className="text-xl font-black font-mono text-[#1F281A]">
-            {macroStats.period.co2EmissionsSavedKg.toLocaleString('id-ID')} <span className="text-xs">kg</span>
-          </div>
-          <span className="text-[10px] text-neutral-500 block">Gas Metana Tercegah</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-semibold">Air Bersih Terlindungi</span>
-            <Droplets className="w-4 h-4 text-sky-600" />
-          </div>
-          <div className="text-xl font-black font-mono text-sky-800">
-            {macroStats.period.waterSavedLiters.toLocaleString('id-ID')} <span className="text-xs">L</span>
-          </div>
-          <span className="text-[10px] text-neutral-500 block">Virtual Water Footprint</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-semibold">Omzet UMKM Pulih</span>
-            <Coins className="w-4 h-4 text-amber-600" />
-          </div>
-          <div className="text-xl font-black font-mono text-[#1F281A]">
-            {formatRupiah(macroStats.period.umkmRevenueRecovered)}
-          </div>
-          <span className="text-[10px] text-emerald-600 font-semibold block">Dipulihkan ke Pedagang</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-[11px] font-semibold">Dana Escrow Aktif</span>
-            <Receipt className="w-4 h-4 text-indigo-600" />
-          </div>
-          <div className="text-xl font-black font-mono text-indigo-900">
-            {formatRupiah(macroStats.totalEscrowHeld)}
-          </div>
-          <span className="text-[10px] text-indigo-600 font-semibold block">Terlindungi Pembeli</span>
-        </div>
-      </div>
-
-      {/* Environmental & ESG Methodology Transparency Bar */}
-      <div className="bg-[#F4F6EC] border border-[#8DA249]/30 rounded-2xl p-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start gap-2.5">
-            <div className="w-7 h-7 rounded-xl bg-[#8DA249] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
-              <Info className="w-4 h-4" />
+      <div className="sp-workspace">
+        <section className="sp-panel" aria-label="Mitra UMKM">
+          <div className="sp-panel-head">
+            <div className="sp-panel-title">
+              <div className="sp-icon"><Store size={20} strokeWidth={1.7} aria-hidden="true" /></div>
+              <div><h3>Mitra UMKM</h3><span className="sp-caption">Gerai & menu</span></div>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#1F281A]">
-                  Metodologi Sains Transparansi Dampak Lingkungan (LCA & Bappenas)
-                </span>
-                <span className="text-[10px] font-mono font-bold bg-white px-2 py-0.5 rounded border border-[#8DA249]/40 text-[#8DA249]">
-                  Algorithmic Engine
-                </span>
-              </div>
-              <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                Pembeli tidak perlu menginput data teknis. Sistem secara otomatis mengonversi kuantitas porsi transaksi riil ke metrik ekologis standar <strong>IPCC, FAO, & Bappenas</strong>.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowMethodology(!showMethodology)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#8DA249]/15 border border-[#8DA249]/30 text-[#1F281A] text-xs font-bold rounded-xl transition-colors shrink-0 self-start sm:self-center cursor-pointer shadow-2xs"
-          >
-            <span>{showMethodology ? 'Tutup Formula' : 'Buka Formula Hitungan'}</span>
-            {showMethodology ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
-        </div>
-
-        {/* Collapsible Formula Breakdown */}
-        {showMethodology && (
-          <div className="mt-3.5 pt-3.5 border-t border-emerald-200/70 grid grid-cols-1 md:grid-cols-3 gap-3 animate-in fade-in duration-150">
-            <div className="bg-white p-3 rounded-xl border border-emerald-100">
-              <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-xs mb-1">
-                <Leaf className="w-3.5 h-3.5" />
-                <span>1. Sampah Dicegah (kg)</span>
-              </div>
-              <p className="text-[11px] text-neutral-600 leading-normal">
-                Setiap <strong>1 porsi</strong> makanan siap santap dihitung setara bobot <strong>0,45 kg (450 g)</strong> mengacu kajian timbulan sampah pangan Bappenas & UNEP.
-              </p>
-              <div className="mt-1.5 text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                Porsi × 0,45 kg = kg Sampah
-              </div>
-            </div>
-
-            <div className="bg-white p-3 rounded-xl border border-emerald-100">
-              <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-xs mb-1">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>2. Reduksi Emisi CO₂e (kg)</span>
-              </div>
-              <p className="text-[11px] text-neutral-600 leading-normal">
-                Setiap <strong>1 kg sampah makanan</strong> yang urung membusuk anaerobik di TPA Sarimukti mencegah pelepasan <strong>2,5 kg CO₂e gas metana</strong> (standar FAO/IPCC).
-              </p>
-              <div className="mt-1.5 text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                kg Sampah × 2,5 = kg CO₂e
-              </div>
-            </div>
-
-            <div className="bg-white p-3 rounded-xl border border-emerald-100">
-              <div className="flex items-center gap-1.5 text-sky-800 font-bold text-xs mb-1">
-                <Droplets className="w-3.5 h-3.5" />
-                <span>3. Air Bersih Terlindungi (L)</span>
-              </div>
-              <p className="text-[11px] text-neutral-600 leading-normal">
-                Konsep <em>Virtual Water Footprint</em> (Hoekstra, WFN): memproduksi <strong>1 kg makanan olahan</strong> membutuhkan rata-rata <strong>800 Liter air tawar</strong> (hulu ke hilir).
-              </p>
-              <div className="mt-1.5 text-[10px] font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded">
-                kg Sampah × 800 = Liter Air
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Ecosystem Balance Grid: User Needs vs Seller Needs */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column: Sisi Mitra UMKM (Penjual) */}
-        <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
-                <Store className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm text-neutral-900">Sisi Mitra UMKM (Penjual)</h3>
-                <p className="text-[11px] text-neutral-500">Legalitas, prep window, dan pelepasan dana penjualan</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => onSelectTab('seller-governance')}
-              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1 cursor-pointer"
-            >
-              <span>Kelola Mitra</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+            <button type="button" className="sp-text-button" onClick={() => onSelectTab('seller-governance')}>
+              Kelola mitra <ArrowUpRight size={14} />
             </button>
           </div>
-
-          <div className="space-y-3">
-            <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-neutral-800 block">
-                  Mitra Aktif & Terverifikasi
-                </span>
-                <span className="text-[11px] text-neutral-500">
-                  {umkmVerifications.filter((u) => u.status === 'Verified').length} Gerai Resmi di 5 Kecamatan
-                </span>
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                Sesuai Standar
-              </span>
-            </div>
-
-            <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-neutral-800 block">
-                  Pengajuan KYB Menunggu Review
-                </span>
-                <span className="text-[11px] text-neutral-500">
-                  {macroStats.pendingUmkmCount} UMKM baru mendaftar NIB & Halal
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={onFilterPendingUmkm}
-                className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
-              >
-                Tinjau Sekarang
+          <div className="sp-rows">
+            <ActionRow title="Mitra terverifikasi" detail={`${verifiedCount.toLocaleString('id-ID')} gerai`}>
+              <span className="sp-badge"><ShieldCheck size={12} aria-hidden="true" /> Terverifikasi</span>
+            </ActionRow>
+            <ActionRow title="Menunggu verifikasi" detail={`${macroStats.pendingUmkmCount.toLocaleString('id-ID')} mitra`}>
+              <button type="button" className="sp-review-button" onClick={onFilterPendingUmkm}>Tinjau mitra</button>
+            </ActionRow>
+            <ActionRow title="Menu aktif" detail={`${macroStats.activeProductsCount.toLocaleString('id-ID')} menu`}>
+              <button type="button" className="sp-text-button" onClick={() => onSelectTab('product-curation')}>
+                Lihat menu <Utensils size={13} aria-hidden="true" />
               </button>
-            </div>
-
-            <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-neutral-800 block">
-                  Menu Sisa Piring Tayang
-                </span>
-                <span className="text-[11px] text-neutral-500">
-                  {macroStats.activeProductsCount} menu dalam pengawasan prep window
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => onSelectTab('product-curation')}
-                className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
-              >
-                Buka Kurasi
-              </button>
-            </div>
+            </ActionRow>
           </div>
-        </div>
+        </section>
 
-        {/* Right Column: Sisi Konsumen (Pembeli) */}
-        <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center font-bold">
-                <ShoppingBag className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm text-neutral-900">Sisi Konsumen (Pembeli)</h3>
-                <p className="text-[11px] text-neutral-500">Pesanan, kepuasan ulasan, dan jaminan refund komplain</p>
-              </div>
+        <section className="sp-panel" aria-label="Pembeli">
+          <div className="sp-panel-head">
+            <div className="sp-panel-title">
+              <div className="sp-icon sp-icon-buyer"><ShoppingBag size={20} strokeWidth={1.7} aria-hidden="true" /></div>
+              <div><h3>Pembeli</h3><span className="sp-caption">Pesanan & ulasan</span></div>
             </div>
-            <button
-              type="button"
-              onClick={() => onSelectTab('disputes-refund')}
-              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1 cursor-pointer"
-            >
-              <span>Pusat Komplain</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+            <button type="button" className="sp-text-button" onClick={() => onSelectTab('disputes-refund')}>
+              Lihat komplain <ArrowUpRight size={14} />
             </button>
           </div>
-
-          <div className="space-y-3">
-            <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-neutral-800 block">
-                  Pesanan Masuk & Serah Terima
-                </span>
-                <span className="text-[11px] text-neutral-500">
-                  {macroStats.totalOrdersCount} pesanan konsumen telah terintegrasi
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => onSelectTab('order-escrow')}
-                className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
-              >
-                Cek Pesanan
+          <div className="sp-rows">
+            <ActionRow title="Total pesanan" detail={`${macroStats.totalOrdersCount.toLocaleString('id-ID')} pesanan`}>
+              <button type="button" className="sp-text-button" onClick={() => onSelectTab('order-escrow')}>
+                Lihat pesanan <ArrowUpRight size={13} />
               </button>
-            </div>
-
-            <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-neutral-800 block">
-                  Tiket Komplain & Proteksi Refund
-                </span>
-                <span className="text-[11px] text-neutral-500">
-                  {macroStats.openDisputesCount} tiket membutuhkan resolusi cepat
-                </span>
-              </div>
-              <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${macroStats.openDisputesCount > 0
-                    ? 'bg-rose-100 text-rose-800 font-bold'
-                    : 'bg-emerald-100 text-emerald-800'
-                  }`}
-              >
-                {macroStats.openDisputesCount > 0 ? 'Perlu Ditindak' : 'Semua Beres'}
+            </ActionRow>
+            <ActionRow title="Komplain terbuka" detail={`${macroStats.openDisputesCount.toLocaleString('id-ID')} tiket`}>
+              <span className={`sp-badge ${macroStats.openDisputesCount > 0 ? 'sp-badge-danger' : ''}`}>
+                {macroStats.openDisputesCount > 0 ? 'Perlu ditangani' : 'Tidak ada komplain'}
               </span>
-            </div>
-
-            <div className="p-3.5 bg-neutral-50 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-neutral-800 block">
-                  Indeks Kepuasan Konsumen
-                </span>
-                <span className="text-[11px] text-neutral-500">
-                  Rata-rata 4.8 / 5.0 dari ulasan pembeli Bandung
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => onSelectTab('reviews-moderation')}
-                className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
-              >
-                Buka Ulasan
+            </ActionRow>
+            <ActionRow title="Ulasan pembeli" detail="Cek masukan pembeli">
+              <button type="button" className="sp-text-button" onClick={() => onSelectTab('reviews-moderation')}>
+                Lihat ulasan <MessageSquare size={13} aria-hidden="true" />
               </button>
-            </div>
+            </ActionRow>
           </div>
-        </div>
+        </section>
       </div>
 
-      {/* District Breakdown Table */}
-      <div className="bg-white rounded-3xl p-6 border border-neutral-200/80 shadow-xs space-y-4">
-        <div>
-          <h3 className="font-bold text-sm text-neutral-900">
-            Sebaran Penyelamatan Pangan Per Kecamatan di Kota Bandung
-          </h3>
-          <p className="text-xs text-neutral-500 mt-0.5">
-            Memantau serapan konsumsi warga dan kontribusi UMKM di wilayah Bandung
-          </p>
+      <section className="sp-district" aria-label="Dampak per kecamatan">
+        <div className="sp-district-head">
+          <div><h3>Dampak per kecamatan</h3><span className="sp-caption">Penyelamatan pangan di Bandung</span></div>
+          <span className="sp-region"><MapPin size={13} aria-hidden="true" /> Kota Bandung</span>
         </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead>
-              <tr className="border-b border-neutral-200 text-neutral-400 font-semibold uppercase text-[10px]">
-                <th className="py-3 px-3">Kecamatan</th>
-                <th className="py-3 px-3">Porsi Diselamatkan</th>
-                <th className="py-3 px-3">Sampah Dicegah</th>
-                <th className="py-3 px-3">Reduksi CO2</th>
-                <th className="py-3 px-3">Air Bersih</th>
-                <th className="py-3 px-3">Mitra Aktif</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100 text-neutral-700">
-              {macroStats.period.districtStats.map((d) => (
-                <tr key={d.district} className="hover:bg-neutral-50/70 transition-colors">
-                  <td className="py-3 px-3 font-bold text-neutral-900 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>{d.district}</span>
-                  </td>
-                  <td className="py-3 px-3 font-mono font-bold text-[#1F281A]">
-                    {d.portionsRescued.toLocaleString('id-ID')} porsi
-                  </td>
-                  <td className="py-3 px-3 font-mono">{d.wasteReducedKg.toLocaleString('id-ID')} kg</td>
-                  <td className="py-3 px-3 font-mono text-emerald-700 font-semibold">
-                    {Math.round(d.portionsRescued * 0.45).toLocaleString('id-ID')} kg
-                  </td>
-                  <td className="py-3 px-3 font-mono text-sky-700">
-                    {Math.round(d.portionsRescued * 62).toLocaleString('id-ID')} L
-                  </td>
-                  <td className="py-3 px-3 font-semibold">
-                    {d.activeUmkm} Gerai <span className="text-[10px] text-neutral-400">({d.participationRate}%)</span>
-                  </td>
+        <div className="sp-table-scroll" role="region" aria-label="Tabel dampak per kecamatan" tabIndex={0}>
+          <table className="sp-table">
+            <thead><tr>
+              <th scope="col">Kecamatan</th><th scope="col">Porsi diselamatkan</th>
+              <th scope="col">Sampah dicegah (kg)</th><th scope="col">Mitra aktif</th>
+            </tr></thead>
+            <tbody>
+              {districts.map((d) => (
+                <tr key={d.district}>
+                  <td><div className="sp-district-name"><MapPin size={14} className="sp-map-icon" aria-hidden="true" />{d.district}</div></td>
+                  <td className="sp-number sp-portions">{d.portionsRescued.toLocaleString('id-ID')}</td>
+                  <td className="sp-number">{d.wasteReducedKg.toLocaleString('id-ID')}</td>
+                  <td className="sp-number">{d.activeUmkm.toLocaleString('id-ID')}</td>
                 </tr>
               ))}
+              {districts.length === 0 && <tr><td colSpan={4} className="sp-empty">Belum ada data untuk periode ini.</td></tr>}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
+
+      <section className="sp-method" aria-label="Metode perhitungan">
+        <button type="button" className="sp-method-toggle" aria-expanded={showMethodology} aria-controls={methodologyId} onClick={() => setShowMethodology((previous) => !previous)}>
+          <span className="sp-method-label"><Info size={15} aria-hidden="true" />Cara menghitung dampak</span>
+          <ChevronDown size={15} className={`sp-chevron ${showMethodology ? 'sp-chevron-open' : ''}`} aria-hidden="true" />
+        </button>
+        {showMethodology && <div id={methodologyId} className="sp-formulas">
+          <div><div className="sp-formula-title">Sampah dicegah</div><p className="sp-formula-value">Estimasi: porsi × 0,45 kg</p></div>
+          <div><div className="sp-formula-title">Emisi berkurang</div><p className="sp-formula-value">Estimasi: sampah (kg) × 2,5 kg CO₂e</p></div>
+          <div><div className="sp-formula-title">Jejak air pangan</div><p className="sp-formula-value">Estimasi: sampah (kg) × 800 liter</p></div>
+        </div>}
+      </section>
     </div>
   );
 };
-

@@ -1015,7 +1015,7 @@ function CustomerAndAdminPortal() {
           ? 'h-[100dvh] max-h-[100dvh] overflow-hidden'
           : 'min-h-screen overflow-x-hidden'
       } flex flex-col bg-white text-stone-900 ${
-        activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
+        currentUser && activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
           ? 'pb-16'
           : ''
       }`}
@@ -1103,12 +1103,12 @@ function CustomerAndAdminPortal() {
                         type="button"
                         onClick={() => {
                           setIsMobileNavOpen(false);
-                          openEtalasePage();
+                          openAuthPage();
                         }}
                         className="w-full text-center px-4 py-2.5 rounded-xl text-sm font-bold bg-[#8DA249] hover:bg-[#7b8e3d] text-white flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm"
                       >
                         <ShoppingBag className="w-4 h-4" />
-                        <span>Mulai Pakai (Buka Etalase)</span>
+                        <span>Mulai Pakai</span>
                       </button>
                     </div>
                   </>
@@ -1851,7 +1851,7 @@ function CustomerAndAdminPortal() {
                   <div className="pt-2">
                     <button
                       type="button"
-                      onClick={openEtalasePage}
+                      onClick={openAuthPage}
                       className="w-full sm:w-auto min-h-[48px] px-10 py-3.5 bg-[#8DA249] hover:bg-[#7b8e3d] active:scale-[0.99] text-white font-display font-semibold text-base rounded-full transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-[#8DA249]/30"
                     >
                       Mulai Pakai
@@ -2770,8 +2770,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY */}
-      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY (Hanya tampil saat sudah login) */}
+      {currentUser && activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2824,8 +2824,8 @@ function CustomerAndAdminPortal() {
         </nav>
       )}
 
-      {/* FLOATING ACTION BUTTONS: KANTONG (DI ATAS) & AI BOT (DI BAWAH) */}
-      {activePage !== 'admin' && activePage !== 'auth' && (
+      {/* FLOATING ACTION BUTTONS: KANTONG (DI ATAS) & AI BOT (DI BAWAH) (Hanya tampil saat sudah login) */}
+      {currentUser && activePage !== 'admin' && activePage !== 'auth' && (
         <FloatingChatButton
           totalCartItems={totalCartItems}
           onOpenCart={openCartPage}

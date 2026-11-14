@@ -5,6 +5,7 @@ export type UserPage =
   | 'landing'
   | 'etalase'
   | 'kantong'
+  | 'kantong-confirmation'
   | 'pesanan'
   | 'history'
   | 'store'
@@ -63,7 +64,7 @@ export const UserNavbar: React.FC<UserNavbarProps> = ({
               onClick={onGoCart}
               aria-label={`Kantong Belanja (${totalCartItems} item)`}
               className={`relative w-9 h-9 inline-flex items-center justify-center border rounded-xl transition-colors cursor-pointer ${
-                activePage === 'kantong'
+                activePage === 'kantong' || activePage === 'kantong-confirmation'
                   ? 'bg-white/30 border-[#8da249]'
                   : 'bg-white/10 border-white/25 hover:bg-white/20'
               }`}

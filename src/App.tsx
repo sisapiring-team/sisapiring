@@ -140,9 +140,9 @@ function CustomerAndAdminPortal() {
     setVerificationStatus,
     refreshRemoteData,
   } = useApp();
-  // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot')
+  // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'kantong-confirmation' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot')
   const [activePage, setActivePage] = useState<
-    'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'kantong-confirmation' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
   >(() => {
     if (typeof window !== 'undefined') {
       const route = parseRoute(window.location.pathname);
@@ -151,6 +151,7 @@ function CustomerAndAdminPortal() {
         route.page === 'landing' ||
         route.page === 'etalase' ||
         route.page === 'kantong' ||
+        route.page === 'kantong-confirmation' ||
         route.page === 'pesanan' ||
         route.page === 'history' ||
         route.page === 'store' ||
@@ -194,6 +195,7 @@ function CustomerAndAdminPortal() {
           route.page === 'landing' ||
           route.page === 'etalase' ||
           route.page === 'kantong' ||
+          route.page === 'kantong-confirmation' ||
           route.page === 'pesanan' ||
           route.page === 'history' ||
           route.page === 'store' ||
@@ -210,7 +212,7 @@ function CustomerAndAdminPortal() {
   }, [setActiveTab]);
 
   const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
-    'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'kantong-confirmation' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
   >('etalase');
 
   const [chatTargetMerchant, setChatTargetMerchant] = useState<string | undefined>(() => {
@@ -537,6 +539,12 @@ function CustomerAndAdminPortal() {
   const openCartPage = () => {
     pushRoute('/kantong');
     setActivePage('kantong');
+    scrollToTop();
+  };
+
+  const openCartConfirmationPage = () => {
+    pushRoute('/kantong/confirmation');
+    setActivePage('kantong-confirmation');
     scrollToTop();
   };
 
@@ -1230,22 +1238,27 @@ function CustomerAndAdminPortal() {
             }}
           />
         </main>
-      ) : activePage === 'kantong' ? (
-        /* PAGE 3: SEPARATE DEDICATED CART PAGE */
+      ) : activePage === 'kantong' || activePage === 'kantong-confirmation' ? (
+        /* PAGE 3: SEPARATE DEDICATED CART & CHECKOUT PAGE */
         <main className="flex-1">
           <RescueCartPage
             cart={cart}
             currentUser={currentUser}
+            initialStep={activePage === 'kantong-confirmation' ? 'confirmation' : 'cart'}
+            onNavigateStep={(step) => {
+              if (step === 'confirmation') {
+                openCartConfirmationPage();
+              } else {
+                openCartPage();
+              }
+            }}
             onUpdateQty={handleUpdateCartQty}
             onRemove={handleRemoveFromCart}
             onClearCart={() => setCart([])}
             onBackToEtalase={openEtalasePage}
             onNavigateToAuth={openAuthPage}
             onOrderCreated={handleOrderCreated}
-            onGoToPesanan={() => {
-              setActivePage('pesanan');
-              scrollToTop();
-            }}
+            onGoToPesanan={openOrdersPage}
           />
         </main>
       ) : activePage === 'store' ? (

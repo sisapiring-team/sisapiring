@@ -234,30 +234,6 @@ export const PublicFloatingNavbar: React.FC<PublicFloatingNavbarProps> = ({
             >
               History
             </button>
-
-            <button
-              type="button"
-              onClick={onOpenLanding}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              Beranda
-            </button>
-
-            <button
-              type="button"
-              onClick={onOpenSeller}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              Mitra UMKM
-            </button>
-
-            <button
-              type="button"
-              onClick={onOpenAdmin}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              Panel Admin
-            </button>
           </>
         )}
       </nav>

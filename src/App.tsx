@@ -20,8 +20,6 @@ import { SellerRegistrationView } from './components/registration/SellerRegistra
 import { VerificationBadgeModal } from './components/common/VerificationBadgeModal';
 import { FoodSafetyModal } from './components/products/FoodSafetyModal';
 import { ProductFormModal } from './components/products/ProductFormModal';
-import { PublicFloatingNavbar } from './components/layout/PublicFloatingNavbar';
-import { PublicMobileDrawer } from './components/layout/PublicMobileDrawer';
 
 /**
  * @license
@@ -982,80 +980,16 @@ function CustomerAndAdminPortal() {
           : ''
       }`}
     >
-      {/* Top Floating Navigation Bar — Matching Admin Capsule Architecture */}
+      {/* UserNavbar — semua page user kecuali auth & admin */}
       {activePage !== 'auth' && activePage !== 'admin' && (
-        <PublicFloatingNavbar
+        <UserNavbar
           activePage={activePage}
-          currentUser={currentUser}
           totalCartItems={totalCartItems}
-          activeOrdersCount={activeOrders.length}
-          onOpenLanding={openLandingPage}
-          onOpenEtalase={openEtalasePage}
-          onOpenOrders={openOrdersPage}
-          onOpenChat={() => openChatPage()}
-          onOpenHistory={openHistoryPage}
-          onOpenCart={openCartPage}
-          onOpenSeller={() => openSellerPage()}
-          onOpenAdmin={openAdminPage}
-          onOpenAuth={openAuthPage}
-          onLogout={handleLogout}
-          onNavigateSection={navigateToSection}
-          onOpenProfileSettings={() => {
-            if (currentUser) {
-              setEditNameText(currentUser.name);
-              setEditPhoneText(currentUser.phone);
-              setAccountModalMode('profile');
-            }
-          }}
-          onOpenAddressSettings={() => {
-            if (currentUser) {
-              setEditDistrictText(currentUser.district || 'Coblong (Dago / Dipatiukur)');
-              setEditAddressText(currentUser.defaultAddress || '');
-              setAccountModalMode('address');
-            }
-          }}
-          onMobileMenuToggle={() => setIsMobileNavOpen(true)}
+          currentUserName={currentUser?.name ?? null}
+          onGoHome={openLandingPage}
+          onGoCart={openCartPage}
+          onGoAuth={openAuthPage}
         />
-      )}
-
-      {/* Mobile Navigation Drawer — Matching Admin Mobile Drawer Styling */}
-      <PublicMobileDrawer
-        isOpen={isMobileNavOpen}
-        onClose={() => setIsMobileNavOpen(false)}
-        activePage={activePage}
-        currentUser={currentUser}
-        totalCartItems={totalCartItems}
-        activeOrdersCount={activeOrders.length}
-        onOpenLanding={openLandingPage}
-        onOpenEtalase={openEtalasePage}
-        onOpenOrders={openOrdersPage}
-        onOpenChat={() => openChatPage()}
-        onOpenHistory={openHistoryPage}
-        onOpenCart={openCartPage}
-        onOpenSeller={() => openSellerPage()}
-        onOpenAdmin={openAdminPage}
-        onOpenAuth={openAuthPage}
-        onLogout={handleLogout}
-        onNavigateSection={navigateToSection}
-        onOpenProfileSettings={() => {
-          if (currentUser) {
-            setEditNameText(currentUser.name);
-            setEditPhoneText(currentUser.phone);
-            setAccountModalMode('profile');
-          }
-        }}
-        onOpenAddressSettings={() => {
-          if (currentUser) {
-            setEditDistrictText(currentUser.district || 'Coblong (Dago / Dipatiukur)');
-            setEditAddressText(currentUser.defaultAddress || '');
-            setAccountModalMode('address');
-          }
-        }}
-      />
-
-      {/* Top Spacer for Non-Landing Pages so Floating Navbar Does Not Obscure Header */}
-      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && (
-        <div className="h-16 sm:h-20 shrink-0 pointer-events-none" aria-hidden="true" />
       )}
 
       {/* Non-intrusive Feedback Toast */}

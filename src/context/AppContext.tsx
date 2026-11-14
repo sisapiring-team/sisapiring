@@ -9,6 +9,7 @@ import {
   fetchCurrentMerchant,
   fetchOrders,
   fetchProducts,
+  getStoredRole,
   updateMerchantRemote,
   updateOrderStatusRemote,
   updateProductRemote,
@@ -17,6 +18,7 @@ import {
 } from '../lib/api';
 import { Order, OrderStatus, SellerProfile, SisaPiringProduct, VerificationStatus } from '../types/seller';
 import { parseRoute } from '../utils/navigation';
+import { checkRoleRouteAccess } from '../utils/authGuard';
 
 export type ActiveTab =
   | 'dashboard'
@@ -86,7 +88,14 @@ const STORAGE_KEY_ORDERS = 'sisapiring_orders_v2';
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     if (typeof window !== 'undefined') {
-      const route = parseRoute(window.location.pathname);
+      const storedRole = getStoredRole();
+      const currentPath = window.location.pathname;
+      const guard = checkRoleRouteAccess(currentPath, storedRole);
+      const effectivePath = guard.allowed ? currentPath : guard.redirectPath;
+      if (!guard.allowed && effectivePath !== currentPath) {
+        window.history.replaceState(null, '', effectivePath);
+      }
+      const route = parseRoute(effectivePath);
       if (route.page === 'admin') return 'admin';
       if (route.page === 'penjual') {
         const validSellerTabs: ActiveTab[] = [
@@ -111,7 +120,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Listen to popstate for browser Back/Forward between portals
   useEffect(() => {
     const handlePopState = () => {
-      const route = parseRoute(window.location.pathname);
+      const storedRole = getStoredRole();
+      const currentPath = window.location.pathname;
+      const guard = checkRoleRouteAccess(currentPath, storedRole);
+      const effectivePath = guard.allowed ? currentPath : guard.redirectPath;
+      if (!guard.allowed && effectivePath !== currentPath) {
+        window.history.replaceState(null, '', effectivePath);
+      }
+      const route = parseRoute(effectivePath);
       if (route.page === 'admin') {
         setActiveTab('admin');
       } else if (route.page === 'penjual') {

@@ -12,6 +12,97 @@ import type {
 } from '../types/seller';
 
 const TOKEN_KEY = 'sisapiring_api_token';
+const USER_KEY = 'sisapiring_user_session';
+
+export function setCookie(name: string, value: string, days = 7): void {
+  if (typeof document === 'undefined') return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+export function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+export function deleteCookie(name: string): void {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+}
+
+function readToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || getCookie('sisapiring_token');
+  } catch {
+    return getCookie('sisapiring_token');
+  }
+}
+
+export function setAuthToken(token: string | null): void {
+  try {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+      setCookie('sisapiring_token', token, 7);
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      deleteCookie('sisapiring_token');
+      deleteCookie('sisapiring_role');
+    }
+  } catch {
+    if (token) setCookie('sisapiring_token', token, 7);
+    else {
+      deleteCookie('sisapiring_token');
+      deleteCookie('sisapiring_role');
+    }
+  }
+}
+
+export function setAuthSession(token: string | null, user?: RemoteUser | null): void {
+  setAuthToken(token);
+  try {
+    if (token && user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      setCookie('sisapiring_role', user.role, 7);
+    } else if (!token) {
+      localStorage.removeItem(USER_KEY);
+      deleteCookie('sisapiring_role');
+    }
+  } catch {
+    if (token && user) {
+      setCookie('sisapiring_role', user.role, 7);
+    } else if (!token) {
+      deleteCookie('sisapiring_role');
+    }
+  }
+}
+
+export function getStoredUser(): RemoteUser | null {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    if (raw) {
+      return JSON.parse(raw) as RemoteUser;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+export function getStoredRole(): 'buyer' | 'seller' | 'admin' | null {
+  const user = getStoredUser();
+  if (user?.role) return user.role;
+  const cookieRole = getCookie('sisapiring_role');
+  if (cookieRole === 'buyer' || cookieRole === 'seller' || cookieRole === 'admin') {
+    return cookieRole;
+  }
+  return null;
+}
+
+export function getAuthToken(): string | null {
+  return readToken();
+}
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',
@@ -21,27 +112,6 @@ const api = axios.create({
   },
   withCredentials: true,
 });
-
-function readToken(): string | null {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function setAuthToken(token: string | null): void {
-  try {
-    if (token) localStorage.setItem(TOKEN_KEY, token);
-    else localStorage.removeItem(TOKEN_KEY);
-  } catch {
-    return;
-  }
-}
-
-export function getAuthToken(): string | null {
-  return readToken();
-}
 
 api.interceptors.request.use((config) => {
   const token = readToken();
@@ -126,33 +196,37 @@ export interface AuthResult {
 export async function loginRemote(email: string, password: string): Promise<AuthResult> {
   const response = await api.post('/auth/login', { email, password });
   const result = { user: mapUser(response.data?.user), token: String(response.data?.token ?? '') };
-  setAuthToken(result.token);
+  setAuthSession(result.token, result.user);
   return result;
 }
 
 export async function registerRemote(payload: Record<string, unknown>): Promise<AuthResult> {
   const response = await api.post('/auth/register', payload);
   const result = { user: mapUser(response.data?.user), token: String(response.data?.token ?? '') };
-  setAuthToken(result.token);
+  setAuthSession(result.token, result.user);
   return result;
 }
 
 export async function fetchMe(): Promise<RemoteUser | null> {
   if (!readToken()) return null;
   const response = await api.get('/auth/me');
-  return mapUser(response.data?.user);
+  const user = mapUser(response.data?.user);
+  setAuthSession(readToken(), user);
+  return user;
 }
 
 export async function updateProfileRemote(updates: Record<string, unknown>): Promise<RemoteUser> {
   const response = await api.patch('/auth/profile', updates);
-  return mapUser(response.data?.user);
+  const user = mapUser(response.data?.user);
+  setAuthSession(readToken(), user);
+  return user;
 }
 
 export async function logoutRemote(): Promise<void> {
   try {
     await api.post('/auth/logout');
   } finally {
-    setAuthToken(null);
+    setAuthSession(null);
   }
 }
 
@@ -542,3 +616,18 @@ export async function moderateAdminProduct(
   const response = await api.post(`/admin/products/${code}/moderate`, { status, reason });
   return mapAdminProduct(asRecord(unwrap<Record<string, unknown>>(response.data)));
 }
+
+export async function createAdminUser(payload: {
+  name: string;
+  email: string;
+  password?: string;
+  phone?: string;
+  district?: string;
+  default_address?: string;
+  role: 'buyer' | 'seller' | 'admin';
+  status?: 'active' | 'suspended';
+}): Promise<RemoteUser> {
+  const response = await api.post('/admin/users', payload);
+  return mapUser(unwrap<Record<string, unknown>>(response.data));
+}
+

@@ -90,13 +90,14 @@ import {
 import { MarketplaceDisplayPage } from './components/MarketplaceDisplayPage';
 import { StoreCatalogPage } from './components/StoreCatalogPage';
 import { AuthPage, UserAccount } from './components/AuthPage';
-import { fetchCatalog, fetchMe, logoutRemote } from './lib/api';
+import { fetchCatalog, fetchMe, getStoredRole, getStoredUser, logoutRemote } from './lib/api';
 import { AdminDashboardPage } from './components/AdminDashboardPage';
 import { AdminLoginGate } from './components/admin/AdminLoginGate';
 import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
 import { BotChatView } from './components/chat/BotChatView';
 import { parseRoute, pushRoute } from './utils/navigation';
+import { checkRoleRouteAccess } from './utils/authGuard';
 import { Footer } from './components/Footer';
 import { FoodWasteFunFacts } from './components/FoodWasteFunFacts';
 import { useSmoothScrollArea } from './hooks/useSmoothScrollArea';
@@ -140,12 +141,35 @@ function CustomerAndAdminPortal() {
     setVerificationStatus,
     refreshRemoteData,
   } = useApp();
+
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    const stored = getStoredUser();
+    if (stored) {
+      return {
+        name: stored.name,
+        email: stored.email,
+        phone: stored.phone || '081234567890',
+        role: stored.role,
+        district: stored.district || 'Coblong (Dago / Dipatiukur)',
+        defaultAddress: stored.defaultAddress || '',
+      };
+    }
+    return null;
+  });
+
   // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'kantong-confirmation' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot')
   const [activePage, setActivePage] = useState<
     'admin' | 'landing' | 'etalase' | 'kantong' | 'kantong-confirmation' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
   >(() => {
     if (typeof window !== 'undefined') {
-      const route = parseRoute(window.location.pathname);
+      const stored = getStoredUser();
+      const currentPath = window.location.pathname;
+      const guard = checkRoleRouteAccess(currentPath, stored?.role);
+      const effectivePath = guard.allowed ? currentPath : guard.redirectPath;
+      if (!guard.allowed && effectivePath !== currentPath) {
+        window.history.replaceState(null, '', effectivePath);
+      }
+      const route = parseRoute(effectivePath);
       if (route.page === 'admin') return 'admin';
       if (
         route.page === 'landing' ||
@@ -177,12 +201,19 @@ function CustomerAndAdminPortal() {
   // Synchronize state when browser Back or Forward is pressed
   useEffect(() => {
     const handlePopState = () => {
-      const route = parseRoute(window.location.pathname);
+      const stored = getStoredUser();
+      const currentPath = window.location.pathname;
+      const guard = checkRoleRouteAccess(currentPath, stored?.role);
+      const effectivePath = guard.allowed ? currentPath : guard.redirectPath;
+      if (!guard.allowed && effectivePath !== currentPath) {
+        window.history.replaceState(null, '', effectivePath);
+      }
+      const route = parseRoute(effectivePath);
       if (route.page === 'admin') {
         setActiveTab('admin');
         setActivePage('admin');
       } else if (route.page === 'penjual') {
-        // Handled in AppProvider
+        setActiveTab('dashboard');
       } else {
         setActiveTab('marketplace');
         if (route.page === 'store' && route.merchantName) {
@@ -253,7 +284,6 @@ function CustomerAndAdminPortal() {
   >('Makanan Tidak Sesuai Deskripsi');
   const [modalComplaintDesc, setModalComplaintDesc] = useState<string>('');
   const [modalComplaintFile, setModalComplaintFile] = useState<string>('');
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -324,49 +354,40 @@ function CustomerAndAdminPortal() {
     INITIAL_USER_ACCESS_LIST
   );
 
-  // Interactive Cart & Modal States
-  const [cart, setCart] = useState<CartEntry[]>([
-    { item: SISA_PIRING_CATALOG[0], quantity: 1 },
-  ]);
-  const [orders, setOrders] = useState<OrderRecord[]>([
-    {
-      orderCode: 'SP-8421',
-      createdAt: 'Hari ini · 16.40 WIB',
-      name: 'Nabil Rachman',
-      phone: '081234567890',
-      payment: 'qris',
-      totalPaid: SISA_PIRING_CATALOG[0].rescuePrice,
-      totalSaved: SISA_PIRING_CATALOG[0].originalPrice - SISA_PIRING_CATALOG[0].rescuePrice,
-      status: 'siap-diambil',
-      deliveryStage: 'perjalanan',
-      items: [{ item: SISA_PIRING_CATALOG[0], quantity: 1 }],
-    },
-    {
-      orderCode: 'SP-7109',
-      createdAt: 'Kemarin · 19.15 WIB',
-      name: 'Nabil Rachman',
-      phone: '081234567890',
-      payment: 'qris',
-      totalPaid: SISA_PIRING_CATALOG[2].rescuePrice,
-      totalSaved: SISA_PIRING_CATALOG[2].originalPrice - SISA_PIRING_CATALOG[2].rescuePrice,
-      status: 'selesai',
-      deliveryStage: 'sampai',
-      userRating: 5,
-      items: [{ item: SISA_PIRING_CATALOG[2], quantity: 1 }],
-    },
-    {
-      orderCode: 'SP-6542',
-      createdAt: '7 Nov 2026 · 18.50 WIB',
-      name: 'Nabil Rachman',
-      phone: '081234567890',
-      payment: 'cod',
-      totalPaid: SISA_PIRING_CATALOG[1].rescuePrice * 2,
-      totalSaved: (SISA_PIRING_CATALOG[1].originalPrice - SISA_PIRING_CATALOG[1].rescuePrice) * 2,
-      status: 'selesai',
-      deliveryStage: 'sampai',
-      items: [{ item: SISA_PIRING_CATALOG[1], quantity: 2 }],
-    },
-  ]);
+  // Interactive Cart & Customer Orders (Clean initial state, persisted in session)
+  const [cart, setCart] = useState<CartEntry[]>(() => {
+    try {
+      const saved = localStorage.getItem('sisapiring_customer_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [orders, setOrders] = useState<OrderRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem('sisapiring_customer_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('sisapiring_customer_cart', JSON.stringify(cart));
+    } catch (e) {
+      console.warn('Storage sync error', e);
+    }
+  }, [cart]);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('sisapiring_customer_orders', JSON.stringify(orders));
+    } catch (e) {
+      console.warn('Storage sync error', e);
+    }
+  }, [orders]);
   const [activeProductModal, setActiveProductModal] = useState<SisaPiringItem | null>(null);
   const [recentToast, setRecentToast] = useState<string | null>(null);
 
@@ -578,6 +599,29 @@ function CustomerAndAdminPortal() {
     scrollToTop();
   };
 
+  // Enforce role-based page boundary whenever currentUser changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const currentPath = window.location.pathname;
+    const guard = checkRoleRouteAccess(currentPath, currentUser?.role);
+    if (!guard.allowed && guard.redirectPath !== currentPath) {
+      pushRoute(guard.redirectPath);
+      const targetRoute = parseRoute(guard.redirectPath);
+      if (targetRoute.page === 'admin') {
+        setActiveTab('admin');
+        setActivePage('admin');
+      } else if (targetRoute.page === 'penjual') {
+        setActiveTab('dashboard');
+      } else {
+        setActiveTab('marketplace');
+        setActivePage(targetRoute.page === 'landing' ? 'landing' : targetRoute.page);
+      }
+      if (guard.notice) {
+        setRecentToast(guard.notice);
+      }
+    }
+  }, [currentUser, setActiveTab]);
+
   const openStorePage = (merchantName: string) => {
     pushRoute(`/toko/${encodeURIComponent(merchantName)}`);
     setSelectedStoreName(merchantName);
@@ -586,6 +630,11 @@ function CustomerAndAdminPortal() {
   };
 
   const openAdminPage = () => {
+    const role = currentUser?.role ? String(currentUser.role).toLowerCase() : null;
+    if (role && role !== 'admin') {
+      setRecentToast('Akses Dibatasi: Akun Anda tidak memiliki izin akses ke Panel Admin.');
+      return;
+    }
     pushRoute('/admin');
     setActiveTab('admin');
     setActivePage('admin');
@@ -593,12 +642,21 @@ function CustomerAndAdminPortal() {
   };
 
   const openSellerPage = (subTab?: string) => {
+    const role = currentUser?.role ? String(currentUser.role).toLowerCase() : null;
+    if (role && role !== 'seller' && role !== 'penjual' && role !== 'umkm' && role !== 'merchant') {
+      setRecentToast('Akses Dibatasi: Akun Anda adalah Pembeli dan tidak dapat mengakses Portal Penjual.');
+      return;
+    }
     pushRoute(subTab && subTab !== 'dashboard' ? `/penjual/${subTab}` : '/penjual');
     setActiveTab((subTab as any) || 'dashboard');
     scrollToTop();
   };
 
   const openAuthPage = () => {
+    if (currentUser) {
+      setRecentToast(`Anda sudah masuk sebagai ${currentUser.name}.`);
+      return;
+    }
     pushRoute('/auth');
     if (activePage !== 'auth') {
       setReturnPageAfterAuth(activePage);
@@ -610,13 +668,17 @@ function CustomerAndAdminPortal() {
   const handleLogout = () => {
     void logoutRemote().catch(() => undefined);
     setCurrentUser(null);
+    setCart([]);
+    setOrders([]);
+    try {
+      localStorage.removeItem('sisapiring_customer_cart');
+      localStorage.removeItem('sisapiring_customer_orders');
+    } catch {}
     setIsAccountMenuOpen(false);
     setIsMobileNavOpen(false);
-    if (activePage === 'pesanan' || activePage === 'history' || activePage === 'admin') {
-      pushRoute('/etalase');
-      setActiveTab('marketplace');
-      setActivePage('etalase');
-    }
+    pushRoute('/auth');
+    setActiveTab('marketplace');
+    setActivePage('auth');
     setRecentToast('Anda telah keluar dari akun.');
     window.setTimeout(() => setRecentToast(null), 2500);
   };
@@ -953,7 +1015,7 @@ function CustomerAndAdminPortal() {
           ? 'h-[100dvh] max-h-[100dvh] overflow-hidden'
           : 'min-h-screen overflow-x-hidden'
       } flex flex-col bg-white text-stone-900 ${
-        activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
+        !currentUser && activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
           ? 'pb-16'
           : ''
       }`}
@@ -963,10 +1025,18 @@ function CustomerAndAdminPortal() {
         <UserNavbar
           activePage={activePage}
           totalCartItems={totalCartItems}
+          currentUser={currentUser}
           currentUserName={currentUser?.name ?? null}
+          activeOrdersCount={activeOrders.length}
           onGoHome={openLandingPage}
           onGoCart={openCartPage}
           onGoAuth={openAuthPage}
+          onLogout={handleLogout}
+          onOpenAddressModal={() => setAccountModalMode('address')}
+          onOpenProfileModal={() => setAccountModalMode('profile')}
+          onGoEtalase={openEtalasePage}
+          onGoOrders={openOrdersPage}
+          onGoHistory={openHistoryPage}
         />
       )}
 
@@ -1101,33 +1171,40 @@ function CustomerAndAdminPortal() {
                 )}
               </div>
 
-              <div className="pt-3 border-t border-stone-100 space-y-2">
-                <p className="px-3 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                  Portal Khusus
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openSellerPage();
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#8da249] bg-[#8da249]/10 hover:bg-[#8da249]/20 flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <Store className="w-4 h-4 shrink-0" />
-                  <span>Portal Mitra UMKM</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openAdminPage();
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#2e434f] bg-stone-100 hover:bg-stone-200 flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
-                  <span>Panel Admin</span>
-                </button>
-              </div>
+              {/* Portal Khusus hanya tampil jika bukan akun Pembeli */}
+              {(!currentUser || currentUser.role !== 'buyer') && (
+                <div className="pt-3 border-t border-stone-100 space-y-2">
+                  <p className="px-3 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                    Portal Khusus
+                  </p>
+                  {(!currentUser || currentUser.role === 'seller') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openSellerPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#8da249] bg-[#8da249]/10 hover:bg-[#8da249]/20 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <Store className="w-4 h-4 shrink-0" />
+                      <span>Portal Mitra UMKM</span>
+                    </button>
+                  )}
+                  {(!currentUser || currentUser.role === 'admin') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openAdminPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#2e434f] bg-stone-100 hover:bg-stone-200 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <ShieldCheck className="w-4 h-4 shrink-0" />
+                      <span>Panel Admin</span>
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="pt-4 border-t border-stone-100">
@@ -1209,20 +1286,59 @@ function CustomerAndAdminPortal() {
       ) : activePage === 'auth' ? (
         /* PAGE 4: SEPARATE LOGIN & REGISTER PAGE */
         <main className="flex-1">
-          <AuthPage
-            onSuccessLogin={handleSuccessLogin}
-            onBack={() => {
-              const target = returnPageAfterAuth || 'etalase';
-              if (target === 'landing') openLandingPage();
-              else if (target === 'kantong') openCartPage();
-              else if (target === 'pesanan') openOrdersPage();
-              else if (target === 'history') openHistoryPage();
-              else if (target === 'chat') openChatPage();
-              else if (target === 'chat-bot') openChatBotPage();
-              else if (target === 'admin') openAdminPage();
-              else openEtalasePage();
-            }}
-          />
+          {currentUser ? (
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+              <div className="bg-white border border-stone-200 rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center mx-auto">
+                  <User className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-stone-900 font-display">
+                    Anda Sudah Masuk
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-1">
+                    Saat ini Anda masuk sebagai <strong className="text-stone-800">{currentUser.name}</strong> ({currentUser.email}).
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (currentUser.role === 'admin') openAdminPage();
+                      else if (currentUser.role === 'seller') openSellerPage();
+                      else openEtalasePage();
+                    }}
+                    className="w-full h-11 bg-[#1F281A] hover:bg-emerald-900 text-white font-semibold text-xs rounded-xl transition-colors cursor-pointer"
+                  >
+                    Lanjut ke Halaman Utama
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full h-11 border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-xs rounded-xl transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Keluar dari Akun</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <AuthPage
+              onSuccessLogin={handleSuccessLogin}
+              onBack={() => {
+                const target = returnPageAfterAuth || 'etalase';
+                if (target === 'landing') openLandingPage();
+                else if (target === 'kantong') openCartPage();
+                else if (target === 'pesanan') openOrdersPage();
+                else if (target === 'history') openHistoryPage();
+                else if (target === 'chat') openChatPage();
+                else if (target === 'chat-bot') openChatBotPage();
+                else if (target === 'admin') openAdminPage();
+                else openEtalasePage();
+              }}
+            />
+          )}
         </main>
       ) : activePage === 'kantong' || activePage === 'kantong-confirmation' ? (
         /* PAGE 3: SEPARATE DEDICATED CART & CHECKOUT PAGE */
@@ -2654,8 +2770,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY (Hanya di dalam aplikasi pemesanan) */}
-      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY (Hanya untuk tamu/guest sebelum login) */}
+      {!currentUser && activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2794,6 +2910,17 @@ const SellerPortalContent: React.FC = () => {
 
 function MainAppDispatcher() {
   const { activeTab } = useApp();
+  const storedRole = getStoredRole();
+
+  // Akun pembeli atau admin tidak diizinkan membuka SellerPortalContent
+  if (storedRole === 'buyer' || storedRole === 'admin') {
+    return <CustomerAndAdminPortal />;
+  }
+
+  // Jika tamu belum login mencoba mengakses portal penjual, tangani lewat CustomerAndAdminPortal (agar diarahkan ke login)
+  if (!storedRole && activeTab !== 'admin' && activeTab !== 'marketplace') {
+    return <CustomerAndAdminPortal />;
+  }
 
   if (activeTab === 'admin' || activeTab === 'marketplace') {
     return <CustomerAndAdminPortal />;

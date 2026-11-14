@@ -20,7 +20,7 @@ enum OrderStatus: string
         return match ($this) {
             self::PendingPayment => [self::WaitingConfirmation, self::Cancelled, self::Expired],
             self::WaitingConfirmation => [self::Confirmed, self::Cancelled],
-            self::Confirmed => [self::ReadyForPickup, self::Cancelled],
+            self::Confirmed => [self::ReadyForPickup, self::Completed, self::Cancelled],
             self::ReadyForPickup => [self::Completed, self::Cancelled],
             self::Completed, self::Cancelled, self::Expired => [],
         };

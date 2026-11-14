@@ -62,6 +62,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
           macroStats={macroStats}
           onSwitchToPublicEtalase={onSwitchToPublicEtalase}
           onSwitchToSellerPortal={onSwitchToSellerPortal}
+          onLogout={onLogout}
         />
       </div>
 

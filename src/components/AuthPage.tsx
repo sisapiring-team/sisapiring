@@ -12,9 +12,6 @@ import {
   CheckCircle2,
   MapPin,
   Store,
-  Upload,
-  FileText,
-  Image as ImageIcon,
   X,
 } from 'lucide-react';
 
@@ -52,13 +49,6 @@ const UMKM_BUSINESS_CATEGORIES = [
   'Katering & Dapur Rumahan',
 ];
 
-const UMKM_DOC_TYPES = [
-  'KTP Penanggung Jawab',
-  'NIB (Nomor Induk Berusaha)',
-  'Surat Keterangan Usaha (SKU)',
-  'Sertifikat Halal / PIRT',
-];
-
 export const AuthPage: React.FC<AuthPageProps> = ({
   initialMode = 'login',
   onSuccessLogin,
@@ -85,11 +75,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const [streetAddress, setStreetAddress] = useState('');
   const [addressLandmark, setAddressLandmark] = useState('');
 
-  // UMKM Registration Sequential States (3 Pages):
+  // UMKM Registration Sequential States (2 Pages):
   // Page 1: Nama pemilik/penanggung jawab, Nomor telepon aktif, Email
-  // Page 2: Identitas Usaha Bagian 1 (Nama usaha, Kategori usaha, Alamat usaha)
-  // Page 3: Identitas Usaha Bagian 2 (Foto usaha & Dokumen pendukung usaha)
-  const [umkmStep, setUmkmStep] = useState<1 | 2 | 3>(1);
+  // Page 2: Identitas Usaha (Nama usaha, Kategori usaha, Alamat usaha)
+  const [umkmStep, setUmkmStep] = useState<1 | 2>(1);
   const [umkmOwnerName, setUmkmOwnerName] = useState('');
   const [umkmPhone, setUmkmPhone] = useState('');
   const [umkmEmail, setUmkmEmail] = useState('');
@@ -97,10 +86,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const [umkmCategory, setUmkmCategory] = useState(UMKM_BUSINESS_CATEGORIES[0]);
   const [umkmDistrict, setUmkmDistrict] = useState(BANDUNG_DISTRICTS[0]);
   const [umkmAddress, setUmkmAddress] = useState('');
-  const [umkmPhotoName, setUmkmPhotoName] = useState('');
-  const [umkmPhotoPreview, setUmkmPhotoPreview] = useState<string | null>(null);
-  const [umkmDocType, setUmkmDocType] = useState(UMKM_DOC_TYPES[0]);
-  const [umkmDocName, setUmkmDocName] = useState('');
   const [umkmSubmitted, setUmkmSubmitted] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -246,10 +231,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       setRegisterStep(2);
       return;
     }
-    if (mode === 'register-umkm' && !umkmSubmitted && umkmStep === 3) {
-      setUmkmStep(2);
-      return;
-    }
     if (mode === 'register-umkm' && !umkmSubmitted && umkmStep === 2) {
       setUmkmStep(1);
       return;
@@ -287,7 +268,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // UMKM Page 2: Identitas Usaha Bagian 1 (Nama Usaha, Kategori Usaha, Alamat Usaha)
+  // UMKM Page 2: Identitas Usaha (Nama Usaha, Kategori Usaha, Alamat Usaha)
   const handleUmkmStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -305,47 +286,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    setUmkmStep(3);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // UMKM Page 3: Identitas Usaha Bagian 2 (Foto & Dokumen Pendukung Usaha)
-  const handleUmkmStep3Submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
-
-    if (!umkmPhotoName && !umkmDocName) {
-      setErrorMsg('Mohon unggah minimal foto tempat/produk usaha atau dokumen pendukung usaha.');
-      return;
-    }
-
     setUmkmSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUmkmPhotoName(file.name);
-    setErrorMsg('');
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          setUmkmPhotoPreview(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setUmkmPhotoPreview(null);
-    }
-  };
-
-  const handleDocFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUmkmDocName(file.name);
-    setErrorMsg('');
   };
 
   return (
@@ -380,9 +322,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     ? 'Pendaftaran usaha berhasil dikirim'
                     : umkmStep === 1
                     ? 'Data pemilik atau penanggung jawab usaha'
-                    : umkmStep === 2
-                    ? 'Identitas nama, kategori, dan alamat usaha'
-                    : 'Unggah foto & dokumen pendukung usaha'
+                    : 'Identitas nama, kategori, dan alamat usaha'
                   : registerStep === 1
                   ? 'Masukkan nomor telepon aktif Anda'
                   : registerStep === 2
@@ -786,14 +726,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       <span className="text-stone-400">Lokasi Usaha:</span>{' '}
                       <span>{umkmAddress}, {umkmDistrict}</span>
                     </p>
-                    <p>
-                      <span className="text-stone-400">Dokumen Terlampir:</span>{' '}
-                      <span>
-                        {[umkmPhotoName && `Foto: ${umkmPhotoName}`, umkmDocName && `${umkmDocType}: ${umkmDocName}`]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </span>
-                    </p>
                   </div>
 
                   <button
@@ -891,8 +823,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
-              ) : umkmStep === 2 ? (
-                /* -------- UMKM PAGE 2: IDENTITAS USAHA BAGIAN 1 (NAMA, KATEGORI & ALAMAT) -------- */
+              ) : (
+                /* -------- UMKM PAGE 2: IDENTITAS USAHA (NAMA, KATEGORI & ALAMAT) -------- */
                 <form onSubmit={handleUmkmStep2Submit} className="space-y-4">
                   <div className="space-y-1">
                     <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
@@ -998,144 +930,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       onClick={() => {
                         setErrorMsg('');
                         setUmkmStep(1);
-                      }}
-                      className="h-12 px-4 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
-                    >
-                      Kembali
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-                    >
-                      <span>Lanjut ke Dokumen Usaha</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                /* -------- UMKM PAGE 3: IDENTITAS USAHA BAGIAN 2 (FOTO & DOKUMEN PENDUKUNG) -------- */
-                <form onSubmit={handleUmkmStep3Submit} className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
-                      Foto & Dokumen Pendukung Usaha
-                    </h2>
-                    <p className="text-xs text-stone-500 leading-relaxed">
-                      Unggah foto tempat usaha/produk beserta dokumen pendukung untuk verifikasi mitra UMKM SisaPiring.
-                    </p>
-                  </div>
-
-                  {/* Upload Foto Tempat Usaha / Produk */}
-                  <div>
-                    <label className="block text-xs font-medium text-stone-700 mb-1.5">
-                      Foto Tempat Usaha / Etalase Produk
-                    </label>
-                    <label
-                      htmlFor="umkm-photo-upload"
-                      className="flex flex-col items-center justify-center border-2 border-dashed border-stone-300 hover:border-[#1F281A] bg-white rounded-xl p-4 text-center cursor-pointer transition-colors"
-                    >
-                      {umkmPhotoPreview ? (
-                        <div className="space-y-2 w-full">
-                          <img
-                            src={umkmPhotoPreview}
-                            alt="Preview Foto Usaha"
-                            className="w-full h-32 object-cover rounded-lg border border-stone-200"
-                          />
-                          <p className="text-xs font-medium text-[#1F281A] truncate">
-                            {umkmPhotoName}
-                          </p>
-                          <span className="inline-block text-[11px] text-stone-500 underline">
-                            Ganti foto usaha
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="space-y-1.5 py-2">
-                          <div className="w-9 h-9 rounded-xl bg-stone-200/70 text-stone-700 flex items-center justify-center mx-auto">
-                            <ImageIcon className="w-4 h-4" />
-                          </div>
-                          <p className="text-xs font-semibold text-stone-800">
-                            {umkmPhotoName || 'Klik untuk unggah foto tampak depan toko / produk'}
-                          </p>
-                          <p className="text-[11px] text-stone-500">
-                            Format JPG, PNG, atau WEBP (Maks. 5MB)
-                          </p>
-                        </div>
-                      )}
-                      <input
-                        id="umkm-photo-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoFileChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-
-                  {/* Pilih & Upload Dokumen Pendukung */}
-                  <div className="space-y-2.5">
-                    <div>
-                      <label
-                        htmlFor="umkm-doc-type"
-                        className="block text-xs font-medium text-stone-700 mb-1"
-                      >
-                        Jenis Dokumen Pendukung Usaha
-                      </label>
-                      <select
-                        id="umkm-doc-type"
-                        value={umkmDocType}
-                        onChange={(e) => setUmkmDocType(e.target.value)}
-                        className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
-                      >
-                        {UMKM_DOC_TYPES.map((doc) => (
-                          <option key={doc} value={doc}>
-                            {doc}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <label
-                      htmlFor="umkm-doc-upload"
-                      className="flex items-center justify-between gap-3 border border-stone-300 hover:border-[#1F281A] bg-white rounded-xl px-3.5 py-3 cursor-pointer transition-colors"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-950/10 text-[#1F281A] flex items-center justify-center shrink-0">
-                          <FileText className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold text-stone-800 truncate">
-                            {umkmDocName || `Unggah ${umkmDocType}`}
-                          </p>
-                          <p className="text-[11px] text-stone-500">
-                            Foto dokumen atau PDF
-                          </p>
-                        </div>
-                      </div>
-                      <span className="px-2.5 py-1.5 rounded-lg bg-white border border-stone-300 text-[11px] font-semibold text-stone-700 shrink-0 inline-flex items-center gap-1">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>Pilih File</span>
-                      </span>
-                      <input
-                        id="umkm-doc-upload"
-                        type="file"
-                        accept="image/*,.pdf"
-                        onChange={handleDocFileChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-
-                  {errorMsg && (
-                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
-                      {errorMsg}
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setErrorMsg('');
-                        setUmkmStep(2);
                       }}
                       className="h-12 px-4 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
                     >

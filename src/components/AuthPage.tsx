@@ -309,25 +309,25 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 {mode === 'login'
                   ? 'Masuk ke SisaPiring'
                   : mode === 'register-umkm'
-                  ? 'Pendaftaran Mitra UMKM'
-                  : registerStep === 3
-                  ? 'Atur Alamat Default'
-                  : 'Daftar Akun SisaPiring'}
+                    ? 'Pendaftaran Mitra UMKM'
+                    : registerStep === 3
+                      ? 'Atur Alamat Default'
+                      : 'Daftar Akun SisaPiring'}
               </h1>
               <p className="text-[11px] sm:text-xs text-stone-500">
                 {mode === 'login'
                   ? 'Masukkan nama/email dan kata sandi Anda'
                   : mode === 'register-umkm'
-                  ? umkmSubmitted
-                    ? 'Pendaftaran usaha berhasil dikirim'
-                    : umkmStep === 1
-                    ? 'Data pemilik atau penanggung jawab usaha'
-                    : 'Identitas nama, kategori, dan alamat usaha'
-                  : registerStep === 1
-                  ? 'Masukkan nomor telepon aktif Anda'
-                  : registerStep === 2
-                  ? 'Lengkapi nama, email, dan kata sandi akun'
-                  : 'Simpan alamat default Bandung Anda'}
+                    ? umkmSubmitted
+                      ? 'Pendaftaran usaha berhasil dikirim'
+                      : umkmStep === 1
+                        ? 'Data pemilik atau penanggung jawab usaha'
+                        : 'Identitas nama, kategori, dan alamat usaha'
+                    : registerStep === 1
+                      ? 'Masukkan nomor telepon aktif Anda'
+                      : registerStep === 2
+                        ? 'Lengkapi nama, email, dan kata sandi akun'
+                        : 'Simpan alamat default Bandung Anda'}
               </p>
             </div>
           </div>
@@ -338,614 +338,614 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 sm:py-12">
         <div className="w-full max-w-md space-y-3.5">
           <div className="bg-white border border-stone-200/90 rounded-2xl shadow-xs overflow-hidden">
-          {mode === 'login' ? (
-            /* ================= LOGIN PAGE: DIRECT NAMA/EMAIL & PASSWORD ================= */
-            <form onSubmit={handleLoginSubmit} className="p-5 sm:p-7 space-y-4">
-              <div className="space-y-1">
-                <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
-                  Selamat Datang Kembali
-                </h2>
-                <p className="text-xs text-stone-500 leading-relaxed">
-                  Masukkan email terdaftar beserta kata sandi Anda untuk langsung masuk.
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="login-identifier"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="login-identifier"
-                    type="email"
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    placeholder="nama@email.com"
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                  />
+            {mode === 'login' ? (
+              /* ================= LOGIN PAGE: DIRECT NAMA/EMAIL & PASSWORD ================= */
+              <form onSubmit={handleLoginSubmit} className="p-5 sm:p-7 space-y-4">
+                <div className="space-y-1">
+                  <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
+                    Selamat Datang Kembali
+                  </h2>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Masukkan email terdaftar beserta kata sandi Anda untuk langsung masuk.
+                  </p>
                 </div>
-              </div>
 
-              <div>
-                <label
-                  htmlFor="login-password"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Kata Sandi
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="login-password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="Masukkan kata sandi"
-                    className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
-                    aria-label="Tampilkan kata sandi"
+                <div>
+                  <label
+                    htmlFor="login-identifier"
+                    className="block text-xs font-medium text-stone-700 mb-1"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
+                    Email
+                  </label>
+                  <div className="relative">
+                    <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="login-identifier"
+                      type="email"
+                      value={loginIdentifier}
+                      onChange={(e) => setLoginIdentifier(e.target.value)}
+                      placeholder="nama@email.com"
+                      className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {errorMsg && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
-                  {errorMsg}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-wait"
-              >
-                {isSubmitting ? 'Memproses...' : 'Masuk Sekarang'}
-              </button>
-
-              <div className="pt-2 border-t border-stone-100 text-center">
-                <p className="text-xs text-stone-600">
-                  Belum punya akun SisaPiring?{' '}
-                  <button
-                    type="button"
-                    onClick={() => switchMode('register')}
-                    className="font-semibold text-[#1F281A] underline underline-offset-2 cursor-pointer"
+                <div>
+                  <label
+                    htmlFor="login-password"
+                    className="block text-xs font-medium text-stone-700 mb-1"
                   >
-                    Daftar di sini
-                  </button>
-                </p>
-              </div>
-            </form>
-          ) : mode === 'register' && registerStep === 1 ? (
-            /* ================= REGISTER PAGE 1: ISI NOMOR TELEPON ================= */
-            <form onSubmit={handleStep1PhoneSubmit} className="p-5 sm:p-7 space-y-4">
-              <div className="space-y-1">
-                <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
-                  Masukkan Nomor Telepon
-                </h2>
-                <p className="text-xs text-stone-500 leading-relaxed">
-                  Masukkan nomor telepon / WhatsApp aktif Anda untuk memulai pendaftaran akun baru.
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-phone"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Nomor Telepon / WhatsApp
-                </label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="reg-phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Contoh: 081234567890"
-                    autoFocus
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
-                  />
-                </div>
-                <p className="text-[11px] text-stone-400 mt-1.5">
-                  Nomor ini akan digunakan untuk pengiriman kode tiket pengambilan makanan UMKM.
-                </p>
-              </div>
-
-              {errorMsg && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
-                  {errorMsg}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-              >
-                <span>Lanjut</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <div className="pt-2 border-t border-stone-100 text-center">
-                <p className="text-xs text-stone-600">
-                  Sudah punya akun?{' '}
-                  <button
-                    type="button"
-                    onClick={() => switchMode('login')}
-                    className="font-semibold text-[#1F281A] underline underline-offset-2 cursor-pointer"
-                  >
-                    Login di sini
-                  </button>
-                </p>
-              </div>
-            </form>
-          ) : mode === 'register' && registerStep === 2 ? (
-            /* ================= REGISTER PAGE 2: ISI NAMA, EMAIL & KATA SANDI ================= */
-            <form onSubmit={handleStep2AccountSubmit} className="p-5 sm:p-7 space-y-4">
-              <div className="space-y-1">
-                <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
-                  Lengkapi Profil & Kata Sandi
-                </h2>
-                <p className="text-xs text-stone-500 leading-relaxed">
-                  Isi nama lengkap, alamat email, dan buat kata sandi untuk akun SisaPiring Anda.
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-name"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Nama Lengkap
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="reg-name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Contoh: Nabil Rachman"
-                    autoFocus
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-email"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Alamat Email
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="reg-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Contoh: nama@email.com"
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-password"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Kata Sandi
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="reg-password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Minimal 6 karakter"
-                    className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
-                    aria-label="Tampilkan kata sandi"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-confirm-password"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Konfirmasi Kata Sandi
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="reg-confirm-password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Ulangi kata sandi"
-                    className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                  />
-                </div>
-              </div>
-
-              {errorMsg && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
-                  {errorMsg}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-              >
-                <span>Daftarkan Akun</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
-          ) : mode === 'register' ? (
-            /* ================= REGISTER PAGE 3: ISI ALAMAT DEFAULT (FULL ADDRESS CARD) ================= */
-            <form onSubmit={handleStep3AddressSubmit} className="p-5 sm:p-7 space-y-4">
-              <div className="space-y-1">
-                <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
-                  Atur Alamat Default
-                </h2>
-                <p className="text-xs text-stone-500 leading-relaxed">
-                  Alamat ini digunakan sebagai lokasi utama Anda saat memesan paket penyelamatan makanan UMKM Bandung.
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-district"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Kecamatan di Kota Bandung
-                </label>
-                <select
-                  id="reg-district"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full h-11 px-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
-                >
-                  {BANDUNG_DISTRICTS.map((d) => (
-                    <option key={d} value={d}>
-                      {d}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-street"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Alamat Lengkap (Nama Jalan, No. Rumah / Kos, RT/RW)
-                </label>
-                <div className="relative">
-                  <MapPin className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5 pointer-events-none" />
-                  <textarea
-                    id="reg-street"
-                    rows={3}
-                    value={streetAddress}
-                    onChange={(e) => setStreetAddress(e.target.value)}
-                    placeholder="Contoh: Jl. Tubagus Ismail Dalam No. 14, RT 02 / RW 05"
-                    autoFocus
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="reg-landmark"
-                  className="block text-xs font-medium text-stone-700 mb-1"
-                >
-                  Detail Patokan Lokasi (Opsional)
-                </label>
-                <input
-                  id="reg-landmark"
-                  type="text"
-                  value={addressLandmark}
-                  onChange={(e) => setAddressLandmark(e.target.value)}
-                  placeholder="Contoh: Pagar hitam sebelah warkop"
-                  className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                />
-              </div>
-
-              {errorMsg && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
-                  {errorMsg}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full h-12 bg-[#f89254] hover:bg-[#e57d3d] active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-wait"
-              >
-                {isSubmitting ? 'Mendaftarkan...' : 'Simpan Alamat Default & Mulai Belanja'}
-              </button>
-            </form>
-          ) : (
-            /* ================= REGISTER UMKM VIEW (3 SEQUENTIAL PAGES) ================= */
-            <div className="p-5 sm:p-7 space-y-4">
-              {umkmSubmitted ? (
-                <div className="py-3 text-center space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <h2 className="text-base sm:text-lg font-bold text-stone-900 font-display">
-                      Pendaftaran UMKM "{umkmStoreName}" Diterima!
-                    </h2>
-                    <p className="text-xs text-stone-600 leading-relaxed">
-                      Terima kasih, <strong>{umkmOwnerName}</strong>. Tim verifikasi mitra SisaPiring Bandung akan menghubungi nomor <strong>{umkmPhone}</strong> dan email <strong>{umkmEmail}</strong>.
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-stone-200 rounded-xl p-3.5 text-left space-y-1.5 text-xs text-stone-700">
-                    <p>
-                      <span className="text-stone-400">Penanggung Jawab:</span>{' '}
-                      <strong className="text-stone-900">{umkmOwnerName}</strong>
-                    </p>
-                    <p>
-                      <span className="text-stone-400">Nama & Kategori Usaha:</span>{' '}
-                      <strong className="text-stone-900">{umkmStoreName}</strong> ({umkmCategory})
-                    </p>
-                    <p>
-                      <span className="text-stone-400">Lokasi Usaha:</span>{' '}
-                      <span>{umkmAddress}, {umkmDistrict}</span>
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => switchMode('login')}
-                    className="w-full h-11 bg-[#1F281A] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
-                  >
-                    Kembali ke Halaman Login
-                  </button>
-                </div>
-              ) : umkmStep === 1 ? (
-                /* -------- UMKM PAGE 1: NAMA PEMILIK, NOMOR TELEPON AKTIF & EMAIL -------- */
-                <form onSubmit={handleUmkmStep1Submit} className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
-                      Data Pemilik / Penanggung Jawab
-                    </h2>
-                    <p className="text-xs text-stone-500 leading-relaxed">
-                      Lengkapi identitas pemilik atau penanggung jawab beserta kontak aktif untuk proses verifikasi mitra UMKM.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="umkm-owner"
-                      className="block text-xs font-medium text-stone-700 mb-1"
-                    >
-                      Nama Pemilik atau Penanggung Jawab
-                    </label>
-                    <div className="relative">
-                      <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      <input
-                        id="umkm-owner"
-                        type="text"
-                        value={umkmOwnerName}
-                        onChange={(e) => setUmkmOwnerName(e.target.value)}
-                        placeholder="Contoh: Bapak Sudarto"
-                        autoFocus
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="umkm-phone"
-                      className="block text-xs font-medium text-stone-700 mb-1"
-                    >
-                      Nomor Telepon / WhatsApp Aktif
-                    </label>
-                    <div className="relative">
-                      <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      <input
-                        id="umkm-phone"
-                        type="tel"
-                        value={umkmPhone}
-                        onChange={(e) => setUmkmPhone(e.target.value)}
-                        placeholder="Contoh: 081234567890"
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="umkm-email"
-                      className="block text-xs font-medium text-stone-700 mb-1"
-                    >
-                      Alamat Email Aktif
-                    </label>
-                    <div className="relative">
-                      <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      <input
-                        id="umkm-email"
-                        type="email"
-                        value={umkmEmail}
-                        onChange={(e) => setUmkmEmail(e.target.value)}
-                        placeholder="Contoh: pemilik@usahaumkm.com"
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {errorMsg && (
-                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
-                      {errorMsg}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-                  >
-                    <span>Lanjut ke Identitas Usaha</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </form>
-              ) : (
-                /* -------- UMKM PAGE 2: IDENTITAS USAHA (NAMA, KATEGORI & ALAMAT) -------- */
-                <form onSubmit={handleUmkmStep2Submit} className="space-y-4">
-                  <div className="space-y-1">
-                    <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
-                      Identitas & Lokasi Usaha
-                    </h2>
-                    <p className="text-xs text-stone-500 leading-relaxed">
-                      Masukkan nama usaha kuliner, kategori usaha, serta alamat lengkap lokasi operasional di Bandung.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="umkm-store-name"
-                      className="block text-xs font-medium text-stone-700 mb-1"
-                    >
-                      Nama Usaha
-                    </label>
-                    <div className="relative">
-                      <Store className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      <input
-                        id="umkm-store-name"
-                        type="text"
-                        value={umkmStoreName}
-                        onChange={(e) => setUmkmStoreName(e.target.value)}
-                        placeholder="Contoh: Martabak Legit Burangrang"
-                        autoFocus
-                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="umkm-category"
-                      className="block text-xs font-medium text-stone-700 mb-1"
-                    >
-                      Kategori Usaha
-                    </label>
-                    <select
-                      id="umkm-category"
-                      value={umkmCategory}
-                      onChange={(e) => setUmkmCategory(e.target.value)}
-                      className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
-                    >
-                      {UMKM_BUSINESS_CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="umkm-district"
-                      className="block text-xs font-medium text-stone-700 mb-1"
-                    >
-                      Kecamatan Usaha di Kota Bandung
-                    </label>
-                    <select
-                      id="umkm-district"
-                      value={umkmDistrict}
-                      onChange={(e) => setUmkmDistrict(e.target.value)}
-                      className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
-                    >
-                      {BANDUNG_DISTRICTS.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="umkm-address"
-                      className="block text-xs font-medium text-stone-700 mb-1"
-                    >
-                      Alamat Lengkap Usaha
-                    </label>
-                    <div className="relative">
-                      <MapPin className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5 pointer-events-none" />
-                      <textarea
-                        id="umkm-address"
-                        rows={3}
-                        value={umkmAddress}
-                        onChange={(e) => setUmkmAddress(e.target.value)}
-                        placeholder="Contoh: Jl. Burangrang No. 34, Seberang SMA 7 Bandung"
-                        className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {errorMsg && (
-                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
-                      {errorMsg}
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2.5 pt-1">
+                    Kata Sandi
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="login-password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="Masukkan kata sandi"
+                      className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    />
                     <button
                       type="button"
-                      onClick={() => {
-                        setErrorMsg('');
-                        setUmkmStep(1);
-                      }}
-                      className="h-12 px-4 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
+                      aria-label="Tampilkan kata sandi"
                     >
-                      Kembali
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
-                    >
-                      Kirim Pendaftaran UMKM
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
-                </form>
-              )}
-            </div>
-          )}
+                </div>
+
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                    {errorMsg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-wait"
+                >
+                  {isSubmitting ? 'Memproses...' : 'Masuk Sekarang'}
+                </button>
+
+                <div className="pt-2 border-t border-stone-100 text-center">
+                  <p className="text-xs text-stone-600">
+                    Belum punya akun SisaPiring?{' '}
+                    <button
+                      type="button"
+                      onClick={() => switchMode('register')}
+                      className="font-semibold text-[#1F281A] underline underline-offset-2 cursor-pointer"
+                    >
+                      Daftar di sini
+                    </button>
+                  </p>
+                </div>
+              </form>
+            ) : mode === 'register' && registerStep === 1 ? (
+              /* ================= REGISTER PAGE 1: ISI NOMOR TELEPON ================= */
+              <form onSubmit={handleStep1PhoneSubmit} className="p-5 sm:p-7 space-y-4">
+                <div className="space-y-1">
+                  <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
+                    Masukkan Nomor Telepon
+                  </h2>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Masukkan nomor telepon / WhatsApp aktif Anda untuk memulai pendaftaran akun baru.
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-phone"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Nomor Telepon / WhatsApp
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="reg-phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Contoh: 081234567890"
+                      autoFocus
+                      className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
+                    />
+                  </div>
+                  <p className="text-[11px] text-stone-400 mt-1.5">
+                    Nomor ini akan digunakan untuk pengiriman kode tiket pengambilan makanan UMKM.
+                  </p>
+                </div>
+
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                    {errorMsg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                >
+                  <span>Lanjut</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <div className="pt-2 border-t border-stone-100 text-center">
+                  <p className="text-xs text-stone-600">
+                    Sudah punya akun?{' '}
+                    <button
+                      type="button"
+                      onClick={() => switchMode('login')}
+                      className="font-semibold text-[#1F281A] underline underline-offset-2 cursor-pointer"
+                    >
+                      Login di sini
+                    </button>
+                  </p>
+                </div>
+              </form>
+            ) : mode === 'register' && registerStep === 2 ? (
+              /* ================= REGISTER PAGE 2: ISI NAMA, EMAIL & KATA SANDI ================= */
+              <form onSubmit={handleStep2AccountSubmit} className="p-5 sm:p-7 space-y-4">
+                <div className="space-y-1">
+                  <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
+                    Lengkapi Profil & Kata Sandi
+                  </h2>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Isi nama lengkap, alamat email, dan buat kata sandi untuk akun SisaPiring Anda.
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-name"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Nama Lengkap
+                  </label>
+                  <div className="relative">
+                    <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="reg-name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Contoh: Nabil Rachman"
+                      autoFocus
+                      className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-email"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Alamat Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="reg-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Contoh: nama@email.com"
+                      className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-password"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Kata Sandi
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="reg-password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Minimal 6 karakter"
+                      className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
+                      aria-label="Tampilkan kata sandi"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-confirm-password"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Konfirmasi Kata Sandi
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      id="reg-confirm-password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Ulangi kata sandi"
+                      className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                    {errorMsg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                >
+                  <span>Daftarkan Akun</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+            ) : mode === 'register' ? (
+              /* ================= REGISTER PAGE 3: ISI ALAMAT DEFAULT (FULL ADDRESS CARD) ================= */
+              <form onSubmit={handleStep3AddressSubmit} className="p-5 sm:p-7 space-y-4">
+                <div className="space-y-1">
+                  <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
+                    Atur Alamat Default
+                  </h2>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Alamat ini digunakan sebagai lokasi utama Anda saat memesan paket penyelamatan makanan UMKM Bandung.
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-district"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Kecamatan di Kota Bandung
+                  </label>
+                  <select
+                    id="reg-district"
+                    value={district}
+                    onChange={(e) => setDistrict(e.target.value)}
+                    className="w-full h-11 px-3 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
+                  >
+                    {BANDUNG_DISTRICTS.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-street"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Alamat Lengkap (Nama Jalan, No. Rumah / Kos, RT/RW)
+                  </label>
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5 pointer-events-none" />
+                    <textarea
+                      id="reg-street"
+                      rows={3}
+                      value={streetAddress}
+                      onChange={(e) => setStreetAddress(e.target.value)}
+                      placeholder="Contoh: Jl. Tubagus Ismail Dalam No. 14, RT 02 / RW 05"
+                      autoFocus
+                      className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-landmark"
+                    className="block text-xs font-medium text-stone-700 mb-1"
+                  >
+                    Detail Patokan Lokasi (Opsional)
+                  </label>
+                  <input
+                    id="reg-landmark"
+                    type="text"
+                    value={addressLandmark}
+                    onChange={(e) => setAddressLandmark(e.target.value)}
+                    placeholder="Contoh: Pagar hitam sebelah warkop"
+                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                  />
+                </div>
+
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                    {errorMsg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-12 bg-[#f89254] hover:bg-[#e57d3d] active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-wait"
+                >
+                  {isSubmitting ? 'Mendaftarkan...' : 'Simpan Alamat Default & Mulai Belanja'}
+                </button>
+              </form>
+            ) : (
+              /* ================= REGISTER UMKM VIEW (3 SEQUENTIAL PAGES) ================= */
+              <div className="p-5 sm:p-7 space-y-4">
+                {umkmSubmitted ? (
+                  <div className="py-3 text-center space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <h2 className="text-base sm:text-lg font-bold text-stone-900 font-display">
+                        Pendaftaran UMKM "{umkmStoreName}" Diterima!
+                      </h2>
+                      <p className="text-xs text-stone-600 leading-relaxed">
+                        Terima kasih, <strong>{umkmOwnerName}</strong>. Tim verifikasi mitra SisaPiring Bandung akan menghubungi nomor <strong>{umkmPhone}</strong> dan email <strong>{umkmEmail}</strong>.
+                      </p>
+                    </div>
+
+                    <div className="bg-white border border-stone-200 rounded-xl p-3.5 text-left space-y-1.5 text-xs text-stone-700">
+                      <p>
+                        <span className="text-stone-400">Penanggung Jawab:</span>{' '}
+                        <strong className="text-stone-900">{umkmOwnerName}</strong>
+                      </p>
+                      <p>
+                        <span className="text-stone-400">Nama & Kategori Usaha:</span>{' '}
+                        <strong className="text-stone-900">{umkmStoreName}</strong> ({umkmCategory})
+                      </p>
+                      <p>
+                        <span className="text-stone-400">Lokasi Usaha:</span>{' '}
+                        <span>{umkmAddress}, {umkmDistrict}</span>
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => switchMode('login')}
+                      className="w-full h-11 bg-[#1F281A] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                    >
+                      Kembali ke Halaman Login
+                    </button>
+                  </div>
+                ) : umkmStep === 1 ? (
+                  /* -------- UMKM PAGE 1: NAMA PEMILIK, NOMOR TELEPON AKTIF & EMAIL -------- */
+                  <form onSubmit={handleUmkmStep1Submit} className="space-y-4">
+                    <div className="space-y-1">
+                      <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
+                        Data Pemilik / Penanggung Jawab
+                      </h2>
+                      <p className="text-xs text-stone-500 leading-relaxed">
+                        Lengkapi identitas pemilik atau penanggung jawab beserta kontak aktif untuk proses verifikasi mitra UMKM.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="umkm-owner"
+                        className="block text-xs font-medium text-stone-700 mb-1"
+                      >
+                        Nama Pemilik atau Penanggung Jawab
+                      </label>
+                      <div className="relative">
+                        <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          id="umkm-owner"
+                          type="text"
+                          value={umkmOwnerName}
+                          onChange={(e) => setUmkmOwnerName(e.target.value)}
+                          placeholder="Contoh: Bapak Sudarto"
+                          autoFocus
+                          className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="umkm-phone"
+                        className="block text-xs font-medium text-stone-700 mb-1"
+                      >
+                        Nomor Telepon / WhatsApp Aktif
+                      </label>
+                      <div className="relative">
+                        <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          id="umkm-phone"
+                          type="tel"
+                          value={umkmPhone}
+                          onChange={(e) => setUmkmPhone(e.target.value)}
+                          placeholder="Contoh: 081234567890"
+                          className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="umkm-email"
+                        className="block text-xs font-medium text-stone-700 mb-1"
+                      >
+                        Alamat Email Aktif
+                      </label>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          id="umkm-email"
+                          type="email"
+                          value={umkmEmail}
+                          onChange={(e) => setUmkmEmail(e.target.value)}
+                          placeholder="Contoh: pemilik@usahaumkm.com"
+                          className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {errorMsg && (
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                        {errorMsg}
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      className="w-full h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                    >
+                      <span>Lanjut ke Identitas Usaha</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </form>
+                ) : (
+                  /* -------- UMKM PAGE 2: IDENTITAS USAHA (NAMA, KATEGORI & ALAMAT) -------- */
+                  <form onSubmit={handleUmkmStep2Submit} className="space-y-4">
+                    <div className="space-y-1">
+                      <h2 className="text-lg sm:text-xl font-bold text-stone-900 font-display">
+                        Identitas & Lokasi Usaha
+                      </h2>
+                      <p className="text-xs text-stone-500 leading-relaxed">
+                        Masukkan nama usaha kuliner, kategori usaha, serta alamat lengkap lokasi operasional di Bandung.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="umkm-store-name"
+                        className="block text-xs font-medium text-stone-700 mb-1"
+                      >
+                        Nama Usaha
+                      </label>
+                      <div className="relative">
+                        <Store className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          id="umkm-store-name"
+                          type="text"
+                          value={umkmStoreName}
+                          onChange={(e) => setUmkmStoreName(e.target.value)}
+                          placeholder="Contoh: Martabak Legit Burangrang"
+                          autoFocus
+                          className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="umkm-category"
+                        className="block text-xs font-medium text-stone-700 mb-1"
+                      >
+                        Kategori Usaha
+                      </label>
+                      <select
+                        id="umkm-category"
+                        value={umkmCategory}
+                        onChange={(e) => setUmkmCategory(e.target.value)}
+                        className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
+                      >
+                        {UMKM_BUSINESS_CATEGORIES.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="umkm-district"
+                        className="block text-xs font-medium text-stone-700 mb-1"
+                      >
+                        Kecamatan Usaha di Kota Bandung
+                      </label>
+                      <select
+                        id="umkm-district"
+                        value={umkmDistrict}
+                        onChange={(e) => setUmkmDistrict(e.target.value)}
+                        className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white cursor-pointer"
+                      >
+                        {BANDUNG_DISTRICTS.map((d) => (
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="umkm-address"
+                        className="block text-xs font-medium text-stone-700 mb-1"
+                      >
+                        Alamat Lengkap Usaha
+                      </label>
+                      <div className="relative">
+                        <MapPin className="w-4 h-4 text-stone-400 absolute left-3.5 top-3.5 pointer-events-none" />
+                        <textarea
+                          id="umkm-address"
+                          rows={3}
+                          value={umkmAddress}
+                          onChange={(e) => setUmkmAddress(e.target.value)}
+                          placeholder="Contoh: Jl. Burangrang No. 34, Seberang SMA 7 Bandung"
+                          className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {errorMsg && (
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                        {errorMsg}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setErrorMsg('');
+                          setUmkmStep(1);
+                        }}
+                        className="h-12 px-4 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                      >
+                        Kembali
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex-1 h-12 bg-[#1F281A] hover:bg-emerald-900 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
+                      >
+                        Kirim Pendaftaran UMKM
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
           </div>
 
           {/* TOMBOL "DAFTAR UMKM" DI BAWAH CARD LOGIN */}

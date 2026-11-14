@@ -5,6 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+
         <title>SisaPiring | Penyelamat Kuliner UMKM (Konsumen, Mitra UMKM & Admin)</title>
         <meta name="description" content="Platform penyelamatan makanan sisa piring UMKM: Marketplace Konsumen, Portal Mitra Bisnis Bandung, dan Pusat Tata Kelola Admin.">
         <meta property="og:title" content="SisaPiring — Penyelamat Kuliner UMKM">

@@ -2722,9 +2722,13 @@ function CustomerAndAdminPortal() {
         </nav>
       )}
 
-      {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE - HANYA DI DALAM APLIKASI PEMESANAN) */}
-      {activePage !== 'landing' && activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* FLOATING ACTION BUTTONS: KANTONG (DI ATAS) & AI BOT (DI BAWAH) */}
+      {activePage !== 'admin' && activePage !== 'auth' && (
         <FloatingChatButton
+          totalCartItems={totalCartItems}
+          onOpenCart={openCartPage}
+          showCart={activePage !== 'kantong' && activePage !== 'kantong-confirmation'}
+          showBot={activePage !== 'chat-bot' && activePage !== 'chat'}
           onOpenChatBot={openChatBotPage}
         />
       )}

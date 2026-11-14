@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, User } from 'lucide-react';
+import { User } from 'lucide-react';
 
 export type UserPage =
   | 'landing'
@@ -16,19 +16,19 @@ export type UserPage =
 
 interface UserNavbarProps {
   activePage: UserPage;
-  totalCartItems: number;
+  totalCartItems?: number;
   currentUserName?: string | null;
   onGoHome: () => void;
-  onGoCart: () => void;
+  onGoCart?: () => void;
   onGoAuth: () => void;
 }
 
 export const UserNavbar: React.FC<UserNavbarProps> = ({
-  activePage,
-  totalCartItems,
+  activePage: _activePage,
+  totalCartItems: _totalCartItems,
   currentUserName,
   onGoHome,
-  onGoCart,
+  onGoCart: _onGoCart,
   onGoAuth,
 }) => {
   return (
@@ -55,28 +55,8 @@ export const UserNavbar: React.FC<UserNavbarProps> = ({
           </span>
         </button>
 
-        {/* Kanan: Cart + Profile */}
+        {/* Kanan: Profile / Login */}
         <div className="flex-1 flex items-center justify-end gap-2">
-          {/* Keranjang */}
-          {activePage !== 'landing' && (
-            <button
-              type="button"
-              onClick={onGoCart}
-              aria-label={`Kantong Belanja (${totalCartItems} item)`}
-              className={`relative w-9 h-9 inline-flex items-center justify-center border rounded-xl transition-colors cursor-pointer ${
-                activePage === 'kantong' || activePage === 'kantong-confirmation'
-                  ? 'bg-white/30 border-[#8da249]'
-                  : 'bg-white/10 border-white/25 hover:bg-white/20'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4 text-[#8da249]" />
-              {totalCartItems > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold flex items-center justify-center">
-                  {totalCartItems}
-                </span>
-              )}
-            </button>
-          )}
 
           {/* Profile / Login */}
           {currentUserName ? (

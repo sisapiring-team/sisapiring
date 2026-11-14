@@ -100,7 +100,7 @@ export const Footer: React.FC<FooterProps> = ({
         >
           <button
             type="button"
-            onClick={onNavigateHome ? onNavigateHome : scrollToTop}
+            onClick={onNavigateHome ? onNavigateHome : () => scrollToTop()}
             className="hover:text-[#8DA249] transition-colors cursor-pointer"
           >
             Beranda
@@ -196,7 +196,7 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="flex justify-center items-center text-center">
           <button
             type="button"
-            onClick={scrollToTop}
+            onClick={() => scrollToTop()}
             className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-[#8DA249] text-stone-200 hover:text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
             aria-label="Kembali ke bagian atas halaman"
           >

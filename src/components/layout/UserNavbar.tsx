@@ -41,15 +41,17 @@ export const UserNavbar: React.FC<UserNavbarProps> = ({
         <button
           type="button"
           onClick={onGoHome}
-          className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 cursor-pointer"
+          className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
           aria-label="Ke halaman beranda"
         >
           <img
             src="/assets/images/logo_full.png"
             alt="Logo SisaPiring"
-            className="w-8 h-8 rounded-lg object-cover shrink-0"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover shrink-0 transition-transform group-hover:scale-105 shadow-xs"
           />
-          <span className="text-base font-bold tracking-tight text-white">SisaPiring</span>
+          <span className="text-xl sm:text-2xl font-bold tracking-tight text-white group-hover:text-stone-100 transition-colors">
+            SisaPiring
+          </span>
         </button>
 
         {/* Kanan: Cart + Profile */}

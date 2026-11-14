@@ -4,6 +4,7 @@ import { ToastContainer } from './components/common/ToastContainer';
 import { SellerSidebar } from './components/layout/SellerSidebar';
 import { SellerHeader } from './components/layout/SellerHeader';
 import { MobileNav } from './components/layout/MobileNav';
+import { UserNavbar } from './components/layout/UserNavbar';
 
 // Seller Views
 import { SellerDashboardView } from './components/dashboard/SellerDashboardView';
@@ -89,20 +90,18 @@ import {
 import { MarketplaceDisplayPage } from './components/MarketplaceDisplayPage';
 import { StoreCatalogPage } from './components/StoreCatalogPage';
 import { AuthPage, UserAccount } from './components/AuthPage';
-import { fetchCatalog, fetchMe, logoutRemote } from './lib/api';
+import { fetchCatalog, fetchMe, getStoredRole, getStoredUser, logoutRemote } from './lib/api';
 import { AdminDashboardPage } from './components/AdminDashboardPage';
+import { AdminLoginGate } from './components/admin/AdminLoginGate';
 import { ChatContainerPage } from './components/chat/ChatContainerPage';
 import { FloatingChatButton } from './components/chat/FloatingChatButton';
 import { BotChatView } from './components/chat/BotChatView';
 import { parseRoute, pushRoute } from './utils/navigation';
+import { checkRoleRouteAccess } from './utils/authGuard';
 import { Footer } from './components/Footer';
 import { FoodWasteFunFacts } from './components/FoodWasteFunFacts';
 import { useSmoothScrollArea } from './hooks/useSmoothScrollArea';
-import {
-  resizeSmoothScroll,
-  scrollToElement,
-  scrollToTop,
-} from './lib/smoothScroll';
+import { scrollToElement, scrollToTop } from './lib/smoothScroll';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -142,17 +141,41 @@ function CustomerAndAdminPortal() {
     setVerificationStatus,
     refreshRemoteData,
   } = useApp();
-  // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot')
+
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    const stored = getStoredUser();
+    if (stored) {
+      return {
+        name: stored.name,
+        email: stored.email,
+        phone: stored.phone || '081234567890',
+        role: stored.role,
+        district: stored.district || 'Coblong (Dago / Dipatiukur)',
+        defaultAddress: stored.defaultAddress || '',
+      };
+    }
+    return null;
+  });
+
+  // Active Page View ('admin' | 'etalase' | 'landing' | 'kantong' | 'kantong-confirmation' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot')
   const [activePage, setActivePage] = useState<
-    'admin' | 'landing' | 'etalase' | 'kantong' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'kantong-confirmation' | 'auth' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
   >(() => {
     if (typeof window !== 'undefined') {
-      const route = parseRoute(window.location.pathname);
+      const stored = getStoredUser();
+      const currentPath = window.location.pathname;
+      const guard = checkRoleRouteAccess(currentPath, stored?.role);
+      const effectivePath = guard.allowed ? currentPath : guard.redirectPath;
+      if (!guard.allowed && effectivePath !== currentPath) {
+        window.history.replaceState(null, '', effectivePath);
+      }
+      const route = parseRoute(effectivePath);
       if (route.page === 'admin') return 'admin';
       if (
         route.page === 'landing' ||
         route.page === 'etalase' ||
         route.page === 'kantong' ||
+        route.page === 'kantong-confirmation' ||
         route.page === 'pesanan' ||
         route.page === 'history' ||
         route.page === 'store' ||
@@ -178,12 +201,19 @@ function CustomerAndAdminPortal() {
   // Synchronize state when browser Back or Forward is pressed
   useEffect(() => {
     const handlePopState = () => {
-      const route = parseRoute(window.location.pathname);
+      const stored = getStoredUser();
+      const currentPath = window.location.pathname;
+      const guard = checkRoleRouteAccess(currentPath, stored?.role);
+      const effectivePath = guard.allowed ? currentPath : guard.redirectPath;
+      if (!guard.allowed && effectivePath !== currentPath) {
+        window.history.replaceState(null, '', effectivePath);
+      }
+      const route = parseRoute(effectivePath);
       if (route.page === 'admin') {
         setActiveTab('admin');
         setActivePage('admin');
       } else if (route.page === 'penjual') {
-        // Handled in AppProvider
+        setActiveTab('dashboard');
       } else {
         setActiveTab('marketplace');
         if (route.page === 'store' && route.merchantName) {
@@ -196,6 +226,7 @@ function CustomerAndAdminPortal() {
           route.page === 'landing' ||
           route.page === 'etalase' ||
           route.page === 'kantong' ||
+          route.page === 'kantong-confirmation' ||
           route.page === 'pesanan' ||
           route.page === 'history' ||
           route.page === 'store' ||
@@ -211,15 +242,8 @@ function CustomerAndAdminPortal() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [setActiveTab]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      resizeSmoothScroll();
-    }, 120);
-    return () => clearTimeout(timer);
-  }, [activePage, activeTab]);
-
   const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
-    'admin' | 'landing' | 'etalase' | 'kantong' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
+    'admin' | 'landing' | 'etalase' | 'kantong' | 'kantong-confirmation' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
   >('etalase');
 
   const [chatTargetMerchant, setChatTargetMerchant] = useState<string | undefined>(() => {
@@ -231,6 +255,8 @@ function CustomerAndAdminPortal() {
     }
     return undefined;
   });
+
+  const [chatTargetProduct, setChatTargetProduct] = useState<SisaPiringItem | null>(null);
 
   const [selectedStoreName, setSelectedStoreName] = useState<string>(() => {
     if (typeof window !== 'undefined') {
@@ -258,7 +284,6 @@ function CustomerAndAdminPortal() {
   >('Makanan Tidak Sesuai Deskripsi');
   const [modalComplaintDesc, setModalComplaintDesc] = useState<string>('');
   const [modalComplaintFile, setModalComplaintFile] = useState<string>('');
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -329,49 +354,40 @@ function CustomerAndAdminPortal() {
     INITIAL_USER_ACCESS_LIST
   );
 
-  // Interactive Cart & Modal States
-  const [cart, setCart] = useState<CartEntry[]>([
-    { item: SISA_PIRING_CATALOG[0], quantity: 1 },
-  ]);
-  const [orders, setOrders] = useState<OrderRecord[]>([
-    {
-      orderCode: 'SP-8421',
-      createdAt: 'Hari ini · 16.40 WIB',
-      name: 'Nabil Rachman',
-      phone: '081234567890',
-      payment: 'qris',
-      totalPaid: SISA_PIRING_CATALOG[0].rescuePrice,
-      totalSaved: SISA_PIRING_CATALOG[0].originalPrice - SISA_PIRING_CATALOG[0].rescuePrice,
-      status: 'siap-diambil',
-      deliveryStage: 'perjalanan',
-      items: [{ item: SISA_PIRING_CATALOG[0], quantity: 1 }],
-    },
-    {
-      orderCode: 'SP-7109',
-      createdAt: 'Kemarin · 19.15 WIB',
-      name: 'Nabil Rachman',
-      phone: '081234567890',
-      payment: 'qris',
-      totalPaid: SISA_PIRING_CATALOG[2].rescuePrice,
-      totalSaved: SISA_PIRING_CATALOG[2].originalPrice - SISA_PIRING_CATALOG[2].rescuePrice,
-      status: 'selesai',
-      deliveryStage: 'sampai',
-      userRating: 5,
-      items: [{ item: SISA_PIRING_CATALOG[2], quantity: 1 }],
-    },
-    {
-      orderCode: 'SP-6542',
-      createdAt: '7 Nov 2026 · 18.50 WIB',
-      name: 'Nabil Rachman',
-      phone: '081234567890',
-      payment: 'cod',
-      totalPaid: SISA_PIRING_CATALOG[1].rescuePrice * 2,
-      totalSaved: (SISA_PIRING_CATALOG[1].originalPrice - SISA_PIRING_CATALOG[1].rescuePrice) * 2,
-      status: 'selesai',
-      deliveryStage: 'sampai',
-      items: [{ item: SISA_PIRING_CATALOG[1], quantity: 2 }],
-    },
-  ]);
+  // Interactive Cart & Customer Orders (Clean initial state, persisted in session)
+  const [cart, setCart] = useState<CartEntry[]>(() => {
+    try {
+      const saved = localStorage.getItem('sisapiring_customer_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [orders, setOrders] = useState<OrderRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem('sisapiring_customer_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('sisapiring_customer_cart', JSON.stringify(cart));
+    } catch (e) {
+      console.warn('Storage sync error', e);
+    }
+  }, [cart]);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('sisapiring_customer_orders', JSON.stringify(orders));
+    } catch (e) {
+      console.warn('Storage sync error', e);
+    }
+  }, [orders]);
   const [activeProductModal, setActiveProductModal] = useState<SisaPiringItem | null>(null);
   const [recentToast, setRecentToast] = useState<string | null>(null);
 
@@ -547,6 +563,12 @@ function CustomerAndAdminPortal() {
     scrollToTop();
   };
 
+  const openCartConfirmationPage = () => {
+    pushRoute('/kantong/confirmation');
+    setActivePage('kantong-confirmation');
+    scrollToTop();
+  };
+
   const openOrdersPage = () => {
     pushRoute('/pesanan');
     setActiveTab('marketplace');
@@ -561,9 +583,10 @@ function CustomerAndAdminPortal() {
     scrollToTop();
   };
 
-  const openChatPage = (merchantName?: string) => {
+  const openChatPage = (merchantName?: string, product?: SisaPiringItem) => {
     pushRoute(merchantName ? `/chat/${encodeURIComponent(merchantName)}` : '/chat');
     setChatTargetMerchant(merchantName);
+    setChatTargetProduct(product || null);
     setActiveTab('marketplace');
     setActivePage('chat');
     scrollToTop();
@@ -576,6 +599,29 @@ function CustomerAndAdminPortal() {
     scrollToTop();
   };
 
+  // Enforce role-based page boundary whenever currentUser changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const currentPath = window.location.pathname;
+    const guard = checkRoleRouteAccess(currentPath, currentUser?.role);
+    if (!guard.allowed && guard.redirectPath !== currentPath) {
+      pushRoute(guard.redirectPath);
+      const targetRoute = parseRoute(guard.redirectPath);
+      if (targetRoute.page === 'admin') {
+        setActiveTab('admin');
+        setActivePage('admin');
+      } else if (targetRoute.page === 'penjual') {
+        setActiveTab('dashboard');
+      } else {
+        setActiveTab('marketplace');
+        setActivePage(targetRoute.page === 'landing' ? 'landing' : targetRoute.page);
+      }
+      if (guard.notice) {
+        setRecentToast(guard.notice);
+      }
+    }
+  }, [currentUser, setActiveTab]);
+
   const openStorePage = (merchantName: string) => {
     pushRoute(`/toko/${encodeURIComponent(merchantName)}`);
     setSelectedStoreName(merchantName);
@@ -584,6 +630,11 @@ function CustomerAndAdminPortal() {
   };
 
   const openAdminPage = () => {
+    const role = currentUser?.role ? String(currentUser.role).toLowerCase() : null;
+    if (role && role !== 'admin') {
+      setRecentToast('Akses Dibatasi: Akun Anda tidak memiliki izin akses ke Panel Admin.');
+      return;
+    }
     pushRoute('/admin');
     setActiveTab('admin');
     setActivePage('admin');
@@ -591,12 +642,21 @@ function CustomerAndAdminPortal() {
   };
 
   const openSellerPage = (subTab?: string) => {
+    const role = currentUser?.role ? String(currentUser.role).toLowerCase() : null;
+    if (role && role !== 'seller' && role !== 'penjual' && role !== 'umkm' && role !== 'merchant') {
+      setRecentToast('Akses Dibatasi: Akun Anda adalah Pembeli dan tidak dapat mengakses Portal Penjual.');
+      return;
+    }
     pushRoute(subTab && subTab !== 'dashboard' ? `/penjual/${subTab}` : '/penjual');
     setActiveTab((subTab as any) || 'dashboard');
     scrollToTop();
   };
 
   const openAuthPage = () => {
+    if (currentUser) {
+      setRecentToast(`Anda sudah masuk sebagai ${currentUser.name}.`);
+      return;
+    }
     pushRoute('/auth');
     if (activePage !== 'auth') {
       setReturnPageAfterAuth(activePage);
@@ -605,26 +665,20 @@ function CustomerAndAdminPortal() {
     scrollToTop();
   };
 
-  const handleAuthBack = () => {
-    const target = returnPageAfterAuth || 'etalase';
-    if (target === 'landing') openLandingPage();
-    else if (target === 'kantong') openCartPage();
-    else if (target === 'pesanan') openOrdersPage();
-    else if (target === 'history') openHistoryPage();
-    else if (target === 'chat') openChatPage();
-    else if (target === 'chat-bot') openChatBotPage();
-    else if (target === 'admin') openAdminPage();
-    else openEtalasePage();
-  };
-
   const handleLogout = () => {
     void logoutRemote().catch(() => undefined);
     setCurrentUser(null);
+    setCart([]);
+    setOrders([]);
+    try {
+      localStorage.removeItem('sisapiring_customer_cart');
+      localStorage.removeItem('sisapiring_customer_orders');
+    } catch {}
     setIsAccountMenuOpen(false);
     setIsMobileNavOpen(false);
-    if (activePage === 'pesanan' || activePage === 'history') {
-      setActivePage('etalase');
-    }
+    pushRoute('/auth');
+    setActiveTab('marketplace');
+    setActivePage('auth');
     setRecentToast('Anda telah keluar dari akun.');
     window.setTimeout(() => setRecentToast(null), 2500);
   };
@@ -639,19 +693,24 @@ function CustomerAndAdminPortal() {
         phone: user.phone,
       }))
     );
-    // Ketika user pembeli berhasil login, langsung diarahkan ke menu etalase!
-    if (user.role === 'seller') {
-      openSellerPage('dashboard');
-    } else if (user.role === 'admin') {
+
+    const role = String(user.role || '').trim().toLowerCase();
+    if (role === 'admin') {
       openAdminPage();
+    } else if (
+      role === 'seller' ||
+      role === 'umkm' ||
+      role === 'penjual' ||
+      role === 'merchant'
+    ) {
+      openSellerPage();
     } else {
-      // Pembeli (buyer): langsung ke menu etalase makanan!
       openEtalasePage();
     }
 
-    setRecentToast(`Selamat datang, ${user.name}!`);
+    setRecentToast(`Selamat datang kembali, ${user.name}!`);
     window.setTimeout(() => {
-      setRecentToast(null);
+      setRecentToast((prev) => (prev?.includes(user.name) ? null : prev));
     }, 3000);
   };
 
@@ -961,309 +1020,24 @@ function CustomerAndAdminPortal() {
           : ''
       }`}
     >
-      {/* Top Navigation Bar — Hidden on Login/Register Page & Admin Workspace */}
+      {/* UserNavbar — semua page user kecuali auth & admin */}
       {activePage !== 'auth' && activePage !== 'admin' && (
-        <header className="sticky top-0 z-30 h-14 md:h-16 bg-[#1F281A] text-white border-b border-white/10 flex items-center">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2 sm:gap-4 md:gap-8 px-3 sm:px-6">
-          {/* Zone 1: Single text element wordmark */}
-          <button
-            type="button"
-            onClick={openLandingPage}
-            className="text-lg md:text-xl font-bold tracking-tight text-white font-display whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            SisaPiring
-          </button>
-
-          {/* Zone 2: Navigation Links (Desktop) */}
-          <nav
-            aria-label="Navigasi Utama"
-            className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-display font-medium text-stone-100"
-          >
-            {activePage === 'landing' ? (
-              /* ON LANDING PAGE: Only Beranda, Cara Kerja, Dampak UMKM */
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById('beranda');
-                    if (el) scrollToElement(el);
-                    else openLandingPage();
-                  }}
-                  className="text-[#8da249] font-bold underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Beranda
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigateToSection('cara-kerja')}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Cara Kerja
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigateToSection('dampak-umkm')}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Fakta Limbah Pangan
-                </button>
-              </>
-            ) : (
-              /* INSIDE APP: Etalase Makanan, Pesanan, Chat Penjual, History, Beranda, Mitra UMKM, Panel Admin */
-              <>
-                <button
-                  type="button"
-                  onClick={openEtalasePage}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'etalase' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  Etalase Makanan
-                </button>
-                <button
-                  type="button"
-                  onClick={openOrdersPage}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'pesanan' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  Pesanan
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openChatPage()}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'chat' || activePage === 'chat-bot' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  Chat Penjual
-                </button>
-                <button
-                  type="button"
-                  onClick={openHistoryPage}
-                  className={`hover:text-[#8da249] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    activePage === 'history' ? 'text-[#8da249] font-bold underline' : ''
-                  }`}
-                >
-                  History
-                </button>
-                <button
-                  type="button"
-                  onClick={openLandingPage}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Beranda
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openSellerPage()}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Mitra UMKM
-                </button>
-                <button
-                  type="button"
-                  onClick={openAdminPage}
-                  className="hover:text-[#8da249] hover:underline underline-offset-4 text-stone-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Panel Admin
-                </button>
-              </>
-            )}
-          </nav>
-
-          {/* Zone 3: Header Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {activePage === 'landing' ? (
-              /* ON LANDING PAGE: CTA button to enter app + Login/User + Hamburger */
-              <button
-                type="button"
-                onClick={openEtalasePage}
-                className="h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 bg-[#8DA249] hover:bg-[#7b8e3d] text-white shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <ShoppingBag className="w-3.5 h-3.5" />
-                <span>Mulai Pakai</span>
-              </button>
-            ) : (
-              /* INSIDE APP: Chat + Cart + Login/User + Hamburger */
-              <>
-                <button
-                  type="button"
-                  onClick={() => openChatPage()}
-                  title="Pusat Pesan & Chat Penjual"
-                  aria-label="Pusat Pesan & Chat Penjual"
-                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                    activePage === 'chat'
-                      ? 'bg-white/30 border-[#8da249]'
-                      : 'bg-white/15 border-white/25 hover:bg-white/25'
-                  }`}
-                >
-                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#f89254] ring-2 ring-[#1F281A]" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={openCartPage}
-                  aria-label={`Kantong Belanja (${totalCartItems} item)`}
-                  className={`relative w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                    activePage === 'kantong'
-                      ? 'bg-white/30 border-[#8da249]'
-                      : 'bg-white/15 border-white/25 hover:bg-white/25'
-                  }`}
-                >
-                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-                  {totalCartItems > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f89254] text-white text-[10px] font-bold font-mono-tabular flex items-center justify-center">
-                      {totalCartItems}
-                    </span>
-                  )}
-                </button>
-              </>
-            )}
-
-            {!currentUser ? (
-              <button
-                type="button"
-                onClick={openAuthPage}
-                className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border bg-white text-[#1F281A] border-white hover:bg-stone-100 shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <User className="w-3.5 h-3.5 shrink-0" />
-                <span>Login</span>
-              </button>
-            ) : (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsAccountMenuOpen((prev) => !prev)}
-                  aria-label="Menu Akun Pengguna"
-                  aria-expanded={isAccountMenuOpen}
-                  className={`w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border rounded-xl transition-colors shrink-0 cursor-pointer ${
-                    isAccountMenuOpen
-                      ? 'bg-white/30 border-[#8da249]'
-                      : 'bg-white/15 border-white/25 hover:bg-white/25'
-                  }`}
-                >
-                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#8da249]" />
-                </button>
-
-                {isAccountMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white text-stone-900 border border-stone-200 rounded-2xl shadow-xl py-2 z-50 overflow-hidden">
-                    {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-stone-100 bg-white">
-                      <p className="text-xs font-bold text-stone-900 truncate">
-                        {currentUser.name}
-                      </p>
-                      <p className="text-[11px] text-stone-500 truncate">
-                        {currentUser.email}
-                      </p>
-                      <p className="text-[11px] font-mono-tabular text-stone-500 mt-0.5">
-                        {currentUser.phone}
-                      </p>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="py-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditDistrictText(currentUser.district || 'Coblong (Dago / Dipatiukur)');
-                          setEditAddressText(currentUser.defaultAddress || '');
-                          setAccountModalMode('address');
-                          setIsAccountMenuOpen(false);
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-start gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <MapPin className="w-4 h-4 text-[#1F281A] shrink-0 mt-0.5" />
-                        <div className="min-w-0 flex-1">
-                          <span className="block font-semibold text-stone-900">
-                            Alamat Default
-                          </span>
-                          <span className="block text-[11px] text-stone-500 truncate">
-                            {currentUser.defaultAddress || 'Belum diatur'}
-                          </span>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditNameText(currentUser.name);
-                          setEditPhoneText(currentUser.phone);
-                          setAccountModalMode('profile');
-                          setIsAccountMenuOpen(false);
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <Settings className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Pengaturan Profil & Nomor</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAccountMenuOpen(false);
-                          openCartPage();
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <ShoppingBag className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Kantong Penyelamatan ({totalCartItems})</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAccountMenuOpen(false);
-                          setActiveTab('dashboard');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <Store className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Portal Mitra UMKM</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAccountMenuOpen(false);
-                          openAdminPage();
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-xs font-medium text-stone-700 hover:bg-stone-100 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <ShieldCheck className="w-4 h-4 text-[#1F281A] shrink-0" />
-                        <span>Panel Admin (Pengelola)</span>
-                      </button>
-                    </div>
-
-                    {/* Logout Action */}
-                    <div className="pt-1 border-t border-stone-100">
-                      <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="w-full px-4 py-2.5 text-left text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors cursor-pointer"
-                      >
-                        <LogOut className="w-4 h-4 shrink-0" />
-                        <span>Keluar (Logout)</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Mobile Navigation Drawer Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsMobileNavOpen(true)}
-              aria-label="Buka Menu Navigasi"
-              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center text-white border border-white/20 bg-white/10 hover:bg-white/20 rounded-xl transition-colors shrink-0 cursor-pointer"
-            >
-              <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </button>
-          </div>
-        </div>
-      </header>
+        <UserNavbar
+          activePage={activePage}
+          totalCartItems={totalCartItems}
+          currentUser={currentUser}
+          currentUserName={currentUser?.name ?? null}
+          activeOrdersCount={activeOrders.length}
+          onGoHome={openLandingPage}
+          onGoCart={openCartPage}
+          onGoAuth={openAuthPage}
+          onLogout={handleLogout}
+          onOpenAddressModal={() => setAccountModalMode('address')}
+          onOpenProfileModal={() => setAccountModalMode('profile')}
+          onGoEtalase={openEtalasePage}
+          onGoOrders={openOrdersPage}
+          onGoHistory={openHistoryPage}
+        />
       )}
 
       {/* Mobile Navigation Drawer for Customer & Portal Links */}
@@ -1373,20 +1147,6 @@ function CustomerAndAdminPortal() {
                       type="button"
                       onClick={() => {
                         setIsMobileNavOpen(false);
-                        openChatPage();
-                      }}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                        activePage === 'chat' || activePage === 'chat-bot'
-                          ? 'bg-[#8da249]/15 text-[#8da249]'
-                          : 'text-stone-700 hover:bg-stone-100'
-                      }`}
-                    >
-                      Chat Penjual
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
                         openHistoryPage();
                       }}
                       className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
@@ -1411,33 +1171,40 @@ function CustomerAndAdminPortal() {
                 )}
               </div>
 
-              <div className="pt-3 border-t border-stone-100 space-y-2">
-                <p className="px-3 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                  Portal Khusus
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openSellerPage();
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#8da249] bg-[#8da249]/10 hover:bg-[#8da249]/20 flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <Store className="w-4 h-4 shrink-0" />
-                  <span>Portal Mitra UMKM</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openAdminPage();
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#2e434f] bg-stone-100 hover:bg-stone-200 flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
-                  <span>Panel Admin</span>
-                </button>
-              </div>
+              {/* Portal Khusus hanya tampil jika bukan akun Pembeli */}
+              {(!currentUser || currentUser.role !== 'buyer') && (
+                <div className="pt-3 border-t border-stone-100 space-y-2">
+                  <p className="px-3 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                    Portal Khusus
+                  </p>
+                  {(!currentUser || currentUser.role === 'seller') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openSellerPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#8da249] bg-[#8da249]/10 hover:bg-[#8da249]/20 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <Store className="w-4 h-4 shrink-0" />
+                      <span>Portal Mitra UMKM</span>
+                    </button>
+                  )}
+                  {(!currentUser || currentUser.role === 'admin') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileNavOpen(false);
+                        openAdminPage();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#2e434f] bg-stone-100 hover:bg-stone-200 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <ShieldCheck className="w-4 h-4 shrink-0" />
+                      <span>Panel Admin</span>
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="pt-4 border-t border-stone-100">
@@ -1498,53 +1265,102 @@ function CustomerAndAdminPortal() {
       {activePage === 'admin' ? (
         /* PAGE 8: DEDICATED PLATFORM ADMIN GOVERNANCE CONSOLE */
         <main className="flex-1">
-          <AdminDashboardPage
-            catalogItems={catalogItems}
-            productMonitoring={productMonitoring}
-            umkmVerifications={umkmVerifications}
-            disputes={adminDisputes}
-            transactions={adminTransactions}
-            discountHistory={discountHistory}
-            userAccounts={userAccounts}
-            orders={orders}
-            complaints={complaints}
-            onUpdateUmkmStatus={handleUpdateUmkmStatus}
-            onAddSimulatedUmkm={handleAddSimulatedUmkm}
-            onUpdateProductMonitoring={handleUpdateProductMonitoring}
-            onCorrectProductPrice={handleCorrectProductPrice}
-            onResolveDispute={handleResolveDispute}
-            onUpdateTransactionGateway={handleUpdateTransactionGateway}
-            onUpdateUserAccess={handleUpdateUserAccess}
-            onAddUserAccount={handleAddUserAccount}
-            onSwitchToPublicEtalase={openEtalasePage}
-            onSwitchToSellerPortal={() => setActiveTab('dashboard')}
-            onOpenPublicStore={openStorePage}
-          />
+          {currentUser?.role !== 'admin' ? (
+            <AdminLoginGate
+              onLoginSuccess={(name, email) => {
+                setCurrentUser((prev) => prev
+                  ? { ...prev, name, email, role: 'admin' }
+                  : { name, email, phone: '', role: 'admin' }
+                );
+              }}
+            />
+          ) : (
+            <AdminDashboardPage
+              onSwitchToPublicEtalase={openEtalasePage}
+              onSwitchToSellerPortal={() => setActiveTab('dashboard')}
+              currentUser={currentUser}
+              onLogout={handleLogout}
+            />
+          )}
         </main>
       ) : activePage === 'auth' ? (
         /* PAGE 4: SEPARATE LOGIN & REGISTER PAGE */
         <main className="flex-1">
-          <AuthPage
-            onSuccessLogin={handleSuccessLogin}
-            onBack={() => setActivePage(returnPageAfterAuth)}
-          />
+          {currentUser ? (
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+              <div className="bg-white border border-stone-200 rounded-3xl p-8 max-w-md w-full shadow-lg space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center mx-auto">
+                  <User className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-stone-900 font-display">
+                    Anda Sudah Masuk
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-1">
+                    Saat ini Anda masuk sebagai <strong className="text-stone-800">{currentUser.name}</strong> ({currentUser.email}).
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (currentUser.role === 'admin') openAdminPage();
+                      else if (currentUser.role === 'seller') openSellerPage();
+                      else openEtalasePage();
+                    }}
+                    className="w-full h-11 bg-[#1F281A] hover:bg-emerald-900 text-white font-semibold text-xs rounded-xl transition-colors cursor-pointer"
+                  >
+                    Lanjut ke Halaman Utama
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full h-11 border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-xs rounded-xl transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Keluar dari Akun</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <AuthPage
+              onSuccessLogin={handleSuccessLogin}
+              onBack={() => {
+                const target = returnPageAfterAuth || 'etalase';
+                if (target === 'landing') openLandingPage();
+                else if (target === 'kantong') openCartPage();
+                else if (target === 'pesanan') openOrdersPage();
+                else if (target === 'history') openHistoryPage();
+                else if (target === 'chat') openChatPage();
+                else if (target === 'chat-bot') openChatBotPage();
+                else if (target === 'admin') openAdminPage();
+                else openEtalasePage();
+              }}
+            />
+          )}
         </main>
-      ) : activePage === 'kantong' ? (
-        /* PAGE 3: SEPARATE DEDICATED CART PAGE */
+      ) : activePage === 'kantong' || activePage === 'kantong-confirmation' ? (
+        /* PAGE 3: SEPARATE DEDICATED CART & CHECKOUT PAGE */
         <main className="flex-1">
           <RescueCartPage
             cart={cart}
             currentUser={currentUser}
+            initialStep={activePage === 'kantong-confirmation' ? 'confirmation' : 'cart'}
+            onNavigateStep={(step) => {
+              if (step === 'confirmation') {
+                openCartConfirmationPage();
+              } else {
+                openCartPage();
+              }
+            }}
             onUpdateQty={handleUpdateCartQty}
             onRemove={handleRemoveFromCart}
             onClearCart={() => setCart([])}
             onBackToEtalase={openEtalasePage}
             onNavigateToAuth={openAuthPage}
             onOrderCreated={handleOrderCreated}
-            onGoToPesanan={() => {
-              setActivePage('pesanan');
-              scrollToTop();
-            }}
+            onGoToPesanan={openOrdersPage}
           />
         </main>
       ) : activePage === 'store' ? (
@@ -1568,11 +1384,16 @@ function CustomerAndAdminPortal() {
         </main>
       ) : activePage === 'chat' ? (
         /* PAGE 8: DEDICATED CHAT VIEW (CHAT DENGAN PENJUAL MITRA UMKM) */
-        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white mb-16">
+        <main className="flex-1 min-h-0 w-full overflow-hidden bg-white">
           <ChatContainerPage
             initialMerchantName={chatTargetMerchant}
+            initialProduct={chatTargetProduct}
             catalog={publicVisibleCatalogItems}
-            onBack={openEtalasePage}
+            onBack={() => {
+              setChatTargetMerchant(undefined);
+              setChatTargetProduct(null);
+              openEtalasePage();
+            }}
             onOpenStore={(mName) => openStorePage(mName)}
             onOpenOrder={(orderCode) => openOrdersPage()}
             onOpenEtalase={openEtalasePage}
@@ -1986,7 +1807,7 @@ function CustomerAndAdminPortal() {
               openLandingPage();
               window.setTimeout(() => navigateToSection(sec), 150);
             }}
-            onNavigateEtalase={scrollToTop}
+            onNavigateEtalase={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             onNavigateOrders={openOrdersPage}
             onNavigateChat={openChatPage}
           />
@@ -2030,12 +1851,67 @@ function CustomerAndAdminPortal() {
                   <div className="pt-2">
                     <button
                       type="button"
-                      onClick={openAuthPage}
+                      onClick={openEtalasePage}
                       className="w-full sm:w-auto min-h-[48px] px-10 py-3.5 bg-[#8DA249] hover:bg-[#7b8e3d] active:scale-[0.99] text-white font-display font-semibold text-base rounded-full transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-[#8DA249]/30"
                     >
                       Mulai Pakai
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Full-Width 4-Column Quantitative Proof Strip Below Hero */}
+          <section
+            aria-label="Fakta Krisis Sampah Pangan di Indonesia"
+            className="bg-[#F4F6EC] border-b border-[#8DA249]/20 py-8 sm:py-10"
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-4 mb-6 border-b border-[#8DA249]/15">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#f89254]" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-600">
+                    Fakta Krisis Sampah Pangan di Indonesia
+                  </span>
+                </div>
+                <span className="text-[10px] text-stone-500 font-mono">
+                  Sumber: Kajian Food Loss & Waste Bappenas & Data SIPSN KLHK
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    23 – 48 Juta Ton
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Bahan pangan terbuang per tahun di Indonesia (115–184 kg/kapita/tahun · Bappenas)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8DA249] font-mono-tabular">
+                    Rp 551 Triliun
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Kerugian ekonomi per tahun akibat makanan terbuang, setara 4%–5% PDB nasional (Bappenas)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    41,5% Sampah RI
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Komposisi sisa makanan mendominasi timbulan sampah terbesar di TPA se-Indonesia (SIPSN KLHK 2023)
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
+                    125 Juta Jiwa
+                  </p>
+                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                    Porsi pangan terbuang yang sebenarnya mampu mencukupi makan 29%–47% populasi warga (Bappenas)
+                  </p>
                 </div>
               </div>
             </div>
@@ -2048,6 +1924,9 @@ function CustomerAndAdminPortal() {
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="max-w-3xl mx-auto text-center space-y-3 mb-10 sm:mb-14">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#8DA249]">
+                  Mekanisme Transparan · Menguntungkan Warga & UMKM
+                </p>
                 <h2
                   className="text-2xl sm:text-3xl md:text-4xl font-bold text-stone-900 tracking-tight font-display"
                   style={{ textWrap: 'balance' }}
@@ -2429,7 +2308,7 @@ function CustomerAndAdminPortal() {
           {/* SECTION 4: DEDICATED CENTER-ALIGNED WEBSITE FOOTER */}
           <Footer
             extraPaddingBottom={false}
-            onNavigateHome={scrollToTop}
+            onNavigateHome={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             onNavigateSection={(sec) => navigateToSection(sec)}
             onNavigateEtalase={openEtalasePage}
             onNavigateOrders={openOrdersPage}
@@ -2444,7 +2323,7 @@ function CustomerAndAdminPortal() {
         onClose={() => setActiveProductModal(null)}
         onAddToCart={handleAddToCart}
         onOpenStore={openStorePage}
-        onChatStore={(mName) => openChatPage(mName)}
+        onChatStore={(mName, item) => openChatPage(mName, item)}
       />
 
       {/* MODAL BERI RATING & ULASAN UMKM SETELAH PESANAN SELESAI */}
@@ -2891,8 +2770,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, CHAT PENJUAL, DAN HISTORY (Hanya di dalam aplikasi pemesanan) */}
-      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY */}
+      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"
@@ -2932,22 +2811,6 @@ function CustomerAndAdminPortal() {
 
           <button
             type="button"
-            onClick={() => openChatPage()}
-            className={`relative flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
-              activePage === 'chat' || activePage === 'chat-bot'
-                ? 'text-[#8da249] font-bold'
-                : 'text-stone-400 hover:text-stone-700 font-medium'
-            }`}
-          >
-            <div className="relative">
-              <MessageSquare className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-[#f89254]" />
-            </div>
-            <span className="text-[11px]">Chat Penjual</span>
-          </button>
-
-          <button
-            type="button"
             onClick={openHistoryPage}
             className={`flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
               activePage === 'history'
@@ -2961,9 +2824,13 @@ function CustomerAndAdminPortal() {
         </nav>
       )}
 
-      {/* FLOATING AI ASSISTANT BOT WIDGET (USER SIDE - HANYA DI DALAM APLIKASI PEMESANAN) */}
-      {activePage !== 'landing' && activePage !== 'admin' && activePage !== 'auth' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* FLOATING ACTION BUTTONS: KANTONG (DI ATAS) & AI BOT (DI BAWAH) */}
+      {activePage !== 'admin' && activePage !== 'auth' && (
         <FloatingChatButton
+          totalCartItems={totalCartItems}
+          onOpenCart={openCartPage}
+          showCart={activePage !== 'kantong' && activePage !== 'kantong-confirmation'}
+          showBot={activePage !== 'chat-bot' && activePage !== 'chat'}
           onOpenChatBot={openChatBotPage}
         />
       )}
@@ -3043,6 +2910,17 @@ const SellerPortalContent: React.FC = () => {
 
 function MainAppDispatcher() {
   const { activeTab } = useApp();
+  const storedRole = getStoredRole();
+
+  // Akun pembeli atau admin tidak diizinkan membuka SellerPortalContent
+  if (storedRole === 'buyer' || storedRole === 'admin') {
+    return <CustomerAndAdminPortal />;
+  }
+
+  // Jika tamu belum login mencoba mengakses portal penjual, tangani lewat CustomerAndAdminPortal (agar diarahkan ke login)
+  if (!storedRole && activeTab !== 'admin' && activeTab !== 'marketplace') {
+    return <CustomerAndAdminPortal />;
+  }
 
   if (activeTab === 'admin' || activeTab === 'marketplace') {
     return <CustomerAndAdminPortal />;

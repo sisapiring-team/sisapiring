@@ -73,3 +73,22 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #CCCCCC;
 }
+
+/* Payment Success Pop & Glow Animation */
+@keyframes payment-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-payment-pop {
+  animation: payment-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

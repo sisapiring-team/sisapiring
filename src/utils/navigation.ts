@@ -2,6 +2,7 @@ export type AppRoute =
   | 'landing'
   | 'etalase'
   | 'kantong'
+  | 'kantong-confirmation'
   | 'pesanan'
   | 'history'
   | 'chat'
@@ -64,7 +65,15 @@ export function parseRoute(pathname: string): RouteState {
     return { page: 'etalase' };
   }
 
-  // 6. Cart / Kantong Penyelamatan
+  // 6. Cart / Kantong Penyelamatan & Confirmation
+  if (
+    lower === '/kantong/confirmation' ||
+    lower === '/kantong/konfirmasi' ||
+    lower === '/checkout'
+  ) {
+    return { page: 'kantong-confirmation' };
+  }
+
   if (lower === '/kantong' || lower === '/keranjang' || lower === '/cart') {
     return { page: 'kantong' };
   }
@@ -119,6 +128,8 @@ export function buildRoutePath(route: RouteState): string {
       return '/etalase';
     case 'kantong':
       return '/kantong';
+    case 'kantong-confirmation':
+      return '/kantong/confirmation';
     case 'pesanan':
       return '/pesanan';
     case 'history':

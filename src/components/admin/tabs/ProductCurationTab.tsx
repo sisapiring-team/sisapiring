@@ -1,24 +1,16 @@
-import React, { useId } from 'react';
+import React, { useId, useState, useCallback } from 'react';
 import {
-  Search, Clock, CheckCircle2, AlertTriangle, RotateCcw, Ban,
+  Search, CheckCircle2, AlertTriangle, RotateCcw, Ban,
   ChevronDown, Utensils, X, SlidersHorizontal, Package,
+  Clock, Loader2, RefreshCw, ChevronLeft, ChevronRight, AlertCircle,
 } from 'lucide-react';
 import { ResilientImage } from '../../ResilientImage';
-import { formatRupiah } from '../../../data/sisaPiringCatalog';
-import type { SisaPiringItem } from '../../../data/sisaPiringCatalog';
-import type { ProductMonitoringMeta, ProductMonitoringStatus } from '../../../data/adminData';
+import { useAdminProducts, type ProductStatusFilter } from '../../../hooks/useAdminProducts';
+import type { AdminProduct } from '../../../lib/api';
 
-interface ProductCurationTabProps {
-  displayProducts: SisaPiringItem[];
-  productMonitoring: Record<string, ProductMonitoringMeta>;
-  productStatusFilter: 'all' | ProductMonitoringStatus;
-  onStatusFilterChange: (status: 'all' | ProductMonitoringStatus) => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  onRestoreProduct: (itemId: string, title: string) => void;
-  onRequestTakedown: (item: SisaPiringItem) => void;
-}
+interface ProductCurationTabProps {}
 
+/* ─── Styles ──────────────────────────────────────────────────────────────── */
 const styles = `
 .sp-curation{--pc-ink:#283529;--pc-muted:#5f6c5c;--pc-olive:#69823c;--pc-border:#e5eadf;max-width:1320px;margin:0 auto;color:var(--pc-ink);font-family:inherit;display:grid;gap:24px}
 .sp-curation,.sp-curation *{box-sizing:border-box}
@@ -58,9 +50,8 @@ const styles = `
 .pc-product-row{transition:background .18s}
 .pc-product-row:hover{background:#fbfcf8}
 .pc-product-row.pc-inactive{background:#fcfbf9}
-.pc-product-row.pc-inactive:hover{background:#f8f5f0}
 .pc-menu{display:flex;align-items:center;gap:13px;min-width:230px;max-width:360px}
-.pc-photo{width:64px;height:64px;flex-shrink:0;overflow:hidden;border-radius:13px;background:#f0f3e9;border:1px solid #e8ecdF}
+.pc-photo{width:64px;height:64px;flex-shrink:0;overflow:hidden;border-radius:13px;background:#f0f3e9;border:1px solid #e8ecdf}
 .pc-photo img{display:block;width:100%;height:100%;object-fit:cover}
 .pc-menu-copy{min-width:0}
 .pc-menu-title{font-weight:650;font-size:16px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
@@ -76,7 +67,6 @@ const styles = `
 .pc-status{display:inline-flex;align-items:center;gap:5px;border-radius:7px;padding:6px 9px;font-size:13px;font-weight:650;white-space:nowrap;background:#eef4e6;color:#5b7834}
 .pc-status-review{background:#fff4df;color:#805b18}
 .pc-status-inactive{background:#f5ebe7;color:#8e503d}
-.pc-reports{display:block;margin-top:6px;font-size:13px;color:#975a43;white-space:nowrap}
 .pc-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border-radius:8px;padding:8px 11px;font-size:14px!important;font-weight:600!important;white-space:nowrap;border:1px solid #eddfd7;color:#8e503d;background:#fff;transition:background .18s,border-color .18s}
 .pc-action:hover{background:#fbefe9;border-color:#dcb6a4}
 .pc-action-restore{border-color:#d9e4c9;color:#66803c;background:#f2f6eb}
@@ -89,35 +79,140 @@ const styles = `
 .pc-reset{margin-top:18px;border:1px solid #dce6ce;background:#f1f5e9;color:#66803c;border-radius:9px;padding:9px 14px;font-size:14px!important;font-weight:600!important}
 .pc-reset:hover{background:#e7efda}
 .pc-mobile-label{display:none}
-@media(min-width:1150px){.pc-table th,.pc-table td{padding-inline:22px}.pc-table th:first-child,.pc-table td:first-child{padding-left:28px}.pc-table th:last-child,.pc-table td:last-child{padding-right:28px}}
-@media(max-width:1000px){.pc-toolbar{align-items:flex-start;flex-direction:column;gap:14px}.pc-controls{width:100%}.pc-search{flex:1;width:auto}.pc-table td{padding-inline:12px}.pc-table th{padding-inline:12px}.pc-menu{min-width:200px}.pc-photo{width:60px;height:60px}}
-@media(max-width:1100px){.pc-table-scroll{overflow:visible}.pc-table,.pc-table tbody{display:block}.pc-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.pc-table tbody{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 20px 20px}.pc-product-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:'menu menu' 'price stock' 'pickup pickup' 'status action';gap:16px 12px;border:1px solid #e6eadf;border-radius:14px;padding:18px}.pc-table td,.pc-table td:first-child,.pc-table td:last-child{padding:0;border:0!important;text-align:left;min-width:0}.pc-table td:nth-child(1){grid-area:menu;padding-bottom:16px;border-bottom:1px solid #edf0e7!important}.pc-table td:nth-child(2){grid-area:price}.pc-table td:nth-child(3){grid-area:stock;text-align:right}.pc-table td:nth-child(4){grid-area:pickup}.pc-table td:nth-child(5){grid-area:status;align-self:center}.pc-table td:nth-child(6){grid-area:action;text-align:right;align-self:center}.pc-menu{min-width:0;max-width:none;gap:12px}.pc-photo{width:64px;height:64px}.pc-mobile-label{display:block;color:#68765f;font-size:13px;margin-bottom:6px}.pc-table td:nth-child(4) .pc-mobile-label{display:inline;margin:0 7px 0 0}.pc-table td:nth-child(4){display:flex;flex-wrap:wrap;align-items:center;gap:3px}.pc-pickup{min-width:0}.pc-action{padding:8px 9px;font-size:13px!important}.pc-status{font-size:12px;padding:6px 7px}.pc-reports{font-size:12px}.pc-footer{padding:14px 20px}}
-@media(max-width:800px){.sp-curation{gap:20px}.pc-header{gap:12px;padding:2px}.pc-header-icon{width:44px;height:44px;border-radius:14px}.pc-header h2{font-size:28px}.pc-header p{font-size:14px}.pc-toolbar{padding:20px 18px}.pc-controls{flex-direction:column;align-items:stretch;gap:10px}.pc-search{flex:auto;width:100%}.pc-filter select{width:100%}.pc-table tbody{grid-template-columns:1fr;padding:0 14px 16px;gap:12px}.pc-product-row{padding:18px}.pc-menu-title{font-size:16px}.pc-action{font-size:14px!important;padding:8px 11px}.pc-status{font-size:13px;padding:6px 9px}}
+.pc-pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 24px;border-top:1px solid #edf0e7;background:#fdfefa}
+.pc-page-btn{display:inline-flex;align-items:center;justify-content:center;height:36px;width:36px;border-radius:9px;border:1px solid #d9e1cf;background:#fff;color:#5f6e54;font-size:13px;font-weight:600;transition:background .15s}
+.pc-page-btn:hover:not(:disabled){background:#f0f4e9}
+.pc-page-btn:disabled{opacity:.4;cursor:not-allowed}
+.pc-page-info{font-size:13px;color:#68765f}
+
+.pc-modal-backdrop{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:16px}
+.pc-modal{background:#fff;border-radius:20px;max-width:460px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.pc-modal-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.pc-modal-textarea{width:100%;min-height:72px;border:1px solid #e5eadf;border-radius:10px;padding:10px;font-size:13px;resize:vertical;margin-top:8px;background:#f8faf6}
+.pc-modal-textarea:focus{outline:none;border-color:#8da249}
+.pc-modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+
+@media(max-width:1000px){.pc-toolbar{align-items:flex-start;flex-direction:column;gap:14px}.pc-controls{width:100%}.pc-search{flex:1;width:auto}}
+@media(max-width:800px){.sp-curation{gap:20px}.pc-header{gap:12px;padding:2px}.pc-header-icon{width:44px;height:44px;border-radius:14px}.pc-header h2{font-size:28px}.pc-header p{font-size:14px}.pc-toolbar{padding:20px 18px}.pc-controls{flex-direction:column;align-items:stretch;gap:10px}.pc-search{flex:auto;width:100%}.pc-filter select{width:100%}}
 @media(prefers-reduced-motion:reduce){.sp-curation *{transition:none!important}}
 `;
 
-export const ProductCurationTab: React.FC<ProductCurationTabProps> = ({
-  displayProducts, productMonitoring, productStatusFilter, onStatusFilterChange,
-  searchQuery, onSearchChange, onRestoreProduct, onRequestTakedown,
-}) => {
+function formatRp(amount: number): string {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+}
+
+/* ─── Takedown Modal ─────────────────────────────────────────────────────── */
+interface TakedownModalProps {
+  product: AdminProduct;
+  onClose: () => void;
+  onConfirm: (code: string, reason: string) => Promise<void>;
+}
+
+const TakedownModal: React.FC<TakedownModalProps> = ({ product, onClose, onConfirm }) => {
+  const [reason, setReason] = useState('Melanggar standar kesegaran & batas aman konsumsi.');
+  const [loading, setLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    setLoading(true);
+    try { await onConfirm(product.id, reason); onClose(); } finally { setLoading(false); }
+  };
+
+  return (
+    <div className="pc-modal-backdrop" onClick={onClose}>
+      <div className="pc-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="pc-modal-title">
+          <AlertTriangle size={16} style={{ color: '#c0392b' }} />
+          Konfirmasi Take Down Menu
+          <button type="button" onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 0, cursor: 'pointer', color: '#888' }}>
+            <X size={16} />
+          </button>
+        </div>
+        <div style={{ background: '#f8faf6', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 12 }}>
+          <strong style={{ display: 'block', color: '#283529' }}>{product.name}</strong>
+          <span style={{ color: '#5f6c5c' }}>{product.merchant?.businessName}</span>
+        </div>
+        <label style={{ fontSize: 12, fontWeight: 600, color: '#5b6855' }}>Alasan Resmi:</label>
+        <textarea
+          className="pc-modal-textarea"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+        <div className="pc-modal-actions">
+          <button type="button" onClick={onClose} style={{ background: 'none', border: '1px solid #e5eadf', borderRadius: 9, padding: '8px 14px', fontSize: 13, cursor: 'pointer', color: '#5f6c5c' }}>
+            Batal
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={loading}
+            style={{ background: '#c0392b', border: 'none', borderRadius: 9, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            {loading && <Loader2 size={12} className="animate-spin" />}
+            Eksekusi Take Down
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Main Tab ───────────────────────────────────────────────────────────── */
+export const ProductCurationTab: React.FC<ProductCurationTabProps> = () => {
   const searchId = useId();
   const filterId = useId();
-  const hasFilters = searchQuery.trim().length > 0 || productStatusFilter !== 'all';
 
-  const changeStatus = (value: string) => {
-    if (value === 'all' || value === 'Aktif & Aman' || value === 'Dalam Tinjauan' || value === 'Take Down') {
-      onStatusFilterChange(value);
-    }
-  };
+  const [statusFilter, setStatusFilter] = useState<ProductStatusFilter>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [takedownTarget, setTakedownTarget] = useState<AdminProduct | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const resetFilters = () => {
-    onSearchChange('');
-    onStatusFilterChange('all');
-  };
+  React.useEffect(() => {
+    const t = setTimeout(() => { setDebouncedQuery(searchQuery); setPage(1); }, 400);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  const { products, loading, error, totalPages, total, reload, moderate } =
+    useAdminProducts(statusFilter, debouncedQuery, page);
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
+
+  const handleRestore = useCallback(async (product: AdminProduct) => {
+    setActionLoading(product.id);
+    try {
+      await moderate(product.id, 'active');
+      showToast(`"${product.name}" dipulihkan ke etalase.`);
+    } finally { setActionLoading(null); }
+  }, [moderate]);
+
+  const handleTakedown = useCallback(async (code: string, reason: string) => {
+    await moderate(code, 'taken_down', reason);
+    showToast('Produk berhasil di-takedown.');
+  }, [moderate]);
+
+  const hasFilters = searchQuery.trim().length > 0 || statusFilter !== 'all';
 
   return (
     <div className="sp-curation">
       <style>{styles}</style>
+
+      {/* Toast */}
+      {toast && (
+        <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 60, background: '#1F281A', color: '#fff', padding: '12px 18px', borderRadius: 14, fontSize: 13, fontWeight: 600, boxShadow: '0 8px 24px rgba(0,0,0,.2)' }}>
+          {toast}
+        </div>
+      )}
+
+      {takedownTarget && (
+        <TakedownModal
+          product={takedownTarget}
+          onClose={() => setTakedownTarget(null)}
+          onConfirm={handleTakedown}
+        />
+      )}
+
       <header className="pc-header">
         <div className="pc-header-icon" aria-hidden="true"><Utensils size={23} strokeWidth={1.6} /></div>
         <div>
@@ -125,111 +220,187 @@ export const ProductCurationTab: React.FC<ProductCurationTabProps> = ({
           <h2>Kelola menu</h2>
           <p>Pantau menu mitra dan tangani yang bermasalah.</p>
         </div>
+        <button
+          type="button"
+          onClick={() => reload()}
+          style={{ marginLeft: 'auto', background: 'none', border: '1px solid #e5eadf', borderRadius: 10, padding: '7px 10px', cursor: 'pointer', color: '#68765f', display: 'flex', alignItems: 'center', gap: 5, fontSize: 12 }}
+          title="Muat ulang"
+        >
+          <RefreshCw size={14} />
+        </button>
       </header>
 
-      <section className="pc-sheet" aria-label="Daftar menu">
+      <section className="pc-sheet">
         <div className="pc-toolbar">
-          <div className="pc-list-title">Daftar menu</div>
+          <div className="pc-list-title">
+            Daftar menu
+            {!loading && <span style={{ display: 'block', fontSize: 13, fontWeight: 400, color: '#68765f', marginTop: 2 }}>{total.toLocaleString('id-ID')} menu</span>}
+          </div>
           <div className="pc-controls">
             <div className="pc-search">
-              <label htmlFor={searchId} className="pc-sr-only">Cari menu, mitra, atau kategori</label>
+              <label htmlFor={searchId} className="pc-sr-only">Cari menu atau mitra</label>
               <Search size={16} className="pc-search-icon" aria-hidden="true" />
-              <input id={searchId} type="text" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} placeholder="Cari menu atau mitra…" />
-              {searchQuery && <button type="button" className="pc-clear" aria-label="Hapus pencarian" onClick={() => onSearchChange('')}><X size={14} /></button>}
+              <input
+                id={searchId}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari menu atau mitra…"
+              />
+              {searchQuery && (
+                <button type="button" className="pc-clear" onClick={() => setSearchQuery('')}>
+                  <X size={14} />
+                </button>
+              )}
             </div>
             <div className="pc-filter">
               <label htmlFor={filterId} className="pc-sr-only">Filter status menu</label>
               <SlidersHorizontal size={14} className="pc-filter-icon" aria-hidden="true" />
-              <select id={filterId} value={productStatusFilter} onChange={(e) => changeStatus(e.target.value)}>
+              <select
+                id={filterId}
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value as ProductStatusFilter); setPage(1); }}
+              >
                 <option value="all">Semua status</option>
-                <option value="Aktif & Aman">Aktif</option>
-                <option value="Dalam Tinjauan">Dalam tinjauan</option>
-                <option value="Take Down">Nonaktif</option>
+                <option value="active">Aktif</option>
+                <option value="under_review">Dalam tinjauan</option>
+                <option value="taken_down">Nonaktif</option>
               </select>
               <ChevronDown size={14} className="pc-filter-chevron" aria-hidden="true" />
             </div>
           </div>
         </div>
 
-        {displayProducts.length > 0 ? (
-          <div className="pc-table-scroll">
-            <table className="pc-table" role="table">
-              <caption className="pc-sr-only">Menu mitra, harga, stok, waktu ambil, status, dan tindakan</caption>
-              <thead role="rowgroup"><tr role="row">
-                <th scope="col" role="columnheader">Menu & mitra</th>
-                <th scope="col" role="columnheader">Harga</th>
-                <th scope="col" role="columnheader">Stok</th>
-                <th scope="col" role="columnheader">Waktu ambil</th>
-                <th scope="col" role="columnheader">Status</th>
-                <th scope="col" role="columnheader">Tindakan</th>
-              </tr></thead>
-              <tbody role="rowgroup">
-                {displayProducts.map((item) => {
-                  const meta = productMonitoring[item.id];
-                  const status = meta?.monitoringStatus ?? 'Aktif & Aman';
-                  const reports = meta?.reportCount ?? 0;
-                  const isTakenDown = status === 'Take Down';
-                  const isReview = status === 'Dalam Tinjauan';
-                  const statusLabel = isTakenDown ? 'Nonaktif' : isReview ? 'Dalam tinjauan' : 'Aktif';
-                  const StatusIcon = isTakenDown ? Ban : isReview ? AlertTriangle : CheckCircle2;
-
-                  return (
-                    <tr key={item.id} role="row" className={`pc-product-row ${isTakenDown ? 'pc-inactive' : ''}`}>
-                      <td role="cell">
-                        <div className="pc-menu">
-                          <div className="pc-photo"><ResilientImage src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
-                          <div className="pc-menu-copy">
-                            <div className="pc-menu-title" title={`${item.title} · ${item.category} · ID: ${item.id}`}>{item.title}</div>
-                            <div className="pc-merchant">{item.merchantName}</div>
-                            <div className="pc-district">{item.district}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td role="cell">
-                        <span className="pc-mobile-label" aria-hidden="true">Harga</span>
-                        <span className="pc-number pc-rescue-price"><span className="pc-sr-only">Harga hemat: </span>{formatRupiah(item.rescuePrice)}</span>
-                        <span className="pc-number pc-original-price"><span className="pc-sr-only">Harga normal: </span>{formatRupiah(item.originalPrice)}</span>
-                      </td>
-                      <td role="cell">
-                        <span className="pc-mobile-label" aria-hidden="true">Stok</span>
-                        <span className="pc-stock"><span className="pc-number">{item.remainingStock.toLocaleString('id-ID')}</span><span className="pc-stock-unit">porsi</span></span>
-                      </td>
-                      <td role="cell">
-                        <span className="pc-mobile-label" aria-hidden="true">Waktu ambil</span>
-                        <div className="pc-pickup"><Clock size={16} aria-hidden="true" /><span>{item.pickupWindow}</span></div>
-                      </td>
-                      <td role="cell">
-                        <span className={`pc-status ${isTakenDown ? 'pc-status-inactive' : isReview ? 'pc-status-review' : ''}`}>
-                          <StatusIcon size={15} aria-hidden="true" />{statusLabel}
-                        </span>
-                        {reports > 0 && <span className="pc-reports">{reports.toLocaleString('id-ID')} laporan</span>}
-                      </td>
-                      <td role="cell">
-                        {isTakenDown ? (
-                          <button type="button" className="pc-action pc-action-restore" aria-label={`Pulihkan ${item.title}`} onClick={() => onRestoreProduct(item.id, item.title)}>
-                            <RotateCcw size={16} aria-hidden="true" />Pulihkan
-                          </button>
-                        ) : (
-                          <button type="button" className="pc-action" aria-label={`Nonaktifkan ${item.title}`} onClick={() => onRequestTakedown(item)}>
-                            <Ban size={16} aria-hidden="true" />Nonaktifkan
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        {loading ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 64, gap: 12, color: '#68765f' }}>
+            <Loader2 size={22} className="animate-spin" />
+            <span style={{ fontSize: 15 }}>Memuat data menu…</span>
           </div>
+        ) : error ? (
+          <div className="pc-empty">
+            <div className="pc-empty-icon"><AlertCircle size={22} /></div>
+            <div className="pc-empty-title">Gagal memuat data</div>
+            <p>{error}</p>
+            <button type="button" className="pc-reset" onClick={() => reload()}>Coba lagi</button>
+          </div>
+        ) : products.length > 0 ? (
+          <>
+            <div className="pc-table-scroll">
+              <table className="pc-table">
+                <caption className="pc-sr-only">Menu mitra, harga, stok, waktu ambil, status, dan tindakan</caption>
+                <thead><tr>
+                  <th scope="col">Menu & mitra</th>
+                  <th scope="col">Harga</th>
+                  <th scope="col">Stok</th>
+                  <th scope="col">Waktu ambil</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Tindakan</th>
+                </tr></thead>
+                <tbody>
+                  {products.map((product) => {
+                    const isTakenDown = product.moderationStatus === 'taken_down';
+                    const isReview = product.moderationStatus === 'under_review';
+                    const statusLabel = isTakenDown ? 'Nonaktif' : isReview ? 'Dalam tinjauan' : 'Aktif';
+                    const StatusIcon = isTakenDown ? Ban : isReview ? AlertTriangle : CheckCircle2;
+                    const isLoading = actionLoading === product.id;
+
+                    return (
+                      <tr key={product.id} className={`pc-product-row${isTakenDown ? ' pc-inactive' : ''}`}>
+                        <td>
+                          <div className="pc-menu">
+                            <div className="pc-photo">
+                              <ResilientImage src={product.image ?? ''} alt={product.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="pc-menu-copy">
+                              <div className="pc-menu-title" title={product.name}>{product.name}</div>
+                              <div className="pc-merchant">{product.merchant?.businessName ?? '—'}</div>
+                              <div className="pc-district">Kec. {product.merchant?.district ?? '—'}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span className="pc-number pc-rescue-price">{formatRp(product.discountedPrice)}</span>
+                          <span className="pc-number pc-original-price">{formatRp(product.originalPrice)}</span>
+                        </td>
+                        <td>
+                          <span className="pc-stock">
+                            <span className="pc-number">{product.stock.toLocaleString('id-ID')}</span>
+                            <span className="pc-stock-unit">porsi</span>
+                          </span>
+                        </td>
+                        <td>
+                          <div className="pc-pickup">
+                            <Clock size={16} aria-hidden="true" />
+                            <span>{product.pickupScheduleStart}–{product.pickupScheduleEnd}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`pc-status${isTakenDown ? ' pc-status-inactive' : isReview ? ' pc-status-review' : ''}`}>
+                            <StatusIcon size={15} aria-hidden="true" />{statusLabel}
+                          </span>
+                          {product.takedownReason && isTakenDown && (
+                            <span style={{ display: 'block', marginTop: 4, fontSize: 12, color: '#975a43' }} title={product.takedownReason}>
+                              {product.takedownReason.length > 40 ? product.takedownReason.slice(0, 40) + '…' : product.takedownReason}
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          {isTakenDown ? (
+                            <button
+                              type="button"
+                              className="pc-action pc-action-restore"
+                              disabled={isLoading}
+                              onClick={() => handleRestore(product)}
+                            >
+                              {isLoading ? <Loader2 size={14} className="animate-spin" /> : <RotateCcw size={16} />}
+                              Pulihkan
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="pc-action"
+                              disabled={isLoading}
+                              onClick={() => setTakedownTarget(product)}
+                            >
+                              <Ban size={16} />Nonaktifkan
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="pc-pagination">
+                <button type="button" className="pc-page-btn" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="pc-page-info">Halaman {page} dari {totalPages}</span>
+                <button type="button" className="pc-page-btn" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="pc-empty">
-            <div className="pc-empty-icon" aria-hidden="true">{hasFilters ? <Search size={22} /> : <Package size={22} />}</div>
+            <div className="pc-empty-icon">{hasFilters ? <Search size={22} /> : <Package size={22} />}</div>
             <div className="pc-empty-title">{hasFilters ? 'Menu tidak ditemukan' : 'Belum ada menu'}</div>
             <p>{hasFilters ? 'Coba kata kunci lain atau ubah filter status.' : 'Menu dari mitra akan muncul di sini.'}</p>
-            {hasFilters && <button type="button" className="pc-reset" onClick={resetFilters}>Reset filter</button>}
+            {hasFilters && (
+              <button type="button" className="pc-reset" onClick={() => { setSearchQuery(''); setStatusFilter('all'); }}>
+                Reset filter
+              </button>
+            )}
           </div>
         )}
-        <div className="pc-footer" role="status">{displayProducts.length.toLocaleString('id-ID')} menu ditampilkan</div>
+
+        {!loading && !error && (
+          <div className="pc-footer">{products.length.toLocaleString('id-ID')} menu ditampilkan</div>
+        )}
       </section>
     </div>
   );

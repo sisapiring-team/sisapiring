@@ -17,7 +17,6 @@ import {
 import { SisaPiringItem, formatRupiah } from '../data/sisaPiringCatalog';
 import { ResilientImage } from './ResilientImage';
 import { UserAccount } from './AuthPage';
-import { scrollToTop } from '../lib/smoothScroll';
 
 export interface CartEntry {
   item: SisaPiringItem;
@@ -29,7 +28,8 @@ export interface OrderRecord {
   createdAt: string;
   name: string;
   phone: string;
-  payment: 'qris' | 'cod';
+  payment: 'qris' | 'cod' | 'transfer' | string;
+  paymentDetail?: string;
   totalPaid: number;
   totalSaved: number;
   status: 'siap-diambil' | 'selesai';
@@ -44,7 +44,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   onAddToCart: (item: SisaPiringItem, qty: number) => void;
   onOpenStore?: (merchantName: string) => void;
-  onChatStore?: (merchantName: string) => void;
+  onChatStore?: (merchantName: string, item?: SisaPiringItem) => void;
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -137,11 +137,27 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </span>
               </div>
 
-              {/* Store Information Card + Button to View Store Catalog & Reviews */}
-              <div className="mb-4 p-3.5 rounded-xl bg-white border border-stone-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-start gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center shrink-0 mt-0.5">
-                    <Store className="w-4 h-4" />
+              {/* Store Information Card + Chat Penjual Icon Beside Store Icon */}
+              <div className="mb-4 p-3.5 rounded-2xl bg-stone-50 border border-stone-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-950/10 text-[#1F281A] flex items-center justify-center shrink-0">
+                      <Store className="w-4 h-4" />
+                    </div>
+                    {onChatStore && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onChatStore(item.merchantName, item);
+                          onClose();
+                        }}
+                        className="w-10 h-10 rounded-xl bg-[#8da249] hover:bg-[#7a8e3d] text-white flex items-center justify-center shrink-0 transition-transform active:scale-95 shadow-xs cursor-pointer group"
+                        title={`Chat Penjual (${item.merchantName})`}
+                        aria-label="Chat Penjual"
+                      >
+                        <MessageSquare className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </button>
+                    )}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
@@ -159,20 +175,36 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </div>
                 </div>
 
-                {onOpenStore && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const targetMerchant = item.merchantName;
-                      onClose();
-                      onOpenStore(targetMerchant);
-                    }}
-                    className="h-9 px-3.5 rounded-lg bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <Store className="w-3.5 h-3.5" />
-                    <span>Lihat Katalog Toko</span>
-                  </button>
-                )}
+                <div className="flex items-center gap-2 shrink-0">
+                  {onChatStore && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChatStore(item.merchantName, item);
+                        onClose();
+                      }}
+                      className="h-9 px-3 rounded-xl bg-[#8da249] hover:bg-[#7a8e3d] text-white text-xs font-bold inline-flex items-center justify-center gap-0 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
+                      title={`Chat langsung dengan penjual ${item.merchantName}`}
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      
+                    </button>
+                  )}
+                  {onOpenStore && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const targetMerchant = item.merchantName;
+                        onClose();
+                        onOpenStore(targetMerchant);
+                      }}
+                      className="h-9 px-3 rounded-xl bg-[#1F281A] hover:bg-emerald-900 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <Store className="w-3.5 h-3.5" />
+                      <span>Lihat Toko</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mb-4">
@@ -253,14 +285,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <button
               type="button"
               onClick={() => {
-                onChatStore(item.merchantName);
+                onChatStore(item.merchantName, item);
                 onClose();
               }}
-              className="h-12 px-3.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+              className="h-12 px-3.5 bg-[#8da249]/15 hover:bg-[#8da249]/25 text-[#3a4914] text-xs font-bold rounded-xl inline-flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer border border-[#8da249]/30"
               title={`Chat penjual ${item.merchantName}`}
             >
-              <MessageSquare className="w-4 h-4 text-emerald-800" />
-              <span className="hidden sm:inline">Tanya Penjual</span>
+              <MessageSquare className="w-4 h-4 text-[#4a5a18]" />
+              <span className="hidden sm:inline">Chat Penjual</span>
             </button>
           )}
 
@@ -280,474 +312,5 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   );
 };
 
-interface RescueCartPageProps {
-  cart: CartEntry[];
-  currentUser: UserAccount | null;
-  onUpdateQty: (id: string, delta: number) => void;
-  onRemove: (id: string) => void;
-  onClearCart: () => void;
-  onBackToEtalase: () => void;
-  onNavigateToAuth: () => void;
-  onOrderCreated?: (order: OrderRecord) => void;
-  onGoToPesanan?: () => void;
-}
-
-export const RescueCartPage: React.FC<RescueCartPageProps> = ({
-  cart,
-  currentUser,
-  onUpdateQty,
-  onRemove,
-  onClearCart,
-  onBackToEtalase,
-  onNavigateToAuth,
-  onOrderCreated,
-  onGoToPesanan,
-}) => {
-  const [customerName, setCustomerName] = useState(currentUser?.name || '');
-  const [customerPhone, setCustomerPhone] = useState(currentUser?.phone || '');
-  const [paymentMethod, setPaymentMethod] = useState<'qris' | 'cod'>('qris');
-  const [formError, setFormError] = useState('');
-  const [confirmedOrder, setConfirmedOrder] = useState<OrderRecord | null>(null);
-
-  useEffect(() => {
-    if (currentUser) {
-      setCustomerName((prev) => prev || currentUser.name);
-      setCustomerPhone((prev) => prev || currentUser.phone);
-    }
-  }, [currentUser]);
-
-  const totalRescuePrice = cart.reduce(
-    (sum, entry) => sum + entry.item.rescuePrice * entry.quantity,
-    0
-  );
-  const totalOriginalPrice = cart.reduce(
-    (sum, entry) => sum + entry.item.originalPrice * entry.quantity,
-    0
-  );
-  const totalSavings = totalOriginalPrice - totalRescuePrice;
-
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customerName.trim() || customerName.trim().length < 2) {
-      setFormError('Mohon isi nama lengkap pengambil paket.');
-      return;
-    }
-    const cleanPhone = customerPhone.replace(/\D/g, '');
-    if (cleanPhone.length < 9) {
-      setFormError(
-        'Mohon masukkan nomor WhatsApp aktif (minimal 9 digit) untuk kode ambil.'
-      );
-      return;
-    }
-
-    setFormError('');
-    const randomCode = `SP-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newOrder: OrderRecord = {
-      orderCode: randomCode,
-      createdAt: 'Hari ini · Baru saja',
-      name: customerName.trim(),
-      phone: customerPhone.trim(),
-      payment: paymentMethod,
-      totalPaid: totalRescuePrice,
-      totalSaved: totalSavings,
-      status: 'siap-diambil',
-      deliveryStage: 'diterima',
-      items: [...cart],
-    };
-    setConfirmedOrder(newOrder);
-    if (onOrderCreated) {
-      onOrderCreated(newOrder);
-    }
-    onClearCart();
-    scrollToTop();
-  };
-
-  return (
-    <div className="min-h-screen bg-white pb-24">
-      {/* Page Header Bar */}
-      <section className="bg-white border-b border-stone-200/90 py-4 sm:py-5">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setConfirmedOrder(null);
-                onBackToEtalase();
-              }}
-              aria-label="Kembali ke Etalase"
-              className="w-10 h-10 rounded-xl bg-stone-100 hover:bg-stone-200/70 flex items-center justify-center text-stone-800 transition-colors cursor-pointer shrink-0"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-base sm:text-xl font-bold text-stone-900 tracking-tight">
-                Kantong Penyelamatan Anda
-              </h1>
-              <p className="text-xs text-stone-500">
-                Ambil langsung di kasir UMKM Bandung sesuai jam sore
-              </p>
-            </div>
-          </div>
-
-          {cart.length > 0 && !confirmedOrder && (
-            <button
-              type="button"
-              onClick={onClearCart}
-              className="text-xs font-medium text-stone-500 hover:text-red-700 underline underline-offset-2 cursor-pointer shrink-0"
-            >
-              Kosongkan
-            </button>
-          )}
-        </div>
-      </section>
-
-      {/* Main Page Body */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8">
-        {confirmedOrder ? (
-          /* CONFIRMED ORDER TICKET VIEW */
-          <div className="max-w-xl mx-auto bg-white border border-stone-200 rounded-2xl p-5 sm:p-8 space-y-6 shadow-xs">
-            <div className="p-5 bg-emerald-950/5 border border-emerald-900/20 rounded-2xl space-y-3">
-              <div className="flex items-center gap-2 text-emerald-900 font-semibold text-base">
-                <CheckCircle2 className="w-5 h-5 shrink-0" />
-                <span>Pesanan #{confirmedOrder.orderCode} Terkonfirmasi</span>
-              </div>
-              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                Tunjukkan kode tiket ini kepada kasir mitra UMKM saat jam pengambilan. Bukti pesanan disiapkan untuk{' '}
-                <strong>{confirmedOrder.name}</strong> ({confirmedOrder.phone}).
-              </p>
-              <div className="pt-3 border-t border-stone-200/80 flex items-center justify-between text-xs sm:text-sm">
-                <span className="text-stone-500">Kode Tiket Pengambilan</span>
-                <span className="font-mono-tabular font-bold text-lg text-stone-900">
-                  {confirmedOrder.orderCode}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-xs sm:text-sm">
-                <span className="text-stone-500">Metode Pembayaran</span>
-                <span className="font-medium text-stone-900">
-                  {confirmedOrder.payment === 'qris'
-                    ? 'QRIS Instan (Lunas)'
-                    : 'Bayar di Kasir UMKM Saat Ambil (COD)'}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h2 className="text-xs sm:text-sm font-semibold text-stone-900">
-                Rincian Lokasi & Waktu Pengambilan:
-              </h2>
-              {confirmedOrder.items.map(({ item, quantity }) => (
-                <div
-                  key={item.id}
-                  className="p-4 bg-white border border-stone-200 rounded-xl text-xs space-y-1.5"
-                >
-                  <div className="flex justify-between font-semibold text-stone-900 gap-2 text-sm">
-                    <span>
-                      {quantity}x {item.title}
-                    </span>
-                    <span className="font-mono-tabular shrink-0 text-[#f89254]">
-                      {formatRupiah(item.rescuePrice * quantity)}
-                    </span>
-                  </div>
-                  <p className="text-stone-600">
-                    {item.merchantName} · {item.address}
-                  </p>
-                  <p className="text-emerald-900 font-medium">
-                    Jam Ambil: {item.pickupWindow}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-2 text-xs sm:text-sm">
-              <div className="flex justify-between text-stone-600">
-                <span>Total Penghematan Anda</span>
-                <span className="font-mono-tabular font-semibold text-emerald-900">
-                  {formatRupiah(confirmedOrder.totalSaved)}
-                </span>
-              </div>
-              <div className="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-200">
-                <span>Total Tebus Hidangan</span>
-                <span className="font-mono-tabular text-[#f89254]">
-                  {formatRupiah(confirmedOrder.totalPaid)}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2.5">
-              {onGoToPesanan && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setConfirmedOrder(null);
-                    onGoToPesanan();
-                  }}
-                  className="flex-1 h-12 px-4 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
-                >
-                  Lihat di Menu Pesanan
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  setConfirmedOrder(null);
-                  onBackToEtalase();
-                }}
-                className="flex-1 h-12 px-4 bg-[#1F281A] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
-              >
-                Kembali ke Menu Utama
-              </button>
-            </div>
-          </div>
-        ) : cart.length === 0 ? (
-          /* EMPTY CART PAGE STATE */
-          <div className="max-w-lg mx-auto bg-white border border-stone-200 rounded-2xl p-10 sm:p-14 text-center space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-stone-100 text-stone-500 flex items-center justify-center mx-auto">
-              <ShoppingBag className="w-7 h-7" />
-            </div>
-            <div className="space-y-1.5">
-              <h2 className="text-base sm:text-lg font-semibold text-stone-900">
-                Kantong penyelamatan Anda masih kosong
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500 max-w-xs mx-auto leading-relaxed">
-                Pilih paket sisa piring dari toko roti, warung makan, atau kafe UMKM Bandung untuk ditebus dengan harga hemat sore ini.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={onBackToEtalase}
-              className="min-h-[44px] px-6 py-2.5 bg-[#1F281A] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-emerald-900 transition-colors cursor-pointer"
-            >
-              Jelajahi Etalase Makanan
-            </button>
-          </div>
-        ) : (
-          /* ACTIVE CART ITEMS + CHECKOUT FORM GRID */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left 7 Columns: List of Cart Items */}
-            <div className="lg:col-span-7 space-y-3">
-              <div className="bg-white border border-stone-200/90 rounded-2xl divide-y divide-stone-200/80 overflow-hidden">
-                {cart.map(({ item, quantity }) => (
-                  <div key={item.id} className="p-4 sm:p-5 flex gap-3.5 sm:gap-4">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-stone-100 shrink-0">
-                      <ResilientImage
-                        src={item.imageUrl}
-                        alt={item.title}
-                        fallbackTitle={item.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                      <div>
-                        <p className="text-[11px] sm:text-xs text-stone-500 truncate">
-                          {item.merchantName} · Ambil {item.pickupWindow}
-                        </p>
-                        <h3 className="text-xs sm:text-sm font-semibold text-stone-900 leading-snug line-clamp-2 mt-0.5">
-                          {item.title}
-                        </h3>
-                        <div className="flex items-baseline gap-2 mt-1.5">
-                          <span className="text-sm sm:text-base font-bold text-[#f89254] font-mono-tabular">
-                            {formatRupiah(item.rescuePrice * quantity)}
-                          </span>
-                          <span className="text-[11px] text-stone-400 line-through font-mono-tabular">
-                            {formatRupiah(item.originalPrice * quantity)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-stone-100">
-                        <div className="flex items-center border border-stone-200 rounded-lg h-8 sm:h-9 bg-white">
-                          <button
-                            type="button"
-                            onClick={() => onUpdateQty(item.id, -1)}
-                            className="min-w-[34px] h-full flex items-center justify-center text-stone-700 hover:bg-stone-200/60 cursor-pointer"
-                            aria-label="Kurangi jumlah"
-                          >
-                            <Minus className="w-3.5 h-3.5" />
-                          </button>
-                          <span className="px-2.5 text-xs font-bold font-mono-tabular text-stone-900">
-                            {quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => onUpdateQty(item.id, 1)}
-                            disabled={quantity >= item.remainingStock}
-                            className="min-w-[34px] h-full flex items-center justify-center text-stone-700 hover:bg-stone-200/60 disabled:opacity-40 cursor-pointer"
-                            aria-label="Tambah jumlah"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => onRemove(item.id)}
-                          className="min-h-[34px] px-2.5 text-xs text-stone-400 hover:text-red-700 inline-flex items-center gap-1 cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Hapus</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right 5 Columns: Customer Pickup Form & Payment Summary */}
-            <div className="lg:col-span-5 relative bg-white border border-stone-200/90 rounded-2xl p-5 sm:p-6 space-y-5 lg:sticky lg:top-20 overflow-hidden">
-              {/* "Mohon Login" Overlay Covering the Data Pengambil Card when Not Logged In */}
-              {!currentUser && (
-                <div className="absolute inset-0 z-10 bg-white/85 backdrop-blur-[3px] flex flex-col items-center justify-center p-6 text-center space-y-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-[#1F281A]/10 text-[#1F281A] flex items-center justify-center">
-                    <Lock className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-1 max-w-xs">
-                    <h3 className="text-base font-bold text-stone-900">
-                      Mohon Login Terlebih Dahulu
-                    </h3>
-                    <p className="text-xs text-stone-600 leading-relaxed">
-                      Silakan login atau daftar akun untuk mengisi Data Pengambil Paket dan menerbitkan tiket pengambilan di kasir UMKM.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={onNavigateToAuth}
-                    className="min-h-[44px] px-6 py-2.5 bg-[#1F281A] hover:bg-emerald-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
-                  >
-                    Login / Register Sekarang
-                  </button>
-                </div>
-              )}
-
-              <form
-                id="rescue-checkout-form"
-                onSubmit={handleCheckoutSubmit}
-                className={`space-y-4 ${!currentUser ? 'pointer-events-none select-none opacity-45' : ''}`}
-              >
-                <h2 className="text-sm sm:text-base font-bold text-stone-900 pb-2 border-b border-stone-200">
-                  Data Pengambil Paket di Lokasi UMKM
-                </h2>
-
-                <div>
-                  <label
-                    htmlFor="checkout-name"
-                    className="block text-xs font-medium text-stone-700 mb-1"
-                  >
-                    Nama Lengkap Pengambil
-                  </label>
-                  <input
-                    id="checkout-name"
-                    type="text"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Contoh: Budi Santoso"
-                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="checkout-phone"
-                    className="block text-xs font-medium text-stone-700 mb-1"
-                  >
-                    Nomor WhatsApp (untuk Tiket Pengambilan)
-                  </label>
-                  <input
-                    id="checkout-phone"
-                    type="tel"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="Contoh: 081234567890"
-                    className="w-full h-11 px-3.5 text-xs sm:text-sm bg-white border border-stone-300 rounded-xl focus:outline-none focus:border-emerald-900 focus:bg-white font-mono-tabular"
-                  />
-                </div>
-
-                {currentUser?.defaultAddress && (
-                  <div className="p-3 bg-white border border-stone-200/80 rounded-xl text-xs space-y-0.5">
-                    <span className="font-semibold text-stone-800 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-[#1F281A]" />
-                      Alamat Default Anda:
-                    </span>
-                    <p className="text-stone-600 leading-relaxed pl-4">
-                      {currentUser.defaultAddress}
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <span className="block text-xs font-medium text-stone-700 mb-1.5">
-                    Pilih Metode Pembayaran
-                  </span>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('qris')}
-                      className={`min-h-[52px] px-3 py-2 text-xs font-semibold rounded-xl border text-left transition-colors cursor-pointer ${
-                        paymentMethod === 'qris'
-                          ? 'border-emerald-900 bg-emerald-950/5 text-emerald-950'
-                          : 'border-stone-200 text-stone-600 hover:border-stone-300'
-                      }`}
-                    >
-                      QRIS Instan
-                      <span className="block text-[11px] font-normal text-stone-500">
-                        Bebas biaya admin
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('cod')}
-                      className={`min-h-[52px] px-3 py-2 text-xs font-semibold rounded-xl border text-left transition-colors cursor-pointer ${
-                        paymentMethod === 'cod'
-                          ? 'border-emerald-900 bg-emerald-950/5 text-emerald-950'
-                          : 'border-stone-200 text-stone-600 hover:border-stone-300'
-                      }`}
-                    >
-                      Bayar Saat Ambil
-                      <span className="block text-[11px] font-normal text-stone-500">
-                        Tunai di kasir UMKM
-                      </span>
-                    </button>
-                  </div>
-                </div>
-
-                {formError && (
-                  <p className="text-xs text-red-700 font-medium">{formError}</p>
-                )}
-
-                {/* Order Cost & Savings Breakdown */}
-                <div className="pt-4 border-t border-stone-200 space-y-2 text-xs sm:text-sm">
-                  <div className="flex justify-between text-stone-500">
-                    <span>Total Harga Normal di Toko</span>
-                    <span className="line-through font-mono-tabular">
-                      {formatRupiah(totalOriginalPrice)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-emerald-900 font-medium">
-                    <span>Total Penghematan Anda</span>
-                    <span className="font-mono-tabular">
-                      -{formatRupiah(totalSavings)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-200">
-                    <span>Total Bayar</span>
-                    <span className="font-mono-tabular text-[#f89254]">
-                      {formatRupiah(totalRescuePrice)}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full h-12 px-4 bg-[#f89254] hover:bg-[#e57d3d] text-white text-xs sm:text-sm font-semibold rounded-xl active:scale-[0.99] transition-all cursor-pointer whitespace-nowrap"
-                >
-                  Konfirmasi & Terbitkan Tiket Ambil
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+export { RescueCartFlow as RescueCartPage } from './cart/RescueCartFlow';
+export type { RescueCartPageProps } from './cart/RescueCartFlow';

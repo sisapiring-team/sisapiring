@@ -14,30 +14,40 @@ import {
   Receipt,
   X,
 } from 'lucide-react';
-import { AdminMacroStats, AdminTab } from './types';
-import { formatRupiah } from '../../data/sisaPiringCatalog';
+import { AdminTab } from './types';
+import { useAdminDashboard } from '../../hooks/useAdminDashboard';
 
-interface AdminFloatingNavbarProps {
-  macroStats: AdminMacroStats;
+export const AdminFloatingNavbar: React.FC<{
   onMobileMenuToggle: () => void;
   onSwitchToPublicEtalase: () => void;
   onSwitchToSellerPortal?: () => void;
   onSelectTab?: (tab: AdminTab) => void;
-}
-
-export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
-  macroStats,
+  currentUser?: { name: string; email: string; role?: string } | null;
+  onLogout?: () => void;
+}> = ({
   onMobileMenuToggle,
   onSwitchToPublicEtalase,
   onSwitchToSellerPortal,
   onSelectTab,
+  currentUser,
+  onLogout,
 }) => {
+  const { stats } = useAdminDashboard();
+  const pendingAlertsCount = (stats?.merchantsPending ?? 0) + (stats?.openDisputes ?? 0);
+
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  const pendingAlertsCount =
-    (macroStats.pendingUmkmCount || 0) + (macroStats.openDisputesCount || 0);
+  const adminName = currentUser?.name || 'Super Administrator';
+  const adminEmail = currentUser?.email || 'admin@sisapiring.com';
+  const adminInitials = adminName
+    .split(' ')
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'SA';
 
   return (
     <header className="fixed top-3 sm:top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none select-none">
@@ -120,7 +130,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  {macroStats.openDisputesCount > 0 && (
+                  {(stats?.openDisputes ?? 0) > 0 && (
                     <button
                       type="button"
                       onClick={() => {
@@ -132,7 +142,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                       <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold text-rose-300 block text-[11px]">
-                          {macroStats.openDisputesCount} Komplain Pembeli Terbuka
+                          {stats?.openDisputes} Komplain Pembeli Terbuka
                         </span>
                         <span className="text-[10px] text-neutral-300 block">
                           Perlu evaluasi klaim garansi sisa piring & refund.
@@ -141,7 +151,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                     </button>
                   )}
 
-                  {macroStats.pendingUmkmCount > 0 && (
+                  {(stats?.merchantsPending ?? 0) > 0 && (
                     <button
                       type="button"
                       onClick={() => {
@@ -153,7 +163,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                       <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold text-amber-300 block text-[11px]">
-                          {macroStats.pendingUmkmCount} Verifikasi KYB Menunggu Review
+                          {stats?.merchantsPending} Verifikasi KYB Menunggu Review
                         </span>
                         <span className="text-[10px] text-neutral-300 block">
                           Tinjau legalitas NIB & uji higienitas gerai baru.
@@ -166,14 +176,14 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                     <div className="flex items-center gap-2">
                       <Receipt className="w-4 h-4 text-indigo-400" />
                       <div>
-                        <span className="text-[10px] text-neutral-400 block">Escrow Platform Aktif</span>
+                        <span className="text-[10px] text-neutral-400 block">Revenue Platform</span>
                         <span className="text-xs font-mono font-bold text-indigo-300">
-                          {formatRupiah(macroStats.totalEscrowHeld)}
+                          {stats ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(stats.revenue) : '—'}
                         </span>
                       </div>
                     </div>
                     <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      Tersimpan Aman
+                      Lunas
                     </span>
                   </div>
 
@@ -205,14 +215,14 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
             aria-label="Menu Profil Administrator"
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#8da249] border border-white/20 text-white font-extrabold text-xs flex items-center justify-center shadow-xs relative shrink-0">
-              SA
+              {adminInitials}
               <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#8da249] ring-2 ring-[#1F281A]" />
             </div>
 
             <div className="hidden md:block text-left">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold text-white leading-tight">
-                  Super Administrator
+                  {adminName}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#8da249] bg-[#8da249]/15 border border-[#8da249]/30 px-1.5 py-0.2 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#8da249] animate-pulse" />
@@ -220,7 +230,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                 </span>
               </div>
               <span className="text-[10px] text-neutral-400 block leading-tight font-mono">
-                admin@sisapiring.id
+                {adminEmail}
               </span>
             </div>
 
@@ -237,51 +247,25 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
             <div className="p-2 border-b border-white/10 mb-1.5">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-[#8da249] border border-white/20 text-white font-bold flex items-center justify-center text-xs shrink-0">
-                  SA
+                  {adminInitials}
                 </div>
                 <div className="min-w-0">
-                  <span className="font-bold text-white block truncate">Super Administrator</span>
+                  <span className="font-bold text-white block truncate">{adminName}</span>
                   <span className="text-[10px] text-[#8da249] font-mono block truncate">
-                    Kota Bandung (Diskominfokot)
+                    {adminEmail}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="pt-1 mt-1 border-t border-white/10">
               <button
                 type="button"
                 onClick={() => {
                   setProfileDropdownOpen(false);
-                  onSwitchToPublicEtalase();
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-neutral-200 hover:text-white transition-colors cursor-pointer text-left"
-              >
-                <ShoppingBag className="w-4 h-4 text-amber-400" />
-                <span>Buka Etalase Pembeli</span>
-              </button>
-
-              {onSwitchToSellerPortal && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileDropdownOpen(false);
-                    onSwitchToSellerPortal();
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-neutral-200 hover:text-white transition-colors cursor-pointer text-left"
-                >
-                  <Store className="w-4 h-4 text-emerald-400" />
-                  <span>Buka Portal Mitra UMKM</span>
-                </button>
-              )}
-            </div>
-
-            <div className="pt-1.5 mt-1.5 border-t border-white/10">
-              <button
-                type="button"
-                onClick={() => {
-                  setProfileDropdownOpen(false);
-                  onSwitchToPublicEtalase();
+                  if (onLogout) {
+                    onLogout();
+                  }
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 transition-colors cursor-pointer text-left font-semibold"
               >

@@ -13,12 +13,11 @@ import {
   Clock,
   XCircle,
   FileCheck,
-  ExternalLink,
-  ShieldCheck,
 } from 'lucide-react';
 import { ActiveTab, useApp } from '../../context/AppContext';
 import { ConfirmationModal } from '../common/ConfirmationModal';
 import { pushRoute } from '../../utils/navigation';
+import { logoutRemote } from '../../lib/api';
 
 /**
  * Warna cadangan tab aktif (dipakai sebelum warna halaman berhasil dibaca).
@@ -112,7 +111,10 @@ export const SellerSidebar: React.FC = () => {
 
   const handleLogout = () => {
     setShowLogoutModal(false);
-    showToast('Keluar Berhasil', 'Sesi sesi portal mitra telah ditutup.', 'info');
+    void logoutRemote().catch(() => undefined);
+    showToast('Keluar Berhasil', 'Sesi portal mitra telah ditutup.', 'info');
+    pushRoute('/auth');
+    setActiveTab('marketplace');
   };
 
   // Inisial usaha untuk avatar (tidak ada field foto di data, jadi pakai huruf)
@@ -217,38 +219,15 @@ export const SellerSidebar: React.FC = () => {
           })}
         </nav>
 
-        {/* Akses lain */}
-        <div className="px-5 pb-4 pt-2">
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f89254]">Akses lain</p>
-          <div className="space-y-0.5">
-            <button
-              onClick={() => {
-                pushRoute('/etalase');
-                setActiveTab('marketplace');
-              }}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <ExternalLink className="h-4 w-4 text-white/50" />
-              <span>Etalase Pembeli</span>
-            </button>
-            <button
-              onClick={() => {
-                pushRoute('/admin');
-                setActiveTab('admin');
-              }}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <ShieldCheck className="h-4 w-4 text-white/50" />
-              <span>Panel Admin</span>
-            </button>
-            <button
-              onClick={() => setShowLogoutModal(true)}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-1.5 text-xs font-medium text-white/50 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Keluar Portal</span>
-            </button>
-          </div>
+        {/* Tombol Keluar Portal */}
+        <div className="px-5 pb-4 pt-3 border-t border-white/10">
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-rose-300 transition-colors hover:bg-rose-500/15 hover:text-rose-200 cursor-pointer"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Keluar Portal</span>
+          </button>
         </div>
       </aside>
 

@@ -19,10 +19,10 @@
 
 | Nama | Peran | Fokus Pekerjaan (Job Desk) | GitHub |
 | :--- | :--- | :--- | :--- |
-| **[Nama 1]** | **Frontend** *(The Builder)* | *Coding* antarmuka. Memastikan desain *mobile-first* (berbentuk memanjang seperti HP) agar realistis digunakan pembeli di lapangan. | [@username](https://github.com/) |
-| **[Nama 2]** | **Backend & DB** *(The Logic)* | Menangani sistem *auth*, CRUD, *countdown timer*, sistem kuncian stok sementara, & rumus di *Impact Dashboard*. | [@username](https://github.com/) |
-| **[Nama 3]** | **UI/UX & Video** *(The Artist)* | Membuat *wireframe* cepat di Figma. Merekam & mengedit video demo menggunakan CapCut (transisi & efek). | [@username](https://github.com/) |
-| **[Nama 4]** | **Project Manager** *(The Pitcher)* | *Hustler* utama. Menulis script video, *pitch deck*, menjadi aktor demo, & melakukan *QA Testing* ketat mencari bug. | [@username](https://github.com/) |
+| **Tifayatul Husna Azahra** | **Frontend** *(The Builder)* | *Coding* antarmuka. Memastikan desain *mobile-first* (berbentuk memanjang seperti HP) agar realistis digunakan pembeli di lapangan. | [ifaaYourStarz07](https://github.com/ifaaYourStarz07) |
+| **Rafaditya Syahputra** | **Backend & DB** *(The Logic)* | Menangani sistem *auth*, CRUD, *countdown timer*, sistem kuncian stok sementara, & rumus di *Impact Dashboard*. | [@Raditt10](https://github.com/Raditt10) |
+| **Nabil Akbar Fadhillah** | **UI/UX Design** *(The Artist)* | Membuat *wireframe*. Merekam & mengedit video demo menggunakan CapCut (transisi & efek). | [@nesnt](https://github.com/nesnt) |
+| **Kaisa Vidya Amatullah** | **Project Manager** *(The Pitcher)* | *Hustler* utama. Menulis script video, *pitch deck*, menjadi aktor demo, & melakukan *QA Testing* ketat mencari bug. | [@kaisavidya-commits](https://github.com/kaisavidya-commits) |
 
 ---
 
@@ -60,29 +60,19 @@ Kami merancang SisaPiring dengan alur yang sangat singkat agar UMKM dan pembeli 
 
 ## 💻 Tech Stack
 
--   **Frontend:** ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white) ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
--   **Backend & DB:** ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white) *(Ganti Firebase jika perlu)*
--   **Design & Media:** ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white) ![CapCut](https://img.shields.io/badge/CapCut-000000?style=for-the-badge&logo=capcut&logoColor=white)
+-   **Frontend:** ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+-   **Backend & DB:** ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white) ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white) ![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 
 ---
 
 ## 🏗️ System Architecture
 
-> [!NOTE]  
-> *(Catatan untuk Tim: Ganti gambar di bawah ini dengan diagram arsitektur sistem/ERD buatan Anda. Bisa menggunakan draw.io)*
+Skema database (ERD) SisaPiring:
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x300/EFEFEF/333333?text=Drop+Your+Architecture+Diagram+Here" alt="Architecture Diagram">
-</div>
-
----
-
-## 🎥 Sneak Peek (Demo)
-
-*(Ganti gambar di bawah dengan GIF rekaman layar aplikasi Anda berdurasi 10 detik. GIF sangat disukai juri!)*
-
-<div align="center">
-  <img src="https://via.placeholder.com/600x350/EFEFEF/333333?text=Drop+Your+GIF+Demo+Here" alt="SisaPiring GIF Demo">
+  <img src="public/assets/images/vibeschema-diagram.png" alt="ERD Database SisaPiring" width="100%">
+  <span>
+  <a href="https://vibe-schema.com/s/qA9vYwVdfs-GRKo-u-Q69W07gY0">Lihat Detail ERD di VibeSchema</a></span>
 </div>
 
 ---
@@ -94,34 +84,50 @@ Jika juri atau pengembang ingin menjalankan SisaPiring di *local environment*, i
 <details>
 <summary><b>Klik untuk melihat panduan instalasi lokal</b></summary>
 
+Prasyarat: Node.js, PHP 8.2+, Composer, dan MySQL/MariaDB (misalnya lewat XAMPP).
+
 1. **Clone repository ini**
    ```bash
-   git clone https://github.com/USERNAME/SisaPiring.git
-   cd SisaPiring
+   git clone https://github.com/sisapiring-team/sisapiring.git
+   cd sisapiring
    ```
 
 2. **Install Dependencies**
    ```bash
    npm install
+   composer install
    ```
 
 3. **Konfigurasi Environment (.env)**
-   Salin file template `.env.example` menjadi `.env.local`
+   Salin file template `.env.example` menjadi `.env`, lalu buat kunci aplikasi:
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env
+   php artisan key:generate
    ```
-   Buka file `.env.local` dan masukkan konfigurasi berikut (sesuaikan dengan kredensial API Anda):
+   Buka file `.env` dan sesuaikan koneksi database (contoh untuk XAMPP). Buat dulu database kosong bernama `sisapiring`:
    ```env
-   # .env.example (Sertakan file ini di repo, JANGAN sertakan API KEY asli)
-   NEXT_PUBLIC_DATABASE_URL=
-   NEXT_PUBLIC_ANON_KEY=
+   DB_CONNECTION=mariadb
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=sisapiring
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+   Jangan sertakan API key asli di repo.
+
+4. **Siapkan Database**
+   ```bash
+   php artisan migrate --seed
    ```
 
-4. **Jalankan Aplikasi**
+5. **Jalankan Aplikasi** (dua terminal)
+   ```bash
+   php artisan serve
+   ```
    ```bash
    npm run dev
    ```
-   Buka `http://localhost:3000`. **Sangat disarankan menekan F12 (Inspect) dan memilih tampilan Mobile** untuk pengalaman UI/UX yang optimal.
+   Buka `http://localhost:5173`. **Sangat disarankan menekan F12 (Inspect) dan memilih tampilan Mobile** untuk pengalaman UI/UX yang optimal.
 
 </details>
 

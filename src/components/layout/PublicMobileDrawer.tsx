@@ -292,37 +292,6 @@ export const PublicMobileDrawer: React.FC<PublicMobileDrawerProps> = ({
             </>
           )}
 
-          {/* Special Portals Divider */}
-          <div className="pt-3 pb-1 border-t border-white/10 mt-3">
-            <span className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400">
-              Portal & Tata Kelola
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              onClose();
-              onOpenSeller();
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-[#8da249] bg-[#8da249]/10 hover:bg-[#8da249]/20 transition-colors cursor-pointer"
-          >
-            <Store className="w-4 h-4" />
-            <span>Portal Mitra UMKM</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              onClose();
-              onOpenAdmin();
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-cyan-400 bg-cyan-400/10 hover:bg-cyan-400/20 transition-colors cursor-pointer"
-          >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Panel Tata Kelola Admin</span>
-          </button>
-
           {/* User Settings in Drawer */}
           {currentUser && (
             <>

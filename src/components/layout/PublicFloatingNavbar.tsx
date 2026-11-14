@@ -425,32 +425,6 @@ export const PublicFloatingNavbar: React.FC<PublicFloatingNavbarProps> = ({
                   <span>Pengaturan Profil & Kontak</span>
                 </button>
               )}
-
-              <div className="my-1 border-t border-white/10" />
-
-              <button
-                type="button"
-                onClick={() => {
-                  setProfileDropdownOpen(false);
-                  onOpenSeller();
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-neutral-200 hover:text-white transition-colors cursor-pointer text-left"
-              >
-                <Store className="w-4 h-4 text-amber-400" />
-                <span>Buka Portal Mitra UMKM</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setProfileDropdownOpen(false);
-                  onOpenAdmin();
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-neutral-200 hover:text-white transition-colors cursor-pointer text-left"
-              >
-                <ShieldCheck className="w-4 h-4 text-cyan-400" />
-                <span>Buka Panel Tata Kelola Admin</span>
-              </button>
             </div>
 
             {/* Logout Action */}

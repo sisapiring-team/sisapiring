@@ -1015,7 +1015,7 @@ function CustomerAndAdminPortal() {
           ? 'h-[100dvh] max-h-[100dvh] overflow-hidden'
           : 'min-h-screen overflow-x-hidden'
       } flex flex-col bg-white text-stone-900 ${
-        !currentUser && activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
+        activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot'
           ? 'pb-16'
           : ''
       }`}
@@ -2770,8 +2770,8 @@ function CustomerAndAdminPortal() {
         </div>
       )}
 
-      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY (Hanya untuk tamu/guest sebelum login) */}
-      {!currentUser && activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
+      {/* BOTTOM NAVBAR (HOME BAR): UTAMA, PESANAN, DAN HISTORY */}
+      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && activePage !== 'chat' && activePage !== 'chat-bot' && (
         <nav
           aria-label="Navigasi Bawah"
           className="fixed bottom-0 inset-x-0 z-40 h-16 bg-white border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-around px-2"

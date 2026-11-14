@@ -7,8 +7,7 @@ import {
   AlertTriangle,
   Star,
   Users,
-  ExternalLink,
-  ShoppingBag,
+  LogOut,
 } from 'lucide-react';
 import { AdminTab, AdminMacroStats } from './types';
 
@@ -16,8 +15,9 @@ interface AdminSidebarProps {
   activeTab: AdminTab;
   onTabChange: (tab: AdminTab) => void;
   macroStats?: AdminMacroStats;
-  onSwitchToPublicEtalase: () => void;
+  onSwitchToPublicEtalase?: () => void;
   onSwitchToSellerPortal?: () => void;
+  onLogout?: () => void;
   expanded?: boolean;
 }
 
@@ -25,8 +25,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   activeTab,
   onTabChange,
   macroStats,
-  onSwitchToPublicEtalase,
-  onSwitchToSellerPortal,
+  onSwitchToPublicEtalase: _onSwitchToPublicEtalase,
+  onSwitchToSellerPortal: _onSwitchToSellerPortal,
+  onLogout,
   expanded = false,
 }) => {
   // LENGKAP 7 MENU FITUR & MONITORING (SEMUA MASUK DI BLOK ATAS)
@@ -161,22 +162,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </div>
 
         <div className="p-4 border-t border-white/10 space-y-2 bg-[#1F281A]">
-          <button
-            type="button"
-            onClick={onSwitchToPublicEtalase}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-          >
-            <ShoppingBag className="w-4 h-4 text-[#8da249]" />
-            <span>Buka Etalase Pembeli</span>
-          </button>
-          {onSwitchToSellerPortal && (
+          {onLogout && (
             <button
               type="button"
-              onClick={onSwitchToSellerPortal}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              onClick={onLogout}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:text-rose-200 hover:bg-rose-500/20 transition-colors cursor-pointer"
             >
-              <Store className="w-4 h-4 text-[#8da249]" />
-              <span>Buka Portal Mitra UMKM</span>
+              <LogOut className="w-4 h-4 text-rose-400" />
+              <span>Keluar dari Sesi Admin</span>
             </button>
           )}
         </div>
@@ -259,39 +252,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       {/* RUANG TENGAH TRANSPARAN (KE BAWAHNYA TIDAK ADA BACKGROUND) */}
       {/* ======================================================== */}
 
-      {/* ======================================================== */}
-      {/* BLOK 2: MENU AKSI / PROFIL (TERPISAH MANDIRI DI BAWAH) */}
-      {/* ======================================================== */}
+      {/* BLOK 2: PROFIL SA & KELUAR SESI */}
       <div
-        aria-label="Aksi Profil & Portal"
+        aria-label="Aksi Profil Admin"
         className="fixed left-4 bottom-6 z-30 w-14 xl:w-16 rounded-3xl bg-[#1F281A]/90 border border-white/10 backdrop-blur-md shadow-2xl py-2.5 px-1.5 xl:px-2 flex flex-col items-center gap-2 select-none"
       >
-        {/* Tombol Pintas Buka Etalase Pembeli */}
-        <div className="relative group w-full flex justify-center">
-          <button
-            type="button"
-            onClick={onSwitchToPublicEtalase}
-            className="w-10 h-10 xl:w-11 xl:h-11 rounded-2xl bg-white/5 hover:bg-white/15 text-neutral-300 hover:text-white border border-white/10 flex items-center justify-center transition-all cursor-pointer hover:scale-105"
-            title="Buka Etalase Pembeli"
-            aria-label="Buka Etalase Pembeli"
-          >
-            <ExternalLink className="w-4 h-4" />
-          </button>
-
-          <div className="pointer-events-none absolute left-full ml-3.5 top-1/2 -translate-y-1/2 z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 transform translate-x-1 group-hover:translate-x-0 whitespace-nowrap">
-            <div className="bg-[#1F281A]/98 text-white px-3 py-1.5 rounded-xl shadow-2xl border border-white/15 text-left backdrop-blur-xl">
-              <span className="font-bold text-xs text-white block">Pintas Etalase Konsumen</span>
-              <span className="text-[10px] text-neutral-400 block">Buka tampilan pasar sisa piring</span>
-            </div>
-            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#1F281A]" />
-          </div>
-        </div>
-
         {/* Profil Super Administrator (SA) */}
         <div className="relative group w-full flex justify-center">
           <div
-            onClick={onSwitchToSellerPortal}
-            className="w-9 h-9 xl:w-10 xl:h-10 rounded-2xl bg-[#8da249] hover:bg-[#7b8e3d] border border-white/20 text-white font-extrabold text-xs flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-pointer"
+            className="w-9 h-9 xl:w-10 xl:h-10 rounded-2xl bg-[#8da249] border border-white/20 text-white font-extrabold text-xs flex items-center justify-center shadow-lg select-none"
             title="Profil Super Administrator"
           >
             SA
@@ -305,11 +274,34 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   Online
                 </span>
               </div>
-              <span className="text-[10px] text-neutral-400 block">admin@sisapiring.id</span>
+              <span className="text-[10px] text-neutral-400 block">admin@sisapiring.com</span>
             </div>
             <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#1F281A]" />
           </div>
         </div>
+
+        {/* Tombol Logout Sesi Admin */}
+        {onLogout && (
+          <div className="relative group w-full flex justify-center">
+            <button
+              type="button"
+              onClick={onLogout}
+              className="w-9 h-9 xl:w-10 xl:h-10 rounded-2xl bg-white/5 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-white/10 flex items-center justify-center transition-all cursor-pointer hover:scale-105"
+              title="Keluar dari Sesi Admin"
+              aria-label="Keluar dari Sesi Admin"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+
+            <div className="pointer-events-none absolute left-full ml-3.5 top-1/2 -translate-y-1/2 z-50 opacity-0 group-hover:opacity-100 transition-all duration-150 transform translate-x-1 group-hover:translate-x-0 whitespace-nowrap">
+              <div className="bg-[#1F281A]/98 text-white px-3 py-1.5 rounded-xl shadow-2xl border border-white/15 text-left backdrop-blur-xl">
+                <span className="font-bold text-xs text-rose-300 block">Keluar Sesi</span>
+                <span className="text-[10px] text-neutral-400 block">Tutup sesi panel admin</span>
+              </div>
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#1F281A]" />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

@@ -258,43 +258,13 @@ export const AdminFloatingNavbar: React.FC<{
               </div>
             </div>
 
-            <div className="space-y-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setProfileDropdownOpen(false);
-                  onSwitchToPublicEtalase();
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-neutral-200 hover:text-white transition-colors cursor-pointer text-left"
-              >
-                <ShoppingBag className="w-4 h-4 text-amber-400" />
-                <span>Buka Etalase Pembeli</span>
-              </button>
-
-              {onSwitchToSellerPortal && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileDropdownOpen(false);
-                    onSwitchToSellerPortal();
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-neutral-200 hover:text-white transition-colors cursor-pointer text-left"
-                >
-                  <Store className="w-4 h-4 text-emerald-400" />
-                  <span>Buka Portal Mitra UMKM</span>
-                </button>
-              )}
-            </div>
-
-            <div className="pt-1.5 mt-1.5 border-t border-white/10">
+            <div className="pt-1 mt-1 border-t border-white/10">
               <button
                 type="button"
                 onClick={() => {
                   setProfileDropdownOpen(false);
                   if (onLogout) {
                     onLogout();
-                  } else {
-                    onSwitchToPublicEtalase();
                   }
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 transition-colors cursor-pointer text-left font-semibold"

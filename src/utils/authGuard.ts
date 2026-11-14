@@ -82,7 +82,11 @@ export function checkRoleRouteAccess(
     return { allowed: true, redirectPath: targetPath };
   }
 
-  // 4. GUEST (UNAUTHENTICATED)
+  // 4. GUEST (UNAUTHENTICATED): Can ONLY access landing (/) or auth (/auth)
+  if (parsed.page === 'landing' || parsed.page === 'auth') {
+    return { allowed: true, redirectPath: targetPath };
+  }
+
   if (parsed.page === 'penjual') {
     return {
       allowed: false,
@@ -99,6 +103,9 @@ export function checkRoleRouteAccess(
     };
   }
 
-  // Allow public etalase, store, chat, and admin login gate
-  return { allowed: true, redirectPath: targetPath };
+  return {
+    allowed: false,
+    redirectPath: '/auth',
+    notice: 'Silakan login atau daftar akun terlebih dahulu untuk mengakses etalase SisaPiring.',
+  };
 }

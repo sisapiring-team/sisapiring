@@ -26,7 +26,7 @@ export interface UserAccount {
 
 interface AuthPageProps {
   initialMode?: 'login' | 'register';
-  onSuccessLogin: (user: UserAccount) => void;
+  onSuccessLogin: (user: UserAccount, isNewRegistration?: boolean) => void;
   onBack: () => void;
 }
 
@@ -129,7 +129,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         role: user.role,
         district: user.district || 'Coblong (Dago / Dipatiukur)',
         defaultAddress: user.defaultAddress || '',
-      });
+      }, false);
     } catch (error) {
       setErrorMsg(apiErrorMessage(error, 'Email atau kata sandi tidak sesuai.'));
     } finally {
@@ -213,7 +213,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         role: user.role,
         district: user.district || district,
         defaultAddress: user.defaultAddress || fullDefaultAddress,
-      });
+      }, true);
     } catch (error) {
       setErrorMsg(apiErrorMessage(error, 'Pendaftaran gagal. Silakan periksa data Anda.'));
     } finally {

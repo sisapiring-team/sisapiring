@@ -367,7 +367,12 @@ function CustomerAndAdminPortal() {
   const [orders, setOrders] = useState<OrderRecord[]>(() => {
     try {
       const saved = localStorage.getItem('sisapiring_customer_orders');
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return [];
+      const stored = getStoredUser();
+      if (!stored) return [];
+      return parsed.filter((o) => o.name === stored.name);
     } catch {
       return [];
     }
@@ -551,6 +556,11 @@ function CustomerAndAdminPortal() {
   };
 
   const openEtalasePage = () => {
+    if (!currentUser) {
+      setRecentToast('Silakan login atau daftar akun terlebih dahulu untuk melihat etalase.');
+      openAuthPage();
+      return;
+    }
     pushRoute('/etalase');
     setActiveTab('marketplace');
     setActivePage('etalase');
@@ -558,18 +568,30 @@ function CustomerAndAdminPortal() {
   };
 
   const openCartPage = () => {
+    if (!currentUser) {
+      openAuthPage();
+      return;
+    }
     pushRoute('/kantong');
     setActivePage('kantong');
     scrollToTop();
   };
 
   const openCartConfirmationPage = () => {
+    if (!currentUser) {
+      openAuthPage();
+      return;
+    }
     pushRoute('/kantong/confirmation');
     setActivePage('kantong-confirmation');
     scrollToTop();
   };
 
   const openOrdersPage = () => {
+    if (!currentUser) {
+      openAuthPage();
+      return;
+    }
     pushRoute('/pesanan');
     setActiveTab('marketplace');
     setActivePage('pesanan');
@@ -577,6 +599,10 @@ function CustomerAndAdminPortal() {
   };
 
   const openHistoryPage = () => {
+    if (!currentUser) {
+      openAuthPage();
+      return;
+    }
     pushRoute('/history');
     setActiveTab('marketplace');
     setActivePage('history');
@@ -683,16 +709,26 @@ function CustomerAndAdminPortal() {
     window.setTimeout(() => setRecentToast(null), 2500);
   };
 
-  const handleSuccessLogin = (user: UserAccount) => {
+  const handleSuccessLogin = (user: UserAccount, isNewRegistration = false) => {
     setCurrentUser(user);
     void refreshRemoteData();
-    setOrders((prev) =>
-      prev.map((o) => ({
-        ...o,
-        name: user.name,
-        phone: user.phone,
-      }))
-    );
+
+    if (isNewRegistration) {
+      setOrders([]);
+      setCart([]);
+      try {
+        localStorage.removeItem('sisapiring_customer_orders');
+        localStorage.removeItem('sisapiring_customer_cart');
+      } catch {}
+    } else {
+      setOrders((prev) => {
+        const matching = prev.filter((o) => o.name === user.name);
+        try {
+          localStorage.setItem('sisapiring_customer_orders', JSON.stringify(matching));
+        } catch {}
+        return matching;
+      });
+    }
 
     const role = String(user.role || '').trim().toLowerCase();
     if (role === 'admin') {
@@ -705,10 +741,13 @@ function CustomerAndAdminPortal() {
     ) {
       openSellerPage();
     } else {
-      openEtalasePage();
+      pushRoute('/etalase');
+      setActiveTab('marketplace');
+      setActivePage('etalase');
+      scrollToTop();
     }
 
-    setRecentToast(`Selamat datang kembali, ${user.name}!`);
+    setRecentToast(`Selamat datang, ${user.name}!`);
     window.setTimeout(() => {
       setRecentToast((prev) => (prev?.includes(user.name) ? null : prev));
     }, 3000);

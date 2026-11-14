@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { apiErrorMessage, loginRemote, registerRemote } from '../lib/api';
+import { scrollToTop } from '../lib/smoothScroll';
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,6 +23,7 @@ export interface UserAccount {
   name: string;
   email: string;
   phone: string;
+  role?: 'buyer' | 'seller' | 'admin';
   district?: string;
   defaultAddress?: string;
 }
@@ -140,6 +142,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         name: user.name,
         email: user.email,
         phone: user.phone || '081234567890',
+        role: user.role,
         district: user.district || 'Coblong (Dago / Dipatiukur)',
         defaultAddress: user.defaultAddress || '',
       });
@@ -162,7 +165,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     }
 
     setRegisterStep(2);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   // Page 2 Registration: Validate Name, Email & Password -> Go to Page 3 (Default Address Page)
@@ -189,7 +192,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
     setRegisterStep(3);
     setShowSuccessRegisterPopup(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   // Page 3 Registration: Save Default Address -> Complete Registration & Login
@@ -223,6 +226,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         name: user.name,
         email: user.email,
         phone: user.phone || phone.trim(),
+        role: 'buyer',
         district: user.district || district,
         defaultAddress: user.defaultAddress || fullDefaultAddress,
       });
@@ -281,7 +285,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     }
 
     setUmkmStep(2);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   // UMKM Page 2: Identitas Usaha Bagian 1 (Nama Usaha, Kategori Usaha, Alamat Usaha)
@@ -303,7 +307,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     }
 
     setUmkmStep(3);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   // UMKM Page 3: Identitas Usaha Bagian 2 (Foto & Dokumen Pendukung Usaha)
@@ -317,7 +321,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     }
 
     setUmkmSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -346,55 +350,23 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white pb-12 flex flex-col">
-      {/* Top Sub-Header with Back Button */}
-      <section className="bg-white border-b border-stone-200/90 py-3.5 sm:py-4">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleHeaderBack}
-              aria-label="Kembali"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-stone-100 hover:bg-stone-200/70 flex items-center justify-center text-stone-800 transition-colors cursor-pointer shrink-0"
-            >
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <div>
-              <h1 className="text-base sm:text-lg font-bold text-stone-900 tracking-tight">
-                {mode === 'login'
-                  ? 'Masuk ke SisaPiring'
-                  : mode === 'register-umkm'
-                  ? 'Pendaftaran Mitra UMKM'
-                  : registerStep === 3
-                  ? 'Atur Alamat Default'
-                  : 'Daftar Akun SisaPiring'}
-              </h1>
-              <p className="text-[11px] sm:text-xs text-stone-500">
-                {mode === 'login'
-                  ? 'Masukkan nama/email dan kata sandi Anda'
-                  : mode === 'register-umkm'
-                  ? umkmSubmitted
-                    ? 'Pendaftaran usaha berhasil dikirim'
-                    : umkmStep === 1
-                    ? 'Data pemilik atau penanggung jawab usaha'
-                    : umkmStep === 2
-                    ? 'Identitas nama, kategori, dan alamat usaha'
-                    : 'Unggah foto & dokumen pendukung usaha'
-                  : registerStep === 1
-                  ? 'Masukkan nomor telepon aktif Anda'
-                  : registerStep === 2
-                  ? 'Lengkapi nama, email, dan kata sandi akun'
-                  : 'Simpan alamat default Bandung Anda'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center px-4 py-8">
+      {/* Top Back & Brand Bar */}
+      <div className="w-full max-w-md mb-3 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-600 hover:text-stone-900 px-3 py-1.5 rounded-xl bg-white border border-stone-200/80 hover:bg-stone-100 transition-colors cursor-pointer shadow-2xs"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Kembali</span>
+        </button>
+        <span className="text-xs text-stone-500 font-medium">SisaPiring Bandung</span>
+      </div>
 
-      {/* Main Centered Auth Card + Below-Card Button */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 sm:py-12">
-        <div className="w-full max-w-md space-y-3.5">
-          <div className="bg-white border border-stone-200/90 rounded-2xl shadow-xs overflow-hidden">
+      {/* Main Centered Auth Card */}
+      <div className="w-full max-w-md">
+        <div className="bg-white border border-stone-200/90 rounded-2xl shadow-xs overflow-hidden">
           {mode === 'login' ? (
             /* ================= LOGIN PAGE: DIRECT NAMA/EMAIL & PASSWORD ================= */
             <form onSubmit={handleLoginSubmit} className="p-5 sm:p-7 space-y-4">
@@ -405,6 +377,48 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 <p className="text-xs text-stone-500 leading-relaxed">
                   Masukkan email terdaftar beserta kata sandi Anda untuk langsung masuk.
                 </p>
+              </div>
+
+              {/* Quick Demo Fill Buttons */}
+              <div className="p-3 rounded-xl bg-[#F4F6EC] border border-[#8DA249]/25 space-y-2">
+                <span className="text-[11px] font-bold text-stone-700 block">
+                  ⚡ Masuk Cepat Akun Demo:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginIdentifier('buyer@sisapiring.com');
+                      setLoginPassword('SisaPiring123');
+                      setErrorMsg('');
+                    }}
+                    className="px-2.5 py-1 bg-white hover:bg-[#8DA249] hover:text-white text-[11px] font-semibold text-stone-700 rounded-lg border border-stone-200 transition-colors cursor-pointer shadow-2xs"
+                  >
+                    👤 Pembeli (Siti)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginIdentifier('seller@sisapiring.com');
+                      setLoginPassword('SisaPiring123');
+                      setErrorMsg('');
+                    }}
+                    className="px-2.5 py-1 bg-white hover:bg-[#8DA249] hover:text-white text-[11px] font-semibold text-stone-700 rounded-lg border border-stone-200 transition-colors cursor-pointer shadow-2xs"
+                  >
+                    🏪 UMKM (Ridwan)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginIdentifier('admin@sisapiring.com');
+                      setLoginPassword('SisaPiring123');
+                      setErrorMsg('');
+                    }}
+                    className="px-2.5 py-1 bg-white hover:bg-[#8DA249] hover:text-white text-[11px] font-semibold text-stone-700 rounded-lg border border-stone-200 transition-colors cursor-pointer shadow-2xs"
+                  >
+                    🛡️ Admin
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -1163,7 +1177,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             </button>
           )}
         </div>
-      </div>
 
       {/* POP-UP NOTIFIKASI PENDAFTARAN AKUN BERHASIL */}
       {showSuccessRegisterPopup && mode === 'register' && registerStep === 3 && (

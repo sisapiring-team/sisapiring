@@ -17,6 +17,7 @@ import {
 import { SisaPiringItem, formatRupiah } from '../data/sisaPiringCatalog';
 import { ResilientImage } from './ResilientImage';
 import { UserAccount } from './AuthPage';
+import { scrollToTop } from '../lib/smoothScroll';
 
 export interface CartEntry {
   item: SisaPiringItem;
@@ -358,7 +359,7 @@ export const RescueCartPage: React.FC<RescueCartPageProps> = ({
       onOrderCreated(newOrder);
     }
     onClearCart();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   };
 
   return (

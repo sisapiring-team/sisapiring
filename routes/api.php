@@ -139,6 +139,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/reviews/{review}/moderate', [Admin\ReviewController::class, 'moderate']);
 
             Route::get('/users', [Admin\UserController::class, 'index']);
+            Route::post('/users', [Admin\UserController::class, 'store']);
             Route::patch('/users/{user}/status', [Admin\UserController::class, 'updateStatus']);
         });
     });

@@ -20,6 +20,8 @@ import { SellerRegistrationView } from './components/registration/SellerRegistra
 import { VerificationBadgeModal } from './components/common/VerificationBadgeModal';
 import { FoodSafetyModal } from './components/products/FoodSafetyModal';
 import { ProductFormModal } from './components/products/ProductFormModal';
+import { PublicFloatingNavbar } from './components/layout/PublicFloatingNavbar';
+import { PublicMobileDrawer } from './components/layout/PublicMobileDrawer';
 
 /**
  * @license
@@ -100,7 +102,11 @@ import { parseRoute, pushRoute } from './utils/navigation';
 import { Footer } from './components/Footer';
 import { FoodWasteFunFacts } from './components/FoodWasteFunFacts';
 import { useSmoothScrollArea } from './hooks/useSmoothScrollArea';
-import { scrollToElement, scrollToTop } from './lib/smoothScroll';
+import {
+  resizeSmoothScroll,
+  scrollToElement,
+  scrollToTop,
+} from './lib/smoothScroll';
 
 const DELIVERY_STAGES: {
   key: OrderRecord['deliveryStage'];
@@ -210,6 +216,13 @@ function CustomerAndAdminPortal() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [setActiveTab]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      resizeSmoothScroll();
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [activePage, activeTab]);
 
   const [returnPageAfterAuth, setReturnPageAfterAuth] = useState<
     'admin' | 'landing' | 'etalase' | 'kantong' | 'kantong-confirmation' | 'pesanan' | 'history' | 'store' | 'chat' | 'chat-bot'
@@ -607,6 +620,18 @@ function CustomerAndAdminPortal() {
     scrollToTop();
   };
 
+  const handleAuthBack = () => {
+    const target = returnPageAfterAuth || 'etalase';
+    if (target === 'landing') openLandingPage();
+    else if (target === 'kantong') openCartPage();
+    else if (target === 'pesanan') openOrdersPage();
+    else if (target === 'history') openHistoryPage();
+    else if (target === 'chat') openChatPage();
+    else if (target === 'chat-bot') openChatBotPage();
+    else if (target === 'admin') openAdminPage();
+    else openEtalasePage();
+  };
+
   const handleLogout = () => {
     void logoutRemote().catch(() => undefined);
     setCurrentUser(null);
@@ -631,7 +656,6 @@ function CustomerAndAdminPortal() {
         phone: user.phone,
       }))
     );
-
     const role = String(user.role || '').trim().toLowerCase();
     if (role === 'admin') {
       openAdminPage();
@@ -641,14 +665,14 @@ function CustomerAndAdminPortal() {
       role === 'penjual' ||
       role === 'merchant'
     ) {
-      openSellerPage();
+      openSellerPage('dashboard');
     } else {
       openEtalasePage();
     }
 
     setRecentToast(`Selamat datang kembali, ${user.name}!`);
     window.setTimeout(() => {
-      setRecentToast((prev) => (prev?.includes(user.name) ? null : prev));
+      setRecentToast(null);
     }, 3000);
   };
 
@@ -958,214 +982,80 @@ function CustomerAndAdminPortal() {
           : ''
       }`}
     >
-      {/* UserNavbar — semua page user kecuali auth & admin */}
+      {/* Top Floating Navigation Bar — Matching Admin Capsule Architecture */}
       {activePage !== 'auth' && activePage !== 'admin' && (
-        <UserNavbar
+        <PublicFloatingNavbar
           activePage={activePage}
+          currentUser={currentUser}
           totalCartItems={totalCartItems}
-          currentUserName={currentUser?.name ?? null}
-          onGoHome={openLandingPage}
-          onGoCart={openCartPage}
-          onGoAuth={openAuthPage}
+          activeOrdersCount={activeOrders.length}
+          onOpenLanding={openLandingPage}
+          onOpenEtalase={openEtalasePage}
+          onOpenOrders={openOrdersPage}
+          onOpenChat={() => openChatPage()}
+          onOpenHistory={openHistoryPage}
+          onOpenCart={openCartPage}
+          onOpenSeller={() => openSellerPage()}
+          onOpenAdmin={openAdminPage}
+          onOpenAuth={openAuthPage}
+          onLogout={handleLogout}
+          onNavigateSection={navigateToSection}
+          onOpenProfileSettings={() => {
+            if (currentUser) {
+              setEditNameText(currentUser.name);
+              setEditPhoneText(currentUser.phone);
+              setAccountModalMode('profile');
+            }
+          }}
+          onOpenAddressSettings={() => {
+            if (currentUser) {
+              setEditDistrictText(currentUser.district || 'Coblong (Dago / Dipatiukur)');
+              setEditAddressText(currentUser.defaultAddress || '');
+              setAccountModalMode('address');
+            }
+          }}
+          onMobileMenuToggle={() => setIsMobileNavOpen(true)}
         />
       )}
 
-      {/* Mobile Navigation Drawer for Customer & Portal Links */}
-      {isMobileNavOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setIsMobileNavOpen(false)}
-          />
-          <div className="fixed inset-y-0 right-0 w-full max-w-xs bg-white text-stone-900 shadow-2xl p-6 flex flex-col justify-between z-10">
-            <div>
-              <div className="flex items-center justify-between pb-5 border-b border-stone-100">
-                <span className="font-display font-bold text-xl text-[#1F281A]">
-                  SisaPiring
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileNavOpen(false)}
-                  className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+      {/* Mobile Navigation Drawer — Matching Admin Mobile Drawer Styling */}
+      <PublicMobileDrawer
+        isOpen={isMobileNavOpen}
+        onClose={() => setIsMobileNavOpen(false)}
+        activePage={activePage}
+        currentUser={currentUser}
+        totalCartItems={totalCartItems}
+        activeOrdersCount={activeOrders.length}
+        onOpenLanding={openLandingPage}
+        onOpenEtalase={openEtalasePage}
+        onOpenOrders={openOrdersPage}
+        onOpenChat={() => openChatPage()}
+        onOpenHistory={openHistoryPage}
+        onOpenCart={openCartPage}
+        onOpenSeller={() => openSellerPage()}
+        onOpenAdmin={openAdminPage}
+        onOpenAuth={openAuthPage}
+        onLogout={handleLogout}
+        onNavigateSection={navigateToSection}
+        onOpenProfileSettings={() => {
+          if (currentUser) {
+            setEditNameText(currentUser.name);
+            setEditPhoneText(currentUser.phone);
+            setAccountModalMode('profile');
+          }
+        }}
+        onOpenAddressSettings={() => {
+          if (currentUser) {
+            setEditDistrictText(currentUser.district || 'Coblong (Dago / Dipatiukur)');
+            setEditAddressText(currentUser.defaultAddress || '');
+            setAccountModalMode('address');
+          }
+        }}
+      />
 
-              <div className="py-4 space-y-1">
-                {activePage === 'landing' ? (
-                  /* ON LANDING PAGE: Beranda, Cara Kerja, Dampak UMKM + Mulai Pakai CTA */
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        const el = document.getElementById('beranda');
-                        if (el) scrollToElement(el);
-                        else openLandingPage();
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold bg-[#8da249]/15 text-[#8da249] transition-colors cursor-pointer"
-                    >
-                      Beranda
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        navigateToSection('cara-kerja');
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
-                    >
-                      Cara Kerja
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        navigateToSection('dampak-umkm');
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
-                    >
-                      Fakta Limbah Pangan
-                    </button>
-                    <div className="pt-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMobileNavOpen(false);
-                          openEtalasePage();
-                        }}
-                        className="w-full text-center px-4 py-2.5 rounded-xl text-sm font-bold bg-[#8DA249] hover:bg-[#7b8e3d] text-white flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm"
-                      >
-                        <ShoppingBag className="w-4 h-4" />
-                        <span>Mulai Pakai (Buka Etalase)</span>
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  /* INSIDE APP: Etalase Makanan, Pesanan, Chat Penjual, History, Beranda */
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        openEtalasePage();
-                      }}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                        activePage === 'etalase'
-                          ? 'bg-[#8da249]/15 text-[#8da249]'
-                          : 'text-stone-700 hover:bg-stone-100'
-                      }`}
-                    >
-                      Etalase Makanan
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        openOrdersPage();
-                      }}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                        activePage === 'pesanan'
-                          ? 'bg-[#8da249]/15 text-[#8da249]'
-                          : 'text-stone-700 hover:bg-stone-100'
-                      }`}
-                    >
-                      Pesanan
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        openHistoryPage();
-                      }}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
-                        activePage === 'history'
-                          ? 'bg-[#8da249]/15 text-[#8da249]'
-                          : 'text-stone-700 hover:bg-stone-100'
-                      }`}
-                    >
-                      History Pesanan
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileNavOpen(false);
-                        openLandingPage();
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
-                    >
-                      Beranda (Landing)
-                    </button>
-                  </>
-                )}
-              </div>
-
-              <div className="pt-3 border-t border-stone-100 space-y-2">
-                <p className="px-3 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                  Portal Khusus
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openSellerPage();
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#8da249] bg-[#8da249]/10 hover:bg-[#8da249]/20 flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <Store className="w-4 h-4 shrink-0" />
-                  <span>Portal Mitra UMKM</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openAdminPage();
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-[#2e434f] bg-stone-100 hover:bg-stone-200 flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
-                  <span>Panel Admin</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-stone-100">
-              {!currentUser ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    openAuthPage();
-                  }}
-                  className="w-full h-11 bg-[#1F281A] hover:bg-[#2e434f] text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-colors"
-                >
-                  <User className="w-4 h-4" />
-                  <span>Login / Daftar Akun</span>
-                </button>
-              ) : (
-                <div className="space-y-2">
-                  <div className="p-3 bg-stone-50 rounded-xl">
-                    <p className="text-xs font-bold text-stone-900 truncate">
-                      {currentUser.name}
-                    </p>
-                    <p className="text-[11px] text-stone-500 truncate">
-                      {currentUser.email}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="w-full h-9 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>Keluar Akun</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* Top Spacer for Non-Landing Pages so Floating Navbar Does Not Obscure Header */}
+      {activePage !== 'landing' && activePage !== 'auth' && activePage !== 'admin' && (
+        <div className="h-16 sm:h-20 shrink-0 pointer-events-none" aria-hidden="true" />
       )}
 
       {/* Non-intrusive Feedback Toast */}
@@ -1691,7 +1581,7 @@ function CustomerAndAdminPortal() {
               openLandingPage();
               window.setTimeout(() => navigateToSection(sec), 150);
             }}
-            onNavigateEtalase={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onNavigateEtalase={scrollToTop}
             onNavigateOrders={openOrdersPage}
             onNavigateChat={openChatPage}
           />
@@ -1735,67 +1625,12 @@ function CustomerAndAdminPortal() {
                   <div className="pt-2">
                     <button
                       type="button"
-                      onClick={openEtalasePage}
+                      onClick={openAuthPage}
                       className="w-full sm:w-auto min-h-[48px] px-10 py-3.5 bg-[#8DA249] hover:bg-[#7b8e3d] active:scale-[0.99] text-white font-display font-semibold text-base rounded-full transition-all whitespace-nowrap shrink-0 cursor-pointer shadow-lg shadow-[#8DA249]/30"
                     >
                       Mulai Pakai
                     </button>
                   </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Full-Width 4-Column Quantitative Proof Strip Below Hero */}
-          <section
-            aria-label="Fakta Krisis Sampah Pangan di Indonesia"
-            className="bg-[#F4F6EC] border-b border-[#8DA249]/20 py-8 sm:py-10"
-          >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-4 mb-6 border-b border-[#8DA249]/15">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#f89254]" />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-stone-600">
-                    Fakta Krisis Sampah Pangan di Indonesia
-                  </span>
-                </div>
-                <span className="text-[10px] text-stone-500 font-mono">
-                  Sumber: Kajian Food Loss & Waste Bappenas & Data SIPSN KLHK
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8">
-                <div>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                    23 – 48 Juta Ton
-                  </p>
-                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                    Bahan pangan terbuang per tahun di Indonesia (115–184 kg/kapita/tahun · Bappenas)
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8DA249] font-mono-tabular">
-                    Rp 551 Triliun
-                  </p>
-                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                    Kerugian ekonomi per tahun akibat makanan terbuang, setara 4%–5% PDB nasional (Bappenas)
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                    41,5% Sampah RI
-                  </p>
-                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                    Komposisi sisa makanan mendominasi timbulan sampah terbesar di TPA se-Indonesia (SIPSN KLHK 2023)
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1F281A] font-mono-tabular">
-                    125 Juta Jiwa
-                  </p>
-                  <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                    Porsi pangan terbuang yang sebenarnya mampu mencukupi makan 29%–47% populasi warga (Bappenas)
-                  </p>
                 </div>
               </div>
             </div>
@@ -1808,9 +1643,6 @@ function CustomerAndAdminPortal() {
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="max-w-3xl mx-auto text-center space-y-3 mb-10 sm:mb-14">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#8DA249]">
-                  Mekanisme Transparan · Menguntungkan Warga & UMKM
-                </p>
                 <h2
                   className="text-2xl sm:text-3xl md:text-4xl font-bold text-stone-900 tracking-tight font-display"
                   style={{ textWrap: 'balance' }}
@@ -2192,7 +2024,7 @@ function CustomerAndAdminPortal() {
           {/* SECTION 4: DEDICATED CENTER-ALIGNED WEBSITE FOOTER */}
           <Footer
             extraPaddingBottom={false}
-            onNavigateHome={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onNavigateHome={scrollToTop}
             onNavigateSection={(sec) => navigateToSection(sec)}
             onNavigateEtalase={openEtalasePage}
             onNavigateOrders={openOrdersPage}

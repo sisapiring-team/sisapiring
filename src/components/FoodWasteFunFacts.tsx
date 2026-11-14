@@ -38,11 +38,6 @@ export const FoodWasteFunFacts: React.FC<FoodWasteFunFactsProps> = ({
     <div className="space-y-8 sm:space-y-12">
       {/* SECTION HEADER (CENTERED) */}
       <div className="max-w-3xl mx-auto text-center space-y-2.5 sm:space-y-3 px-2">
-        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[#8DA249]/15 border border-[#8DA249]/30 text-[#1F281A] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-[#8DA249]" />
-          <span>Menu Fun Fact & Riset Ilmiah Resmi</span>
-        </div>
-
         <h2
           className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-stone-900 tracking-tight font-display"
           style={{ textWrap: 'balance' }}

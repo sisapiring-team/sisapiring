@@ -1,6 +1,5 @@
 <div align="center">
-  <!-- Ganti link gambar ini dengan logo atau banner buatan tim Anda -->
-  <img src="https://via.placeholder.com/800x200/4CAF50/FFFFFF?text=SisaPiring+-+Penyelamat+Produk+Tak+Terjual" alt="SisaPiring Banner" width="100%">
+  <img src="public/banner.jpeg" alt="SisaPiring Banner" width="100%">
 
   <h3>🍃 Save Food. Reduce Waste. Create Impact.</h3>
 

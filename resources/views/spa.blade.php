@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>SisaPiring — Penyelamat Kuliner UMKM (Konsumen, Mitra UMKM & Admin)</title>
+        <title>SisaPiring | Penyelamat Kuliner UMKM (Konsumen, Mitra UMKM & Admin)</title>
         <meta name="description" content="Platform penyelamatan makanan sisa piring UMKM: Marketplace Konsumen, Portal Mitra Bisnis Bandung, dan Pusat Tata Kelola Admin.">
         <meta property="og:title" content="SisaPiring — Penyelamat Kuliner UMKM">
         <meta property="og:description" content="Platform penyelamatan makanan sisa piring UMKM: Marketplace Konsumen, Portal Mitra Bisnis Bandung, dan Pusat Tata Kelola Admin.">

@@ -21,9 +21,12 @@ export const shouldPreventSmoothScroll = (
   if (
     node === root ||
     node === document.documentElement ||
-    node === document.body ||
-    node.hasAttribute('data-lenis-prevent')
+    node === document.body
   ) {
+    return false;
+  }
+
+  if (node.hasAttribute('data-lenis-prevent')) {
     return true;
   }
 
@@ -55,13 +58,26 @@ export function destroySmoothScroll() {
   lenis = null;
 }
 
-export function scrollToTop(immediate = false) {
+export function resizeSmoothScroll() {
+  lenis?.resize();
+}
+
+export function stopSmoothScroll() {
+  lenis?.stop();
+}
+
+export function startSmoothScroll() {
+  lenis?.start();
+}
+
+export function scrollToTop(immediate?: boolean | unknown) {
+  const isImmediate = typeof immediate === 'boolean' ? immediate : false;
   if (lenis) {
-    lenis.scrollTo(0, { immediate, force: true });
+    lenis.scrollTo(0, { immediate: isImmediate, force: true });
     return;
   }
 
-  window.scrollTo({ top: 0, behavior: immediate ? 'auto' : 'smooth' });
+  window.scrollTo({ top: 0, behavior: isImmediate ? 'auto' : 'smooth' });
 }
 
 export function scrollToElement(

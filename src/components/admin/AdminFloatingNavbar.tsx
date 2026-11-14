@@ -14,30 +14,26 @@ import {
   Receipt,
   X,
 } from 'lucide-react';
-import { AdminMacroStats, AdminTab } from './types';
-import { formatRupiah } from '../../data/sisaPiringCatalog';
+import { AdminTab } from './types';
+import { useAdminDashboard } from '../../hooks/useAdminDashboard';
 
-interface AdminFloatingNavbarProps {
-  macroStats: AdminMacroStats;
+export const AdminFloatingNavbar: React.FC<{
   onMobileMenuToggle: () => void;
   onSwitchToPublicEtalase: () => void;
   onSwitchToSellerPortal?: () => void;
   onSelectTab?: (tab: AdminTab) => void;
-}
-
-export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
-  macroStats,
+}> = ({
   onMobileMenuToggle,
   onSwitchToPublicEtalase,
   onSwitchToSellerPortal,
   onSelectTab,
 }) => {
+  const { stats } = useAdminDashboard();
+  const pendingAlertsCount = (stats?.merchantsPending ?? 0) + (stats?.openDisputes ?? 0);
+
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-
-  const pendingAlertsCount =
-    (macroStats.pendingUmkmCount || 0) + (macroStats.openDisputesCount || 0);
 
   return (
     <header className="fixed top-3 sm:top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none select-none">
@@ -120,7 +116,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  {macroStats.openDisputesCount > 0 && (
+                  {(stats?.openDisputes ?? 0) > 0 && (
                     <button
                       type="button"
                       onClick={() => {
@@ -132,7 +128,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                       <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold text-rose-300 block text-[11px]">
-                          {macroStats.openDisputesCount} Komplain Pembeli Terbuka
+                          {stats?.openDisputes} Komplain Pembeli Terbuka
                         </span>
                         <span className="text-[10px] text-neutral-300 block">
                           Perlu evaluasi klaim garansi sisa piring & refund.
@@ -141,7 +137,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                     </button>
                   )}
 
-                  {macroStats.pendingUmkmCount > 0 && (
+                  {(stats?.merchantsPending ?? 0) > 0 && (
                     <button
                       type="button"
                       onClick={() => {
@@ -153,7 +149,7 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                       <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold text-amber-300 block text-[11px]">
-                          {macroStats.pendingUmkmCount} Verifikasi KYB Menunggu Review
+                          {stats?.merchantsPending} Verifikasi KYB Menunggu Review
                         </span>
                         <span className="text-[10px] text-neutral-300 block">
                           Tinjau legalitas NIB & uji higienitas gerai baru.
@@ -166,14 +162,14 @@ export const AdminFloatingNavbar: React.FC<AdminFloatingNavbarProps> = ({
                     <div className="flex items-center gap-2">
                       <Receipt className="w-4 h-4 text-indigo-400" />
                       <div>
-                        <span className="text-[10px] text-neutral-400 block">Escrow Platform Aktif</span>
+                        <span className="text-[10px] text-neutral-400 block">Revenue Platform</span>
                         <span className="text-xs font-mono font-bold text-indigo-300">
-                          {formatRupiah(macroStats.totalEscrowHeld)}
+                          {stats ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(stats.revenue) : '—'}
                         </span>
                       </div>
                     </div>
                     <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      Tersimpan Aman
+                      Lunas
                     </span>
                   </div>
 

@@ -8,7 +8,7 @@ interface AdminMobileDrawerProps {
   onClose: () => void;
   activeTab: AdminTab;
   onTabChange: (tab: AdminTab) => void;
-  macroStats: AdminMacroStats;
+  macroStats?: AdminMacroStats;
   onSwitchToPublicEtalase: () => void;
   onSwitchToSellerPortal?: () => void;
 }
@@ -48,7 +48,6 @@ export const AdminMobileDrawer: React.FC<AdminMobileDrawerProps> = ({
             onTabChange(tab);
             onClose();
           }}
-          macroStats={macroStats}
           expanded={true}
           onSwitchToPublicEtalase={() => {
             onSwitchToPublicEtalase();

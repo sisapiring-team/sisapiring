@@ -15,7 +15,7 @@ import { AdminTab, AdminMacroStats } from './types';
 interface AdminSidebarProps {
   activeTab: AdminTab;
   onTabChange: (tab: AdminTab) => void;
-  macroStats: AdminMacroStats;
+  macroStats?: AdminMacroStats;
   onSwitchToPublicEtalase: () => void;
   onSwitchToSellerPortal?: () => void;
   expanded?: boolean;
@@ -42,7 +42,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       label: 'Mitra UMKM (Penjual)',
       icon: Store,
       desc: 'Verifikasi legalitas KYB',
-      badge: macroStats.pendingUmkmCount,
+      badge: macroStats?.pendingUmkmCount,
       badgeColor: 'bg-[#8da249]',
     },
     {
@@ -62,7 +62,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       label: 'Komplain & Refund',
       icon: AlertTriangle,
       desc: 'Pusat garansi pembeli',
-      badge: macroStats.openDisputesCount,
+      badge: macroStats?.openDisputesCount,
       badgeColor: 'bg-[#f89254]',
     },
     {

@@ -1197,27 +1197,9 @@ function CustomerAndAdminPortal() {
             />
           ) : (
             <AdminDashboardPage
-            catalogItems={catalogItems}
-            productMonitoring={productMonitoring}
-            umkmVerifications={umkmVerifications}
-            disputes={adminDisputes}
-            transactions={adminTransactions}
-            discountHistory={discountHistory}
-            userAccounts={userAccounts}
-            orders={orders}
-            complaints={complaints}
-            onUpdateUmkmStatus={handleUpdateUmkmStatus}
-            onAddSimulatedUmkm={handleAddSimulatedUmkm}
-            onUpdateProductMonitoring={handleUpdateProductMonitoring}
-            onCorrectProductPrice={handleCorrectProductPrice}
-            onResolveDispute={handleResolveDispute}
-            onUpdateTransactionGateway={handleUpdateTransactionGateway}
-            onUpdateUserAccess={handleUpdateUserAccess}
-            onAddUserAccount={handleAddUserAccount}
-            onSwitchToPublicEtalase={openEtalasePage}
-            onSwitchToSellerPortal={() => setActiveTab('dashboard')}
-            onOpenPublicStore={openStorePage}
-          />
+              onSwitchToPublicEtalase={openEtalasePage}
+              onSwitchToSellerPortal={() => setActiveTab('dashboard')}
+            />
           )}
         </main>
       ) : activePage === 'auth' ? (

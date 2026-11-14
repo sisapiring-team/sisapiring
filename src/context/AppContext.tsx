@@ -264,14 +264,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addProduct = (
     productData: Omit<SisaPiringProduct, 'id' | 'createdAt' | 'portionsRescuedCount'>
   ): SisaPiringProduct => {
+    const tempId = `PRD-${Date.now().toString().slice(-4)}`;
     const newProduct: SisaPiringProduct = {
       ...productData,
-      id: `PRD-${Date.now().toString().slice(-4)}`,
+      id: tempId,
       createdAt: new Date().toISOString(),
       portionsRescuedCount: 0,
     };
     setProducts((prev) => [newProduct, ...prev]);
-    void createProductRemote(productData).catch(() => undefined);
+    createProductRemote(productData)
+      .then((created) => {
+        if (created?.id) {
+          setProducts((prev) =>
+            prev.map((p) => (p.id === tempId ? { ...created, ...productData, id: created.id } : p))
+          );
+        }
+      })
+      .catch(() => undefined);
+
     showToast(
       'Produk Sisa Piring Berhasil Diterbitkan',
       `"${newProduct.name}" kini tayang di etalase SisaPiring Bandung.`,

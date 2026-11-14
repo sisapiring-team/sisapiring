@@ -621,16 +621,22 @@ function CustomerAndAdminPortal() {
         phone: user.phone,
       }))
     );
-    const target = returnPageAfterAuth || 'etalase';
-    if (target === 'landing') openLandingPage();
-    else if (target === 'etalase') openEtalasePage();
-    else if (target === 'kantong') openCartPage();
-    else if (target === 'pesanan') openOrdersPage();
-    else if (target === 'history') openHistoryPage();
-    else if (target === 'chat') openChatPage();
-    else if (target === 'chat-bot') openChatBotPage();
-    else if (target === 'admin') openAdminPage();
-    else openEtalasePage();
+
+    const role = String(user.role || '').trim().toLowerCase();
+    if (role === 'admin') {
+      openAdminPage();
+    } else if (
+      role === 'seller' ||
+      role === 'umkm' ||
+      role === 'penjual' ||
+      role === 'merchant'
+    ) {
+      openSellerPage();
+    } else {
+      openEtalasePage();
+    }
+
+    setRecentToast(`Selamat datang kembali, ${user.name}!`);
     window.setTimeout(() => {
       setRecentToast((prev) => (prev?.includes(user.name) ? null : prev));
     }, 3000);
@@ -1211,7 +1217,17 @@ function CustomerAndAdminPortal() {
         <main className="flex-1">
           <AuthPage
             onSuccessLogin={handleSuccessLogin}
-            onBack={() => setActivePage(returnPageAfterAuth)}
+            onBack={() => {
+              const target = returnPageAfterAuth || 'etalase';
+              if (target === 'landing') openLandingPage();
+              else if (target === 'kantong') openCartPage();
+              else if (target === 'pesanan') openOrdersPage();
+              else if (target === 'history') openHistoryPage();
+              else if (target === 'chat') openChatPage();
+              else if (target === 'chat-bot') openChatBotPage();
+              else if (target === 'admin') openAdminPage();
+              else openEtalasePage();
+            }}
           />
         </main>
       ) : activePage === 'kantong' ? (

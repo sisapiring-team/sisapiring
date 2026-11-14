@@ -22,7 +22,7 @@ export interface UserAccount {
   name: string;
   email: string;
   phone: string;
-  role?: 'buyer' | 'seller' | 'admin';
+  role?: 'buyer' | 'seller' | 'admin' | string;
   district?: string;
   defaultAddress?: string;
 }

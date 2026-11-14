@@ -612,7 +612,9 @@ function CustomerAndAdminPortal() {
     setCurrentUser(null);
     setIsAccountMenuOpen(false);
     setIsMobileNavOpen(false);
-    if (activePage === 'pesanan' || activePage === 'history') {
+    if (activePage === 'pesanan' || activePage === 'history' || activePage === 'admin') {
+      pushRoute('/etalase');
+      setActiveTab('marketplace');
       setActivePage('etalase');
     }
     setRecentToast('Anda telah keluar dari akun.');
@@ -1199,6 +1201,8 @@ function CustomerAndAdminPortal() {
             <AdminDashboardPage
               onSwitchToPublicEtalase={openEtalasePage}
               onSwitchToSellerPortal={() => setActiveTab('dashboard')}
+              currentUser={currentUser}
+              onLogout={handleLogout}
             />
           )}
         </main>

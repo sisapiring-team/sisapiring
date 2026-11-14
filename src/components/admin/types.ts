@@ -33,12 +33,12 @@ export type AdminTab =
   | 'user-access';
 
 export interface AdminMacroStats {
-  period: MacroPeriodStats;
-  totalOrdersCount: number;
-  totalRescuedPortions: number;
-  activeProductsCount: number;
-  pendingUmkmCount: number;
-  openDisputesCount: number;
-  totalEscrowHeld: number;
+  period?: MacroPeriodStats;
+  totalOrdersCount?: number;
+  totalRescuedPortions?: number;
+  activeProductsCount?: number;
+  pendingUmkmCount?: number;
+  openDisputesCount?: number;
+  totalEscrowHeld?: number;
 }
 

@@ -110,19 +110,19 @@ export const AdminTopInfoBar: React.FC<AdminTopInfoBarProps> = ({
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-900">
             <Receipt className="w-3.5 h-3.5 text-indigo-700 shrink-0" />
             <span className="text-[11px] font-semibold">
-              Escrow Aktif: <strong className="font-mono text-indigo-950 font-bold">{formatRupiah(macroStats.totalEscrowHeld)}</strong>
+              Escrow Aktif: <strong className="font-mono text-indigo-950 font-bold">{formatRupiah(macroStats.totalEscrowHeld ?? 0)}</strong>
             </span>
           </div>
 
           {/* 4. Critical Action Indicator Badge */}
-          {macroStats.openDisputesCount > 0 ? (
+          {(macroStats.openDisputesCount ?? 0) > 0 ? (
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 animate-pulse">
               <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
               <span className="text-[11px] font-bold">
                 {macroStats.openDisputesCount} Komplain Terbuka
               </span>
             </div>
-          ) : macroStats.pendingUmkmCount > 0 ? (
+          ) : (macroStats.pendingUmkmCount ?? 0) > 0 ? (
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-800">
               <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span className="text-[11px] font-bold">

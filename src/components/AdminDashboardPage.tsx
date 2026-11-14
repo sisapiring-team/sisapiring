@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { AdminTab } from './admin/types';
+import React, { useState, useMemo } from 'react';
+import { AdminTab, AdminMacroStats } from './admin/types';
 import { AdminSidebar } from './admin/AdminSidebar';
 import { AdminMobileDrawer } from './admin/AdminMobileDrawer';
 import { AdminFloatingNavbar } from './admin/AdminFloatingNavbar';
@@ -10,18 +10,34 @@ import { OrderEscrowTab } from './admin/tabs/OrderEscrowTab';
 import { DisputesRefundTab } from './admin/tabs/DisputesRefundTab';
 import { ReviewsModerationTab } from './admin/tabs/ReviewsModerationTab';
 import { UserAccessTab } from './admin/tabs/UserAccessTab';
+import { useAdminDashboard } from '../hooks/useAdminDashboard';
 
 interface AdminDashboardPageProps {
   onSwitchToPublicEtalase: () => void;
   onSwitchToSellerPortal?: () => void;
+  currentUser?: { name: string; email: string; role?: string } | null;
+  onLogout?: () => void;
 }
 
 export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   onSwitchToPublicEtalase,
   onSwitchToSellerPortal,
+  currentUser,
+  onLogout,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const { stats } = useAdminDashboard();
+
+  const macroStats: AdminMacroStats = useMemo(() => ({
+    totalOrdersCount: stats?.orders ?? 0,
+    totalRescuedPortions: stats?.impact?.totalPortions ?? 0,
+    activeProductsCount: stats?.productsUnderReview ?? 0,
+    pendingUmkmCount: stats?.merchantsPending ?? 0,
+    openDisputesCount: stats?.openDisputes ?? 0,
+    totalEscrowHeld: stats?.revenue ?? 0,
+  }), [stats]);
 
   const handleTabChange = (tab: AdminTab) => setActiveTab(tab);
 
@@ -34,6 +50,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         onSwitchToPublicEtalase={onSwitchToPublicEtalase}
         onSwitchToSellerPortal={onSwitchToSellerPortal}
         onSelectTab={setActiveTab}
+        currentUser={currentUser}
+        onLogout={onLogout}
       />
 
       {/* Desktop Floating Left Sidebar */}
@@ -41,6 +59,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         <AdminSidebar
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          macroStats={macroStats}
           onSwitchToPublicEtalase={onSwitchToPublicEtalase}
           onSwitchToSellerPortal={onSwitchToSellerPortal}
         />
@@ -52,6 +71,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         onClose={() => setMobileSidebarOpen(false)}
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        macroStats={macroStats}
         onSwitchToPublicEtalase={onSwitchToPublicEtalase}
         onSwitchToSellerPortal={onSwitchToSellerPortal}
       />
